@@ -6,6 +6,7 @@
  */
 
 import * as dotenv from 'dotenv';
+import { eq } from 'drizzle-orm';
 import { getDb, getPool, testConnection, closePool } from '../src/lib/db/client';
 import { 
   categories, 
@@ -211,7 +212,7 @@ async function importInterpretations(
           const [propertyRecord] = await db
             .select({ id: properties.id })
             .from(properties)
-            .where((t) => t.propname === propName)
+            .where(eq(properties.propname, propName))
             .limit(1);
           
           if (propertyRecord) {
