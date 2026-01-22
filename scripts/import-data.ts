@@ -141,22 +141,22 @@ async function importEvaluations(db: ReturnType<typeof getDb>) {
   let imported = 0;
   let skipped = 0;
   
-  for (const eval of evaluationsData) {
+  for (const evaluation of evaluationsData) {
     try {
       await db
         .insert(evaluations)
         .values({
-          evaliid: eval.evaliid,
-          evalname: eval.evalname,
-          evaldesc: eval.evaldesc || null,
-          evaluationtype: eval.evaluationtype,
-          invertevaluationresults: eval.invertevaluationresults || false,
-          propname: eval.propname,
-          propmod: eval.propmod || '',
-          evalxml: eval.evalxml || null,
-          points: eval.points ? JSON.stringify(eval.points) : null,
-          interpolation: eval.interpolation || null,
-          crispExpression: eval.crispExpression || null,
+          evaliid: evaluation.evaliid,
+          evalname: evaluation.evalname,
+          evaldesc: evaluation.evaldesc || null,
+          evaluationtype: evaluation.evaluationtype,
+          invertevaluationresults: evaluation.invertevaluationresults || false,
+          propname: evaluation.propname,
+          propmod: evaluation.propmod || '',
+          evalxml: evaluation.evalxml || null,
+          points: evaluation.points ? JSON.stringify(evaluation.points) : null,
+          interpolation: evaluation.interpolation || null,
+          crispExpression: evaluation.crispExpression || null,
         })
         .onConflictDoNothing();
       
@@ -167,7 +167,7 @@ async function importEvaluations(db: ReturnType<typeof getDb>) {
       }
     } catch (error) {
       skipped++;
-      console.error(`  Error importing evaluation ${eval.evalname}:`, error);
+      console.error(`  Error importing evaluation ${evaluation.evalname}:`, error);
     }
   }
   
