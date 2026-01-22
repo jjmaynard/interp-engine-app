@@ -1,0 +1,1483 @@
+[
+  {
+    "name": ["AGR - California Revised Storie Index (CA)"],
+    "tree": [
+      {
+        "levelName": "AGR - California Revised Storie Index (CA)                                                         "
+      },
+      {
+        "levelName": " °--RuleOperator_31a1eb65                                                                          ",
+        "Type": "product"
+      },
+      {
+        "levelName": "     ¦--*Storie Factor A Not Rated Soil Orders rev                                                 ",
+        "RefId": "49446",
+        "rule_refid": "49446"
+      },
+      {
+        "levelName": "     ¦   °--RuleHedge_1193d3c1                                                                     ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       °--*Storie Factor A Pedon Group not rated taxonomy rev                                ",
+        "RefId": "50481"
+      },
+      {
+        "levelName": "     ¦--*Storie Factor A                                                                           ",
+        "RefId": "15976",
+        "rule_refid": "15976"
+      },
+      {
+        "levelName": "     ¦   °--RuleOperator_01948bb8                                                                  ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor A Profile Group 1 rev                                               ",
+        "RefId": "49448",
+        "rule_refid": "49448"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleOperator_a72ba798                                                          ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--RuleOperator_b267bf8e                                                      ",
+        "Type": "times"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦--*Storie Factor A Profile Group 1 and 2 fuzzy depth                     ",
+        "RefId": "15967",
+        "rule_refid": "15967"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦   °--RuleHedge_7fad1a79                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦       °--*Storie Factor A Pedon Group 1 and 2 soil depth                ",
+        "RefId": "12916"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--*Storie Factor A Profile Group 1 taxonomy rev                          ",
+        "RefId": "49447",
+        "rule_refid": "49447"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--RuleOperator_4d1fdd8f                                              ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦--RuleHedge_44b2d8f3                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦   °--*Storie Factor A Pedon Group 1 suborders                   ",
+        "RefId": "12914"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦--RuleHedge_f2a5b4ba                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦   °--*Storie Factor A Pedon Group 1 great groups                ",
+        "RefId": "12915"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--RuleHedge_25e606a5                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               °--*Storie Factor A Pedon Group 1 subgroups                   ",
+        "RefId": "13092"
+      },
+      {
+        "levelName": "     ¦       ¦       °--RuleHedge_ea4b1839                                                         ",
+        "Type": "not",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦           °--*Storie Factor A Profile Group 7,8,9 landform                          ",
+        "RefId": "15974",
+        "rule_refid": "15974"
+      },
+      {
+        "levelName": "     ¦       ¦               °--RuleHedge_608f03c8                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦                   °--*Storie Factor A Pedon Group 7, 8, 9 landform                  ",
+        "RefId": "12917"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor A Profile Group 2 rev                                               ",
+        "RefId": "49428",
+        "rule_refid": "49428"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleOperator_8a20de79                                                          ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--RuleOperator_71911310                                                      ",
+        "Type": "times"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦--*Storie Factor A Profile Group 1 and 2 fuzzy depth                     ",
+        "RefId": "15967",
+        "rule_refid": "15967"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦   °--RuleHedge_7fad1a79                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦       °--*Storie Factor A Pedon Group 1 and 2 soil depth                ",
+        "RefId": "12916"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--*Storie Factor A Profile Group 2 taxonomy                              ",
+        "RefId": "15991",
+        "rule_refid": "15991"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--RuleOperator_0ad34d47                                              ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦--RuleHedge_698c3a67                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦   °--*Storie Factor A Pedon Group 2 suborders Arents and Cambids",
+        "RefId": "12929"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--RuleHedge_8fbcb397                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               °--*Storie Factor A Pedon Group 2 great groups                ",
+        "RefId": "12927"
+      },
+      {
+        "levelName": "     ¦       ¦       °--RuleHedge_ea4b1839                                                         ",
+        "Type": "not",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦           °--*Storie Factor A Profile Group 7,8,9 landform                          ",
+        "RefId": "15974",
+        "rule_refid": "15974"
+      },
+      {
+        "levelName": "     ¦       ¦               °--RuleHedge_608f03c8                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦                   °--*Storie Factor A Pedon Group 7, 8, 9 landform                  ",
+        "RefId": "12917"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor A Profile Group 3                                                   ",
+        "RefId": "16017",
+        "rule_refid": "16017"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleOperator_a84c18cd                                                          ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--*Storie Factor A Profile Group 3 taxonomy                                  ",
+        "RefId": "15992",
+        "rule_refid": "15992"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--RuleOperator_c859411b                                                  ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦--RuleHedge_a14e5a0e                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦   °--*Storie Factor A Pedon Group 3 great groups                    ",
+        "RefId": "12931"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--RuleOperator_15a86db4                                              ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦--RuleHedge_da245a09                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦   °--*Storie Factor A Pedon Group 4/6 great groups              ",
+        "RefId": "12934"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦--RuleHedge_61008193                                             ",
+        "Type": "not",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦   °--RuleHedge_1a2fddac                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦       °--*Storie featkind = abrupt textural change              ",
+        "RefId": "13106"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--RuleHedge_214d73a9                                             ",
+        "Type": "not",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               °--RuleHedge_137ed382                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦                   °--Component restriction = \"abrupt textural change\"       ",
+        "RefId": "11459"
+      },
+      {
+        "levelName": "     ¦       ¦       °--*Storie Factor A Profile Group 3 fuzzy depth                               ",
+        "RefId": "16016",
+        "rule_refid": "16016"
+      },
+      {
+        "levelName": "     ¦       ¦           °--RuleHedge_725c57d0                                                     ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦               °--*Storie Factor A Pedon Group 3 soil depth                          ",
+        "RefId": "12938"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor A Profile Group 5                                                   ",
+        "RefId": "16038",
+        "rule_refid": "16038"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleOperator_38a12238                                                          ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--RuleOperator_1ffc51b2                                                      ",
+        "Type": "times"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦--*Storie Factor A Profile Group 5 fuzzy depth                           ",
+        "RefId": "16035",
+        "rule_refid": "16035"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦   °--RuleHedge_a4df1747                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦       °--*Storie Factor A Pedon Group 5 soil depth                      ",
+        "RefId": "12939"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--*Storie Factor A Profile Group 5 taxonomy                              ",
+        "RefId": "16037",
+        "rule_refid": "16037"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--RuleOperator_d8ea2331                                              ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦--RuleHedge_aba67333                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦   °--*Storie Factor A Pedon Group 5 durids                      ",
+        "RefId": "12932"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦--RuleHedge_a831076b                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           ¦   °--*Storie Factor A Pedon Group 5 great groups                ",
+        "RefId": "12933"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--RuleHedge_7954eb2b                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               °--*Storie Factor A Pedon Group 5 subgroups                   ",
+        "RefId": "13093"
+      },
+      {
+        "levelName": "     ¦       ¦       °--RuleHedge_ea4b1839                                                         ",
+        "Type": "not",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦           °--*Storie Factor A Profile Group 7,8,9 landform                          ",
+        "RefId": "15974",
+        "rule_refid": "15974"
+      },
+      {
+        "levelName": "     ¦       ¦               °--RuleHedge_608f03c8                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦                   °--*Storie Factor A Pedon Group 7, 8, 9 landform                  ",
+        "RefId": "12917"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor A Profile Group 4/6                                                 ",
+        "RefId": "16040",
+        "rule_refid": "16040"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleOperator_867650f1                                                          ",
+        "Type": "times"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--*Storie Factor A Profile Group 4/6 fuzzy depth                             ",
+        "RefId": "16041",
+        "rule_refid": "16041"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--RuleOperator_804837c6                                                  ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦--RuleHedge_74ec3ef6                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦   °--*Storie Factor A Pedon Group 4/6 depth abrupt text featkind    ",
+        "RefId": "13207"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--RuleHedge_5d562f5b                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--*Storie Factor A Pedon Group 4/6 depth abrupt tex reskind      ",
+        "RefId": "13208"
+      },
+      {
+        "levelName": "     ¦       ¦       °--*Storie Factor A Profile Group 4/6 taxonomy w/ abrupt text                 ",
+        "RefId": "15996",
+        "rule_refid": "15996"
+      },
+      {
+        "levelName": "     ¦       ¦           °--RuleOperator_d7eb1bf2                                                  ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦--*Storie Factor A Pedon Group 4/6 great groups                      ",
+        "RefId": "12934"
+      },
+      {
+        "levelName": "     ¦       ¦               °--RuleOperator_55f9f74b                                              ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦                   ¦--*Storie featkind = abrupt textural change                      ",
+        "RefId": "13106"
+      },
+      {
+        "levelName": "     ¦       ¦                   °--Component restriction = \"abrupt textural change\"               ",
+        "RefId": "11459"
+      },
+      {
+        "levelName": "     ¦       °--*Storie Factor A Profile Groups 7, 8 or 9                                          ",
+        "RefId": "15975",
+        "rule_refid": "15975"
+      },
+      {
+        "levelName": "     ¦           °--RuleOperator_e9966d4d                                                          ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦               ¦--RuleOperator_48460ff8                                                      ",
+        "Type": "times"
+      },
+      {
+        "levelName": "     ¦               ¦   ¦--*Storie Factor A Profile Group 7,8,9 landform                          ",
+        "RefId": "15974",
+        "rule_refid": "15974"
+      },
+      {
+        "levelName": "     ¦               ¦   ¦   °--RuleHedge_608f03c8                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦               ¦   ¦       °--*Storie Factor A Pedon Group 7, 8, 9 landform                  ",
+        "RefId": "12917"
+      },
+      {
+        "levelName": "     ¦               ¦   °--*Storie Factor A Profile Groups 7, 8, 9 fuzzy depth (hard)             ",
+        "RefId": "15971",
+        "rule_refid": "15971"
+      },
+      {
+        "levelName": "     ¦               ¦       °--RuleHedge_62ac73b3                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦               ¦           °--*Storie Factor A Pedon Group 7 and 8 soil depth                ",
+        "RefId": "12919"
+      },
+      {
+        "levelName": "     ¦               °--RuleOperator_9ffcd0a2                                                      ",
+        "Type": "times"
+      },
+      {
+        "levelName": "     ¦                   ¦--*Storie Factor A Profile Group 7,8,9 landform                          ",
+        "RefId": "15974",
+        "rule_refid": "15974"
+      },
+      {
+        "levelName": "     ¦                   ¦   °--RuleHedge_608f03c8                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦                   ¦       °--*Storie Factor A Pedon Group 7, 8, 9 landform                  ",
+        "RefId": "12917"
+      },
+      {
+        "levelName": "     ¦                   °--*Storie Factor A Profile Group 7, 8 and 9 fuzzy depth (soft)           ",
+        "RefId": "16044",
+        "rule_refid": "16044"
+      },
+      {
+        "levelName": "     ¦                       °--RuleHedge_c0fd8926                                                 ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦                           °--*Storie Factor A Pedon Group 9 soil depth                      ",
+        "RefId": "12947"
+      },
+      {
+        "levelName": "     ¦--*Storie Factor B rev                                                                       ",
+        "RefId": "49444",
+        "rule_refid": "49444"
+      },
+      {
+        "levelName": "     ¦   °--RuleOperator_21467f0e                                                                  ",
+        "Type": "times"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor B surface texture rev                                               ",
+        "RefId": "49443",
+        "rule_refid": "49443"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleHedge_14c104e8                                                             ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       °--*Storie Factor B Surface Texture                                           ",
+        "RefId": "50479"
+      },
+      {
+        "levelName": "     ¦       °--*Storie Factor B surface rock fragments rev                                        ",
+        "RefId": "49445",
+        "rule_refid": "49445"
+      },
+      {
+        "levelName": "     ¦           °--*Storie Factor B rock frag volume 0-25 cm                                      ",
+        "RefId": "50480"
+      },
+      {
+        "levelName": "     ¦--*Storie Factor C Slope fuzzy                                                               ",
+        "RefId": "15748",
+        "rule_refid": "15748"
+      },
+      {
+        "levelName": "     ¦   °--RuleHedge_d4054451                                                                     ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       °--*Storie Factor C Slope 0 to 100%                                                   ",
+        "RefId": "12800"
+      },
+      {
+        "levelName": "     ¦--*Storie Factor X (all chemistry) rev                                                       ",
+        "RefId": "49440",
+        "rule_refid": "49440"
+      },
+      {
+        "levelName": "     ¦   °--RuleOperator_12d91bc8                                                                  ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor X (toxicity EC) rev                                                 ",
+        "RefId": "49441",
+        "rule_refid": "49441"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleHedge_7334ea83                                                             ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       °--*Storie Factor X Toxicity EC maximum 0-25 cm                               ",
+        "RefId": "50477"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor X (toxicity SAR) rev                                                ",
+        "RefId": "49442",
+        "rule_refid": "49442"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleHedge_70d0ed1f                                                             ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       °--*Storie Factor X Toxicity SAR maximum 0-25 cm                              ",
+        "RefId": "50478"
+      },
+      {
+        "levelName": "     ¦       °--*Storie Factor X (toxicity pH) rev                                                 ",
+        "RefId": "49439",
+        "rule_refid": "49439"
+      },
+      {
+        "levelName": "     ¦           °--RuleHedge_dea55415                                                             ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦               °--RuleOperator_37d7e82f                                                      ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦                   ¦--*Storie Factor X Toxicity pH minimum 0-25 cm                           ",
+        "RefId": "50475"
+      },
+      {
+        "levelName": "     ¦                   °--*Storie Factor X Toxicity pH maximum 0-25 cm                           ",
+        "RefId": "50476"
+      },
+      {
+        "levelName": "     ¦--*Storie Factor X (all hydrologic and erosion features)                                     ",
+        "RefId": "15746",
+        "rule_refid": "15746"
+      },
+      {
+        "levelName": "     ¦   °--RuleOperator_e5feb45e                                                                  ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor X (drainage class)                                                  ",
+        "RefId": "16320",
+        "rule_refid": "16320"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleOperator_3be6bd57                                                          ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--RuleOperator_fb03758e                                                      ",
+        "Type": "sum"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦--RuleHedge_773dd408                                                     ",
+        "Type": "limit",
+        "Value": "0.9"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦   °--*Storie Factor X drainage = moderately well                        ",
+        "RefId": "16549",
+        "rule_refid": "16549"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦       °--RuleHedge_cacbefaa                                             ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦           °--*Storie Factor X drainage class = moderately               ",
+        "RefId": "13114"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--RuleOperator_bff68afb                                                  ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦--RuleHedge_60689286                                                 ",
+        "Type": "limit",
+        "Value": "0.1"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦   °--*Storie Factor X local phase is \"drained\"                      ",
+        "RefId": "16314",
+        "rule_refid": "16314"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦       °--RuleHedge_be509db7                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦           °--*Storie component local phase is *drained*             ",
+        "RefId": "13117"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--RuleHedge_9acf6418                                                 ",
+        "Type": "limit",
+        "Value": "0.05"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--*Storie Factor X local phase is \"partially drained\"            ",
+        "RefId": "16317",
+        "rule_refid": "16317"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               °--RuleHedge_a792a01a                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦                   °--*Storie component local phase is *partially drained*   ",
+        "RefId": "13121"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--RuleOperator_b07fd13d                                                      ",
+        "Type": "sum"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦--RuleHedge_4f74ec66                                                     ",
+        "Type": "limit",
+        "Value": "0.7"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦   °--*Storie Factor X drainage = somewhat poorly                        ",
+        "RefId": "16548",
+        "rule_refid": "16548"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦       °--RuleHedge_72e64559                                             ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦           °--*Storie Factor X drainage class = somewhat poorly          ",
+        "RefId": "13113"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--RuleOperator_fac62418                                                  ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦--RuleHedge_7c3c6ede                                                 ",
+        "Type": "limit",
+        "Value": "0.2"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦   °--*Storie Factor X local phase is \"drained\"                      ",
+        "RefId": "16314",
+        "rule_refid": "16314"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦       °--RuleHedge_be509db7                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦           °--*Storie component local phase is *drained*             ",
+        "RefId": "13117"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--RuleHedge_b1c9b07e                                                 ",
+        "Type": "limit",
+        "Value": "0.1"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--*Storie Factor X local phase is \"partially drained\"            ",
+        "RefId": "16317",
+        "rule_refid": "16317"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               °--RuleHedge_a792a01a                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦                   °--*Storie component local phase is *partially drained*   ",
+        "RefId": "13121"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--RuleOperator_f2cb68fb                                                      ",
+        "Type": "sum"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦--RuleHedge_80a214a1                                                     ",
+        "Type": "limit",
+        "Value": "0.5"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦   °--RuleHedge_f60f0b26                                                 ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦       °--*Storie Factor X drainage = poorly or very poorly              ",
+        "RefId": "20223",
+        "rule_refid": "20223"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦           °--RuleHedge_9edb6995                                         ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   ¦               °--*Storie Factor X drainage class = poor or very poorly  ",
+        "RefId": "13112"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--RuleOperator_799a4c22                                                  ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦--RuleHedge_711817c6                                                 ",
+        "Type": "limit",
+        "Value": "0.4"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦   °--*Storie Factor X local phase is \"drained\"                      ",
+        "RefId": "16314",
+        "rule_refid": "16314"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦       °--RuleHedge_be509db7                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦           °--*Storie component local phase is *drained*             ",
+        "RefId": "13117"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--RuleHedge_b1c9b07e                                                 ",
+        "Type": "limit",
+        "Value": "0.1"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--*Storie Factor X local phase is \"partially drained\"            ",
+        "RefId": "16317",
+        "rule_refid": "16317"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               °--RuleHedge_a792a01a                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦                   °--*Storie component local phase is *partially drained*   ",
+        "RefId": "13121"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--*Storie Factor X drainage = well drained                                   ",
+        "RefId": "16546",
+        "rule_refid": "16546"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--RuleHedge_80e2e2c3                                                     ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--*Storie Factor X drainage class = well                             ",
+        "RefId": "13107"
+      },
+      {
+        "levelName": "     ¦       ¦       °--RuleHedge_c0debf92                                                         ",
+        "Type": "limit",
+        "Value": "0.85"
+      },
+      {
+        "levelName": "     ¦       ¦           °--*Storie Factor X drainage = all excessively                            ",
+        "RefId": "16547",
+        "rule_refid": "16547"
+      },
+      {
+        "levelName": "     ¦       ¦               °--RuleHedge_2347996a                                                 ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦                   °--*Storie Factor X drainage class = all excessively              ",
+        "RefId": "13111"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor X (flooding and ponding)                                            ",
+        "RefId": "15749",
+        "rule_refid": "15749"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleOperator_dae2aeb4                                                          ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--*Storie Factor X (ponding interaction)                                     ",
+        "RefId": "16304",
+        "rule_refid": "16304"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--*Storie Factor X landscape ponding in growing season                   ",
+        "RefId": "13115"
+      },
+      {
+        "levelName": "     ¦       ¦       °--*Storie Factor X (flooding interaction)                                    ",
+        "RefId": "16048",
+        "rule_refid": "16048"
+      },
+      {
+        "levelName": "     ¦       ¦           °--RuleOperator_fe6380a3                                                  ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦--Landscape Flooding \"NONE\"                                          ",
+        "RefId": "10265"
+      },
+      {
+        "levelName": "     ¦       ¦               °--*Storie Factor X landscape flooding in growing season              ",
+        "RefId": "12952"
+      },
+      {
+        "levelName": "     ¦       ¦--*Storie Factor X (erosion)                                                         ",
+        "RefId": "16566",
+        "rule_refid": "16566"
+      },
+      {
+        "levelName": "     ¦       ¦   °--RuleOperator_435f004a                                                          ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦--*Storie Factor X (erosion in uplands)                                      ",
+        "RefId": "16564",
+        "rule_refid": "16564"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦   °--RuleOperator_2be43cb6                                                  ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦--*Storie Factor A Profile Group 7,8,9 landform                      ",
+        "RefId": "15974",
+        "rule_refid": "15974"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦   °--RuleHedge_608f03c8                                             ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       ¦       °--*Storie Factor A Pedon Group 7, 8, 9 landform              ",
+        "RefId": "12917"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦       °--*Storie Factor X (erosion class)                                   ",
+        "RefId": "16557",
+        "rule_refid": "16557"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦           °--RuleOperator_3ecc937e                                          ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦--RuleHedge_d47e12df                                         ",
+        "Type": "limit",
+        "Value": "0.95"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦   °--*Storie Factor X erosion class = 1                     ",
+        "RefId": "16558",
+        "rule_refid": "16558"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦       °--RuleHedge_be73ca0c                                 ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦           °--*Storie Factor X erosion class = 1             ",
+        "RefId": "13213"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦--RuleHedge_62c7497e                                         ",
+        "Type": "limit",
+        "Value": "0.85"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦   °--*Storie Factor X erosion class = 2                     ",
+        "RefId": "16562",
+        "rule_refid": "16562"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦       °--RuleHedge_5c67fdf4                                 ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦           °--*Storie Factor X erosion class = 2             ",
+        "RefId": "13214"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦--RuleHedge_16378273                                         ",
+        "Type": "limit",
+        "Value": "0.75"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦   °--*Storie Factor X erosion class = 3                     ",
+        "RefId": "16561",
+        "rule_refid": "16561"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦       °--RuleHedge_c65bf0da                                 ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦           °--*Storie Factor X erosion class = 3             ",
+        "RefId": "13217"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦--RuleHedge_68a3b3e6                                         ",
+        "Type": "limit",
+        "Value": "0.65"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦   °--*Storie Factor X erosion class = 4                     ",
+        "RefId": "16560",
+        "rule_refid": "16560"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦       °--RuleHedge_772054de                                 ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               ¦           °--*Storie Factor X erosion class = 4             ",
+        "RefId": "13216"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦               °--*Storie Factor X erosion class = 0                         ",
+        "RefId": "16563",
+        "rule_refid": "16563"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦                   °--RuleHedge_b3c4b963                                     ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦       ¦                       °--*Storie Factor X erosion class = 0                 ",
+        "RefId": "13212"
+      },
+      {
+        "levelName": "     ¦       ¦       °--*Storie Factor X (erosion in valley)                                       ",
+        "RefId": "16565",
+        "rule_refid": "16565"
+      },
+      {
+        "levelName": "     ¦       ¦           °--RuleOperator_9fee9122                                                  ",
+        "Type": "and"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦--*Storie Factor X (erosion class)                                   ",
+        "RefId": "16557",
+        "rule_refid": "16557"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦   °--RuleOperator_3ecc937e                                          ",
+        "Type": "or"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦--RuleHedge_d47e12df                                         ",
+        "Type": "limit",
+        "Value": "0.95"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦   °--*Storie Factor X erosion class = 1                     ",
+        "RefId": "16558",
+        "rule_refid": "16558"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦       °--RuleHedge_be73ca0c                                 ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦           °--*Storie Factor X erosion class = 1             ",
+        "RefId": "13213"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦--RuleHedge_62c7497e                                         ",
+        "Type": "limit",
+        "Value": "0.85"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦   °--*Storie Factor X erosion class = 2                     ",
+        "RefId": "16562",
+        "rule_refid": "16562"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦       °--RuleHedge_5c67fdf4                                 ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦           °--*Storie Factor X erosion class = 2             ",
+        "RefId": "13214"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦--RuleHedge_16378273                                         ",
+        "Type": "limit",
+        "Value": "0.75"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦   °--*Storie Factor X erosion class = 3                     ",
+        "RefId": "16561",
+        "rule_refid": "16561"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦       °--RuleHedge_c65bf0da                                 ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦           °--*Storie Factor X erosion class = 3             ",
+        "RefId": "13217"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦--RuleHedge_68a3b3e6                                         ",
+        "Type": "limit",
+        "Value": "0.65"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦   °--*Storie Factor X erosion class = 4                     ",
+        "RefId": "16560",
+        "rule_refid": "16560"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦       °--RuleHedge_772054de                                 ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       ¦           °--*Storie Factor X erosion class = 4             ",
+        "RefId": "13216"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦       °--*Storie Factor X erosion class = 0                         ",
+        "RefId": "16563",
+        "rule_refid": "16563"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦           °--RuleHedge_b3c4b963                                     ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦               ¦               °--*Storie Factor X erosion class = 0                 ",
+        "RefId": "13212"
+      },
+      {
+        "levelName": "     ¦       ¦               °--RuleHedge_ea4b1839                                                 ",
+        "Type": "not",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦                   °--*Storie Factor A Profile Group 7,8,9 landform                  ",
+        "RefId": "15974",
+        "rule_refid": "15974"
+      },
+      {
+        "levelName": "     ¦       ¦                       °--RuleHedge_608f03c8                                         ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦       ¦                           °--*Storie Factor A Pedon Group 7, 8, 9 landform          ",
+        "RefId": "12917"
+      },
+      {
+        "levelName": "     ¦       °--*Storie Factor X (wetness in growing season, 25-100cm)                             ",
+        "RefId": "16049",
+        "rule_refid": "16049"
+      },
+      {
+        "levelName": "     ¦           °--RuleHedge_7981f6f4                                                             ",
+        "Type": "null_or",
+        "Value": "0"
+      },
+      {
+        "levelName": "     ¦               °--*Storie Factor X landscape wetness, grow. season, 25-100                   ",
+        "RefId": "12954"
+      },
+      {
+        "levelName": "     °--*Storie Factor X (temperature regime)                                                      ",
+        "RefId": "49449",
+        "rule_refid": "49449"
+      },
+      {
+        "levelName": "         °--*Storie Factor X temperature regime                                                    ",
+        "RefId": "50482"
+      }
+    ],
+    "properties": [
+      {
+        "evaluation": "*Storie Factor A Pedon Group not rated taxonomy rev",
+        "propname": "TAXONOMIC ORDER",
+        "propiid": "85"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 1 and 2 soil depth",
+        "propname": "*Storie depth to first restriction for Profile Group 1-3",
+        "propiid": "12184"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 1 suborders",
+        "propname": "TAXONOMIC SUBORDER",
+        "propiid": "87"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 1 great groups",
+        "propname": "TAXONOMIC GREAT GROUP",
+        "propiid": "83"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 1 subgroups",
+        "propname": "TAXONOMIC SUBGROUP",
+        "propiid": "86"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 7, 8, 9 landform",
+        "propname": "*Storie landforms in hills and mountains of California",
+        "propiid": "12170"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 2 suborders Arents and Cambids",
+        "propname": "TAXONOMIC SUBORDER",
+        "propiid": "87"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 2 great groups",
+        "propname": "TAXONOMIC GREAT GROUP",
+        "propiid": "83"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 3 great groups",
+        "propname": "TAXONOMIC GREAT GROUP",
+        "propiid": "83"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 4/6 great groups",
+        "propname": "TAXONOMIC GREAT GROUP",
+        "propiid": "83"
+      },
+      {
+        "evaluation": "*Storie featkind = abrupt textural change",
+        "propname": "*Storie where at least one cdfkind = abrupt textural change",
+        "propiid": "12315"
+      },
+      {
+        "evaluation": "Component restriction = \"abrupt textural change\"",
+        "propname": "Component restrictions",
+        "propiid": "11293"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 3 soil depth",
+        "propname": "*Storie depth to first restriction for Profile Group 1-3",
+        "propiid": "12184"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 5 soil depth",
+        "propname": "*Storie depth to pan for Profile Group 5",
+        "propiid": "12164"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 5 durids",
+        "propname": "TAXONOMIC SUBORDER",
+        "propiid": "87"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 5 great groups",
+        "propname": "TAXONOMIC GREAT GROUP",
+        "propiid": "83"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 5 subgroups",
+        "propname": "TAXONOMIC SUBGROUP",
+        "propiid": "86"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 4/6 depth abrupt text featkind",
+        "propname": "*Storie depth to featknd abrupt tex change Profile Group 4/6",
+        "propiid": "12376"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 4/6 depth abrupt tex reskind",
+        "propname": "*Storie depth to reskind abrupt tex change Profile Grp 4/6",
+        "propiid": "12375"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 7 and 8 soil depth",
+        "propname": "*Storie depth to hard bedrock/petro* for Profile Grp 7/8/9",
+        "propiid": "12168"
+      },
+      {
+        "evaluation": "*Storie Factor A Pedon Group 9 soil depth",
+        "propname": "*Storie depth to soft bedrock or densics for Profile Grp 7-9",
+        "propiid": "12186"
+      },
+      {
+        "evaluation": "*Storie Factor B Surface Texture",
+        "propname": "*Storie texture score - first horizon below duff",
+        "propiid": "42006"
+      },
+      {
+        "evaluation": "*Storie Factor B rock frag volume 0-25 cm",
+        "propname": "ROCK FRAG VOLUME IN DEPTH 0-25 cm OR RESTRICTION",
+        "propiid": "42009"
+      },
+      {
+        "evaluation": "*Storie Factor C Slope 0 to 100%",
+        "propname": "Slope, rv",
+        "propiid": "12042"
+      },
+      {
+        "evaluation": "*Storie Factor X Toxicity EC maximum 0-25 cm",
+        "propname": "EC MAXIMUM IN DEPTH 0-25 CM BELOW DUFF",
+        "propiid": "42002"
+      },
+      {
+        "evaluation": "*Storie Factor X Toxicity SAR maximum 0-25 cm",
+        "propname": "SAR MAXIMUM IN DEPTH 0-25 CM BELOW DUFF",
+        "propiid": "42003"
+      },
+      {
+        "evaluation": "*Storie Factor X Toxicity pH minimum 0-25 cm",
+        "propname": "pH MINIMUM IN DEPTH 0-25 CM BELOW DUFF",
+        "propiid": "42000"
+      },
+      {
+        "evaluation": "*Storie Factor X Toxicity pH maximum 0-25 cm",
+        "propname": "pH MAXIMUM IN DEPTH 0-25 CM BELOW DUFF",
+        "propiid": "42001"
+      },
+      {
+        "evaluation": "*Storie Factor X drainage class = moderately",
+        "propname": "GRL-DRAINAGE CLASS",
+        "propiid": "10345"
+      },
+      {
+        "evaluation": "*Storie component local phase is *drained*",
+        "propname": "**Storie component local phase is drained",
+        "propiid": "12335"
+      },
+      {
+        "evaluation": "*Storie component local phase is *partially drained*",
+        "propname": "**Storie component local phase is partially drained",
+        "propiid": "12334"
+      },
+      {
+        "evaluation": "*Storie Factor X drainage class = somewhat poorly",
+        "propname": "GRL-DRAINAGE CLASS",
+        "propiid": "10345"
+      },
+      {
+        "evaluation": "*Storie Factor X drainage class = poor or very poorly",
+        "propname": "GRL-DRAINAGE CLASS",
+        "propiid": "10345"
+      },
+      {
+        "evaluation": "*Storie Factor X drainage class = well",
+        "propname": "GRL-DRAINAGE CLASS",
+        "propiid": "10345"
+      },
+      {
+        "evaluation": "*Storie Factor X drainage class = all excessively",
+        "propname": "GRL-DRAINAGE CLASS",
+        "propiid": "10345"
+      },
+      {
+        "evaluation": "*Storie Factor X landscape ponding in growing season",
+        "propname": "*Storie ponding interaction max in growing season",
+        "propiid": "12329"
+      },
+      {
+        "evaluation": "Landscape Flooding \"NONE\"",
+        "propname": "FLOODING FREQUENCY (Maximum Frequency)",
+        "propiid": "28"
+      },
+      {
+        "evaluation": "*Storie Factor X landscape flooding in growing season",
+        "propname": "*Storie flooding interaction max in growing season",
+        "propiid": "12189"
+      },
+      {
+        "evaluation": "*Storie Factor X erosion class = 1",
+        "propname": "Erosion Class in component table",
+        "propiid": "12377"
+      },
+      {
+        "evaluation": "*Storie Factor X erosion class = 2",
+        "propname": "Erosion Class in component table",
+        "propiid": "12377"
+      },
+      {
+        "evaluation": "*Storie Factor X erosion class = 3",
+        "propname": "Erosion Class in component table",
+        "propiid": "12377"
+      },
+      {
+        "evaluation": "*Storie Factor X erosion class = 4",
+        "propname": "Erosion Class in component table",
+        "propiid": "12377"
+      },
+      {
+        "evaluation": "*Storie Factor X erosion class = 0",
+        "propname": "Erosion Class in component table",
+        "propiid": "12377"
+      },
+      {
+        "evaluation": "*Storie Factor X landscape wetness, grow. season, 25-100",
+        "propname": "*Storie near surface wetness rv depth in growing season",
+        "propiid": "12584"
+      },
+      {
+        "evaluation": "*Storie Factor X temperature regime",
+        "propname": "*Storie temperature regime score",
+        "propiid": "42014"
+      }
+    ]
+  },
+  {
+    "name": ["Dust PM10 and PM2.5 Generation"],
+    "tree": [
+      {
+        "levelName": "Dust PM10 and PM2.5 Generation                                               "
+      },
+      {
+        "levelName": " °--RuleHedge_de473ab5                                                       ",
+        "Type": "multiply",
+        "Value": "0.5"
+      },
+      {
+        "levelName": "     °--RuleOperator_0a397761                                                ",
+        "Type": "product"
+      },
+      {
+        "levelName": "         ¦--Dryness Index 0.5 to 3                                           ",
+        "RefId": "18448"
+      },
+      {
+        "levelName": "         °--RuleOperator_7025ab26                                            ",
+        "Type": "sum"
+      },
+      {
+        "levelName": "             ¦--Dust Due to Gypsum                                           ",
+        "RefId": "23659",
+        "rule_refid": "23659"
+      },
+      {
+        "levelName": "             ¦   °--RuleHedge_5c18cb73                                       ",
+        "Type": "not_null_and",
+        "Value": "0"
+      },
+      {
+        "levelName": "             ¦       °--Dust from Gypsum Content 2 to 15 Percent             ",
+        "RefId": "18446"
+      },
+      {
+        "levelName": "             °--Dust Due to Silt and Clay                                    ",
+        "RefId": "23661",
+        "rule_refid": "23661"
+      },
+      {
+        "levelName": "                 °--RuleHedge_caf7e2e0                                       ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "                     °--Dust from Silt and Clay Content 20 to 70 Percent Sand",
+        "RefId": "18447"
+      }
+    ],
+    "properties": [
+      {
+        "evaluation": "Dryness Index 0.5 to 3",
+        "propname": "DRYNESS INDEX",
+        "propiid": "15302"
+      },
+      {
+        "evaluation": "Dust from Gypsum Content 2 to 15 Percent",
+        "propname": "WTD_AVG GYPSUM 0-50cm OR ABOVE RESTRICTION",
+        "propiid": "15300"
+      },
+      {
+        "evaluation": "Dust from Silt and Clay Content 20 to 70 Percent Sand",
+        "propname": "WTD_AVG SAND CONTENT 0-50cm OR ABOVE RESTRICTION, NO O",
+        "propiid": "15301"
+      }
+    ]
+  },
+  {
+    "name": ["Erodibility Factor Maximum"],
+    "tree": [
+      {
+        "levelName": "Erodibility Factor Maximum        "
+      },
+      {
+        "levelName": " °--RuleHedge_ee5b5e32            ",
+        "Type": "null_not_rated",
+        "Value": "0"
+      },
+      {
+        "levelName": "     °--Erodibility Factor Maximum",
+        "RefId": "10237"
+      }
+    ],
+    "properties": [
+      {
+        "evaluation": "Erodibility Factor Maximum",
+        "propname": "SOIL EROSION FACTOR MAXIMUM 1/99",
+        "propiid": "10198"
+      }
+    ]
+  }
+]

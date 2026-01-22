@@ -1,0 +1,822 @@
+{
+  "id": "4e502d3e-c93e-4211-9dd8-6dcad0b12aaa",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.categories": {
+      "name": "categories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "categories_name_idx": {
+          "name": "categories_name_idx",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.evaluation_results_cache": {
+      "name": "evaluation_results_cache",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "interpretation_id": {
+          "name": "interpretation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "property_data_hash": {
+          "name": "property_data_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "property_data": {
+          "name": "property_data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fuzzy_value": {
+          "name": "fuzzy_value",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rating_class": {
+          "name": "rating_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rating_value": {
+          "name": "rating_value",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "limitation_class": {
+          "name": "limitation_class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "evaluation_results": {
+          "name": "evaluation_results",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "cache_key_idx": {
+          "name": "cache_key_idx",
+          "columns": [
+            {
+              "expression": "interpretation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "property_data_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "cache_expires_idx": {
+          "name": "cache_expires_idx",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "evaluation_results_cache_interpretation_id_interpretations_id_fk": {
+          "name": "evaluation_results_cache_interpretation_id_interpretations_id_fk",
+          "tableFrom": "evaluation_results_cache",
+          "tableTo": "interpretations",
+          "columnsFrom": [
+            "interpretation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.evaluations": {
+      "name": "evaluations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "evaliid": {
+          "name": "evaliid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evalname": {
+          "name": "evalname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evaldesc": {
+          "name": "evaldesc",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "evaluationtype": {
+          "name": "evaluationtype",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invertevaluationresults": {
+          "name": "invertevaluationresults",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "propname": {
+          "name": "propname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propmod": {
+          "name": "propmod",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "evalxml": {
+          "name": "evalxml",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points": {
+          "name": "points",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interpolation": {
+          "name": "interpolation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "crisp_expression": {
+          "name": "crisp_expression",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "evaluations_evaliid_idx": {
+          "name": "evaluations_evaliid_idx",
+          "columns": [
+            {
+              "expression": "evaliid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "evaluations_evalname_idx": {
+          "name": "evaluations_evalname_idx",
+          "columns": [
+            {
+              "expression": "evalname",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "evaluations_propname_idx": {
+          "name": "evaluations_propname_idx",
+          "columns": [
+            {
+              "expression": "propname",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.interpretation_evaluations": {
+      "name": "interpretation_evaluations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "interpretation_id": {
+          "name": "interpretation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evaluation_id": {
+          "name": "evaluation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "interp_eval_idx": {
+          "name": "interp_eval_idx",
+          "columns": [
+            {
+              "expression": "interpretation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "evaluation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interp_evals_interp_idx": {
+          "name": "interp_evals_interp_idx",
+          "columns": [
+            {
+              "expression": "interpretation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interp_evals_eval_idx": {
+          "name": "interp_evals_eval_idx",
+          "columns": [
+            {
+              "expression": "evaluation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "interpretation_evaluations_interpretation_id_interpretations_id_fk": {
+          "name": "interpretation_evaluations_interpretation_id_interpretations_id_fk",
+          "tableFrom": "interpretation_evaluations",
+          "tableTo": "interpretations",
+          "columnsFrom": [
+            "interpretation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "interpretation_evaluations_evaluation_id_evaluations_id_fk": {
+          "name": "interpretation_evaluations_evaluation_id_evaluations_id_fk",
+          "tableFrom": "interpretation_evaluations",
+          "tableTo": "evaluations",
+          "columnsFrom": [
+            "evaluation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.interpretation_properties": {
+      "name": "interpretation_properties",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "interpretation_id": {
+          "name": "interpretation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "property_id": {
+          "name": "property_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "required": {
+          "name": "required",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "interp_prop_idx": {
+          "name": "interp_prop_idx",
+          "columns": [
+            {
+              "expression": "interpretation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "property_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interp_properties_interp_idx": {
+          "name": "interp_properties_interp_idx",
+          "columns": [
+            {
+              "expression": "interpretation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interp_properties_prop_idx": {
+          "name": "interp_properties_prop_idx",
+          "columns": [
+            {
+              "expression": "property_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "interpretation_properties_interpretation_id_interpretations_id_fk": {
+          "name": "interpretation_properties_interpretation_id_interpretations_id_fk",
+          "tableFrom": "interpretation_properties",
+          "tableTo": "interpretations",
+          "columnsFrom": [
+            "interpretation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "interpretation_properties_property_id_properties_id_fk": {
+          "name": "interpretation_properties_property_id_properties_id_fk",
+          "tableFrom": "interpretation_properties",
+          "tableTo": "properties",
+          "columnsFrom": [
+            "property_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.interpretations": {
+      "name": "interpretations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "interpid": {
+          "name": "interpid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category_id": {
+          "name": "category_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tree_structure": {
+          "name": "tree_structure",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "interpretations_interpid_idx": {
+          "name": "interpretations_interpid_idx",
+          "columns": [
+            {
+              "expression": "interpid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interpretations_name_idx": {
+          "name": "interpretations_name_idx",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "interpretations_category_idx": {
+          "name": "interpretations_category_idx",
+          "columns": [
+            {
+              "expression": "category_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "interpretations_category_id_categories_id_fk": {
+          "name": "interpretations_category_id_categories_id_fk",
+          "tableFrom": "interpretations",
+          "tableTo": "categories",
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.properties": {
+      "name": "properties",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "propiid": {
+          "name": "propiid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propname": {
+          "name": "propname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "propuom": {
+          "name": "propuom",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "propmin": {
+          "name": "propmin",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "propmax": {
+          "name": "propmax",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "propmod": {
+          "name": "propmod",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dataafuse": {
+          "name": "dataafuse",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "properties_propiid_idx": {
+          "name": "properties_propiid_idx",
+          "columns": [
+            {
+              "expression": "propiid",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "properties_propname_idx": {
+          "name": "properties_propname_idx",
+          "columns": [
+            {
+              "expression": "propname",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

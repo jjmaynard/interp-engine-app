@@ -1,0 +1,290 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { InterpretationEngine } from '@/lib/engine/InterpretationEngine';
+import type { PropertyData } from '@/lib/engine/evaluator';
+import type { InterpretationResult, InterpretationTree, Property } from '@/types/interpretation';
+
+export default function InterpretPage() {
+  const [engine, setEngine] = useState<InterpretationEngine | null>(null);
+  const [interpretations, setInterpretations] = useState<InterpretationTree[]>([]);
+  const [selectedInterp, setSelectedInterp] = useState<string>('');
+  const [requiredProps, setRequiredProps] = useState<Property[]>([]);
+  const [propertyValues, setPropertyValues] = useState<PropertyData>({});
+  const [result, setResult] = useState<InterpretationResult | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Initialize engine
+  useEffect(() => {
+    async function init() {
+      try {
+        const newEngine = new InterpretationEngine({ debug: true });
+        await newEngine.initialize();
+        const interps = await newEngine.getAvailableInterpretations();
+        
+        setEngine(newEngine);
+        setInterpretations(interps);
+        
+        // Select first interpretation by default
+        if (interps.length > 0) {
+          const firstName = Array.isArray(interps[0].name) ? interps[0].name[0] : interps[0].name;
+          setSelectedInterp(firstName);
+        }
+        
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to initialize engine');
+        setLoading(false);
+      }
+    }
+    
+    init();
+  }, []);
+
+  // Load required properties when interpretation changes
+  useEffect(() => {
+    if (!engine || !selectedInterp) return;
+
+    async function loadProps() {
+      if (!engine) return;
+      try {
+        const props = await engine.getRequiredProperties(selectedInterp);
+        setRequiredProps(props);
+        
+        // Initialize property values with empty values
+        const initialValues: PropertyData = {};
+        props.forEach(prop => {
+          initialValues[prop.propname] = undefined;
+        });
+        setPropertyValues(initialValues);
+        setResult(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load properties');
+      }
+    }
+
+    loadProps();
+  }, [engine, selectedInterp]);
+
+  // Run evaluation
+  const handleEvaluate = async () => {
+    if (!engine || !selectedInterp) return;
+
+    try {
+      setError(null);
+      const evalResult = await engine.evaluate(selectedInterp, propertyValues);
+      setResult(evalResult);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Evaluation failed');
+    }
+  };
+
+  // Update property value
+  const handlePropertyChange = (propName: string, value: string) => {
+    const numValue = value === '' ? undefined : parseFloat(value);
+    setPropertyValues(prev => ({
+      ...prev,
+      [propName]: numValue,
+    }));
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl">Loading interpretation engine...</div>
+      </div>
+    );
+  }
+
+  if (error && !engine) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-xl text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold mb-8">Soil Interpretation Demo</h1>
+
+      {/* Interpretation Selection */}
+      <div className="mb-8 p-6 bg-white rounded-lg shadow">
+        <label className="block text-sm font-medium mb-2">
+          Select Interpretation
+        </label>
+        <select
+          value={selectedInterp}
+          onChange={(e) => setSelectedInterp(e.target.value)}
+          className="w-full p-2 border rounded"
+        >
+          {interpretations.map((interp, idx) => {
+            const interpName = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+            return (
+              <option key={idx} value={interpName}>
+                {interpName}
+              </option>
+            );
+          })}
+        </select>
+        
+        <div className="mt-4 text-sm text-gray-600">
+          <p>
+            Available interpretations: {interpretations.length}
+          </p>
+          <p>
+            Required properties: {requiredProps.length}
+          </p>
+        </div>
+      </div>
+
+      {/* Property Inputs */}
+      {requiredProps.length > 0 && (
+        <div className="mb-8 p-6 bg-white rounded-lg shadow">
+          <h2 className="text-2xl font-bold mb-4">Input Property Values</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {requiredProps.map((prop) => (
+              <div key={prop.propname}>
+                <label className="block text-sm font-medium mb-1">
+                  {prop.propname}
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  value={propertyValues[prop.propname] ?? ''}
+                  onChange={(e) => handlePropertyChange(prop.propname, e.target.value)}
+                  placeholder={`Enter ${prop.propname}`}
+                  className="w-full p-2 border rounded"
+                />
+                {prop.propuom && (
+                  <span className="text-xs text-gray-500">Unit: {prop.propuom}</span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={handleEvaluate}
+            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          >
+            Evaluate
+          </button>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded">
+          <p className="text-red-800">{error}</p>
+        </div>
+      )}
+
+      {/* Results */}
+      {result && (
+        <div className="mb-8 p-6 bg-white rounded-lg shadow">
+          <h2 className="text-2xl font-bold mb-4">Evaluation Result</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Overall Rating</h3>
+              <div className="text-4xl font-bold text-blue-600">
+                {result.rating.toFixed(3)}
+              </div>
+              <div className="text-xl mt-2 text-gray-700">
+                {result.ratingClass}
+              </div>
+              
+              {/* Rating bar */}
+              <div className="mt-4 bg-gray-200 rounded-full h-4">
+                <div
+                  className="bg-blue-600 h-4 rounded-full transition-all"
+                  style={{ width: `${result.rating * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Rating Scale</h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span>Well suited</span>
+                  <span className="text-gray-500">0.9 - 1.0</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Moderately well suited</span>
+                  <span className="text-gray-500">0.7 - 0.9</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Moderately suited</span>
+                  <span className="text-gray-500">0.5 - 0.7</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Marginally suited</span>
+                  <span className="text-gray-500">0.3 - 0.5</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Poorly suited</span>
+                  <span className="text-gray-500">0.1 - 0.3</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Not suited</span>
+                  <span className="text-gray-500">0.0 - 0.1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Property Values Used */}
+          {Object.keys(result.propertyValues).length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-2">Property Values Used</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                {Object.entries(result.propertyValues).map(([prop, value]) => (
+                  <div key={prop} className="flex justify-between p-2 bg-gray-50 rounded">
+                    <span className="font-medium">{prop}:</span>
+                    <span>{value ?? 'N/A'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Evaluation Results */}
+          {Object.keys(result.evaluationResults).length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-2">Sub-Evaluation Results</h3>
+              <div className="space-y-2">
+                {Object.entries(result.evaluationResults).map(([evalName, rating]) => (
+                  <div key={evalName} className="flex items-center gap-4">
+                    <div className="flex-1 text-sm font-medium">{evalName}</div>
+                    <div className="w-32 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-green-600 h-2 rounded-full"
+                        style={{ width: `${rating * 100}%` }}
+                      />
+                    </div>
+                    <div className="w-16 text-right text-sm">{rating.toFixed(3)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Example Values */}
+      <div className="p-6 bg-gray-50 rounded-lg">
+        <h2 className="text-xl font-bold mb-4">Tips</h2>
+        <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
+          <li>Select an interpretation from the dropdown above</li>
+          <li>Enter values for all required properties</li>
+          <li>Click "Evaluate" to run the interpretation engine</li>
+          <li>The result shows a fuzzy rating from 0 (not suited) to 1 (well suited)</li>
+          <li>Sub-evaluations show how individual properties contribute to the final rating</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
