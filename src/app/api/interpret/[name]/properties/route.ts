@@ -10,9 +10,9 @@ import { getDefaultEngine } from '@/lib/engine';
 export const dynamic = 'force-dynamic';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     name: string;
-  };
+  }>;
 }
 
 export async function GET(
@@ -20,7 +20,8 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const interpretationName = decodeURIComponent(params.name);
+    const { name } = await params;
+    const interpretationName = decodeURIComponent(name);
 
     if (!interpretationName) {
       return NextResponse.json(
