@@ -33,18 +33,18 @@ export async function loadInterpretationTrees(): Promise<InterpretationTree[]> {
 export async function loadEvaluations(): Promise<Evaluation[]> {
   const results = await getAllEvaluations();
   
-  return results.map(eval => ({
-    evaliid: eval.evaliid,
-    evalname: eval.evalname,
-    evaldesc: eval.evaldesc || '',
-    evaluationtype: eval.evaluationtype as 'Crisp' | 'Fuzzy' | 'Continuous',
-    invertevaluationresults: eval.invertevaluationresults || false,
-    propname: eval.propname,
-    propmod: eval.propmod || '',
-    evalxml: eval.evalxml || undefined,
-    points: eval.points || undefined,
-    interpolation: eval.interpolation as 'linear' | 'spline' | 'step' | undefined,
-    crispExpression: eval.crispExpression || undefined,
+  return results.map(evaluation => ({
+    evaliid: evaluation.evaliid,
+    evalname: evaluation.evalname,
+    evaldesc: evaluation.evaldesc || '',
+    eval: evaluation.evalxml || '', // Map evalxml to eval for type compatibility
+    evaluationtype: evaluation.evaluationtype as 'Crisp' | 'Fuzzy' | 'Continuous',
+    invertevaluationresults: evaluation.invertevaluationresults || false,
+    propname: evaluation.propname,
+    propmod: evaluation.propmod || '',
+    points: evaluation.points || undefined,
+    interpolation: evaluation.interpolation as 'linear' | 'spline' | 'step' | undefined,
+    crispExpression: evaluation.crispExpression || undefined,
   }));
 }
 
@@ -95,11 +95,11 @@ export async function getEvaluation(name: string): Promise<Evaluation | null> {
     evaliid: result.evaliid,
     evalname: result.evalname,
     evaldesc: result.evaldesc || '',
+    eval: result.evalxml || '', // Map evalxml to eval for type compatibility
     evaluationtype: result.evaluationtype as 'Crisp' | 'Fuzzy' | 'Continuous',
     invertevaluationresults: result.invertevaluationresults || false,
     propname: result.propname,
     propmod: result.propmod || '',
-    evalxml: result.evalxml || undefined,
     points: result.points || undefined,
     interpolation: result.interpolation as 'linear' | 'spline' | 'step' | undefined,
     crispExpression: result.crispExpression || undefined,
