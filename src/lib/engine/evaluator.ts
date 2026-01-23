@@ -247,7 +247,12 @@ export function evaluateInterpretation(
   properties: Map<string, Property>,
   debug: boolean = false
 ): InterpretationResult {
+  console.log('[Evaluator] Tree object:', { hasTree: !!tree.tree, treeLength: tree.tree?.length || 0, treeName: tree.name });
+  console.log('[Evaluator] Tree.tree type:', Array.isArray(tree.tree) ? 'array' : typeof tree.tree);
+  
   if (!tree.tree || tree.tree.length === 0) {
+    console.warn('[Evaluator] Tree is empty or invalid!');
+    console.warn('[Evaluator] tree.tree:', tree.tree);
     return {
       rating: NaN,
       ratingClass: 'not rated',
