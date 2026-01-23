@@ -141,7 +141,7 @@ const rateLimiter = new RateLimiter();
  * @returns True if request is allowed
  */
 export function checkRateLimit(request: NextRequest): boolean {
-  const identifier = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+  const identifier = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
   return rateLimiter.check(identifier);
 }
 
