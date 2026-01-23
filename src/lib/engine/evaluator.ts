@@ -305,10 +305,26 @@ export function getRequiredProperties(
   const propertyNames = new Set<string>();
 
   function traverseNode(node: RuleNode) {
+    // Check if this node references an evaluation
+    if (node.RefId || node.rule_refid) {
+      const refId = node.RefId || node.rule_refid;
+      const evaluation = evaluations.get(String(refId));
+      if (evaluation) {
+        // Try to get property by name first (more reliable)
+        if (evaluation.propname) {
+          const property = properties.get(evaluation.propname);
+          if (property) {
+            propertyNames.add(property.propname);
+          }
+        }
+      }
+    }
+
+    // Also check Type === 'Evaluation' pattern
     if (node.Type === 'Evaluation' && node.RefId) {
       const evaluation = evaluations.get(node.RefId);
-      if (evaluation && evaluation.propiid) {
-        const property = properties.get(evaluation.propiid);
+      if (evaluation && evaluation.propname) {
+        const property = properties.get(evaluation.propname);
         if (property) {
           propertyNames.add(property.propname);
         }
@@ -320,8 +336,11 @@ export function getRequiredProperties(
     }
   }
 
-  if (tree.tree && tree.tree.length > 0) {
-    traverseNode(tree.tree[0]);
+  // Handle both tree.tree (wrapped) and direct tree array
+  const treeArray = Array.isArray(tree.tree) ? tree.tree : (Array.isArray(tree) ? tree as any : []);
+  
+  if (treeArray && treeArray.length > 0) {
+    treeArray.forEach((node: RuleNode) => traverseNode(node));
   }
 
   return Array.from(propertyNames);
