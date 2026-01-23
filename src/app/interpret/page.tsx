@@ -1,13 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { InterpretationEngine } from '@/lib/engine/InterpretationEngine';
 import type { PropertyData } from '@/lib/engine/evaluator';
-import type { InterpretationResult, InterpretationTree, Property } from '@/types/interpretation';
+import type { InterpretationResult, Property } from '@/types/interpretation';
+
+interface InterpretationSummary {
+  name: string;
+  propertyCount: number;
+}
 
 export default function InterpretPage() {
-  const [engine, setEngine] = useState<InterpretationEngine | null>(null);
-  const [interpretations, setInterpretations] = useState<InterpretationTree[]>([]);
+  const [interpretations, setInterpretations] = useState<InterpretationSummary[]>([]);
   const [selectedInterp, setSelectedInterp] = useState<string>('');
   const [requiredProps, setRequiredProps] = useState<Property[]>([]);
   const [propertyValues, setPropertyValues] = useState<PropertyData>({});
@@ -15,66 +18,86 @@ export default function InterpretPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize engine
+  // Load interpretations from API
   useEffect(() => {
-    async function init() {
+    async function loadInterpretations() {
       try {
-        const newEngine = new InterpretationEngine({ debug: true });
-        await newEngine.initialize();
-        const interps = await newEngine.getAvailableInterpretations();
+        const response = await fetch('/api/interpret');
+        const data = await response.json();
         
-        setEngine(newEngine);
-        setInterpretations(interps);
-        
-        // Select first interpretation by default
-        if (interps.length > 0) {
-          const firstName = Array.isArray(interps[0].name) ? interps[0].name[0] : interps[0].name;
-          setSelectedInterp(firstName);
+        if (data.success) {
+          setInterpretations(data.data);
+          
+          // Select first interpretation by default
+          if (data.data.length > 0) {
+            setSelectedInterp(data.data[0].name);
+          }
+        } else {
+          setError(data.error || 'Failed to load interpretations');
         }
         
         setLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to initialize engine');
+        setError(err instanceof Error ? err.message : 'Failed to load interpretations');
         setLoading(false);
       }
     }
     
-    init();
+    loadInterpretations();
   }, []);
 
   // Load required properties when interpretation changes
   useEffect(() => {
-    if (!engine || !selectedInterp) return;
+    if (!selectedInterp) return;
 
     async function loadProps() {
-      if (!engine) return;
       try {
-        const props = await engine.getRequiredProperties(selectedInterp);
-        setRequiredProps(props);
+        const response = await fetch(`/api/interpret/${selectedInterp}/properties`);
+        const data = await response.json();
         
-        // Initialize property values with empty values
-        const initialValues: PropertyData = {};
-        props.forEach(prop => {
-          initialValues[prop.propname] = undefined;
-        });
-        setPropertyValues(initialValues);
-        setResult(null);
+        if (data.success) {
+          setRequiredProps(data.data);
+          
+          // Initialize property values with empty values
+          const initialValues: PropertyData = {};
+          data.data.forEach((prop: Property) => {
+            initialValues[prop.propname] = undefined;
+          });
+          setPropertyValues(initialValues);
+          setResult(null);
+        } else {
+          setError(data.error || 'Failed to load properties');
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load properties');
       }
     }
 
     loadProps();
-  }, [engine, selectedInterp]);
+  }, [selectedInterp]);
 
   // Run evaluation
   const handleEvaluate = async () => {
-    if (!engine || !selectedInterp) return;
+    if (!selectedInterp) return;
 
     try {
       setError(null);
-      const evalResult = await engine.evaluate(selectedInterp, propertyValues);
-      setResult(evalResult);
+      const response = await fetch('/api/interpret', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          interpretationName: selectedInterp,
+          propertyData: propertyValues,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setResult(data.data);
+      } else {
+        setError(data.error || 'Evaluation failed');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Evaluation failed');
     }
@@ -119,14 +142,11 @@ export default function InterpretPage() {
           onChange={(e) => setSelectedInterp(e.target.value)}
           className="w-full p-2 border rounded"
         >
-          {interpretations.map((interp, idx) => {
-            const interpName = Array.isArray(interp.name) ? interp.name[0] : interp.name;
-            return (
-              <option key={idx} value={interpName}>
-                {interpName}
-              </option>
-            );
-          })}
+          {interpretations.map((interp, idx) => (
+            <option key={idx} value={interp.name}>
+              {interp.name}
+            </option>
+          ))}
         </select>
         
         <div className="mt-4 text-sm text-gray-600">
