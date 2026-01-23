@@ -120,8 +120,8 @@ export async function getProperty(name: string): Promise<Property | null> {
     propiid: result.propiid,
     propname: result.propname,
     propuom: result.propuom || undefined,
-    propmin: result.propmin ? parseFloat(result.propmin) : undefined,
-    propmax: result.propmax ? parseFloat(result.propmax) : undefined,
+    propmin: result.propmin ?? undefined,
+    propmax: result.propmax ?? undefined,
     propmod: result.propmod || '',
     dataafuse: result.dataafuse || false,
   };
