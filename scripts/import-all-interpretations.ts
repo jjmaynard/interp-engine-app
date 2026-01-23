@@ -105,14 +105,18 @@ async function importAllInterpretations() {
         // Track category statistics
         categoryStats[categoryName] = (categoryStats[categoryName] || 0) + 1;
 
-        // Insert interpretation
+        // Insert interpretation - store full object with tree, properties, and property_count
         const [inserted] = await db
           .insert(interpretations)
           .values({
             interpid: stringToNumericId(interp.name),
             name: interp.name,
             categoryId: categoryId,
-            treeStructure: JSON.stringify(interp.tree),
+            treeStructure: JSON.stringify({
+              tree: interp.tree,
+              properties: interp.properties,
+              property_count: interp.property_count,
+            }),
           })
           .returning({ id: interpretations.id });
 
