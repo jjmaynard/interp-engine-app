@@ -135,9 +135,9 @@ export async function getAllEvaluations() {
     .from(evaluations)
     .orderBy(evaluations.evalname);
   
-  return results.map(eval => ({
-    ...eval,
-    points: eval.points ? JSON.parse(eval.points as string) : null,
+  return results.map(evaluation => ({
+    ...evaluation,
+    points: evaluation.points ? JSON.parse(evaluation.points as string) : null,
   }));
 }
 
@@ -185,9 +185,9 @@ export async function getInterpretationEvaluations(interpretationId: number) {
     .where(eq(interpretationEvaluations.interpretationId, interpretationId))
     .orderBy(evaluations.evalname);
   
-  return results.map(eval => ({
-    ...eval,
-    points: eval.points ? JSON.parse(eval.points as string) : null,
+  return results.map(evaluation => ({
+    ...evaluation,
+    points: evaluation.points ? JSON.parse(evaluation.points as string) : null,
   }));
 }
 
