@@ -10,6 +10,7 @@ import { validateBatchInterpretRequest } from '@/lib/validation/requests';
 import { getResultCache } from '@/lib/cache/results';
 import { checkRateLimit, rateLimitResponse } from '@/lib/middleware/api';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {

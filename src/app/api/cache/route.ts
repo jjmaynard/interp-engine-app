@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getResultCache } from '@/lib/cache/results';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
