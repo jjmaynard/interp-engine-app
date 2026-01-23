@@ -90,7 +90,7 @@ async function checkInterpretation(interpName: string) {
       .select({
         evaliid: evaluations.evaliid,
         evalname: evaluations.evalname,
-        propiid: evaluations.propiid,
+        propname: evaluations.propname,
       })
       .from(evaluations)
       .where(eq(evaluations.evaliid, evalRefs[0]));
@@ -98,20 +98,20 @@ async function checkInterpretation(interpName: string) {
     console.log(`\n📋 Checking first evaluation (${evalRefs[0]}):`);
     if (evals.length > 0) {
       console.log(`   ✅ Found: ${evals[0].evalname}`);
-      console.log(`   Property ID: ${evals[0].propiid}`);
+      console.log(`   Property Name: ${evals[0].propname}`);
       
       // Check the property
-      if (evals[0].propiid) {
+      if (evals[0].propname) {
         const prop = await db
           .select()
           .from(properties)
-          .where(eq(properties.propiid, evals[0].propiid))
+          .where(eq(properties.propname, evals[0].propname))
           .limit(1);
         
         if (prop.length > 0) {
           console.log(`   ✅ Property exists: ${prop[0].propname}`);
         } else {
-          console.log(`   ❌ Property not found for propiid: ${evals[0].propiid}`);
+          console.log(`   ❌ Property not found for propname: ${evals[0].propname}`);
         }
       }
     } else {
