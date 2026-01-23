@@ -98,10 +98,10 @@ async function importAllInterpretations() {
         const [inserted] = await db
           .insert(interpretations)
           .values({
+            interpid: interp.interpid,
             name: interp.name,
             categoryId: categoryId,
             treeStructure: JSON.stringify(interp.tree),
-            description: generateDescription(interp),
           })
           .returning({ id: interpretations.id });
 
