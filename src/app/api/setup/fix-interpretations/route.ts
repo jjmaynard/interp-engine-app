@@ -42,15 +42,11 @@ export async function GET() {
         continue;
       }
       
-      // Update with full structure
+      // Update with tree structure directly
       await db
         .update(interpretations)
         .set({
-          treeStructure: JSON.stringify({
-            tree: interp.tree,
-            properties: interp.properties,
-            property_count: interp.property_count,
-          }),
+          treeStructure: interp.tree, // Store tree array directly, not wrapped
         })
         .where(eq(interpretations.id, existing.id));
       
