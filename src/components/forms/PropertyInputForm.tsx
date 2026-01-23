@@ -38,11 +38,11 @@ export function PropertyInputForm({
       return 'Please enter a valid number';
     }
 
-    if (property.propmin !== undefined && value < property.propmin) {
+    if (property.propmin !== null && property.propmin !== undefined && value < property.propmin) {
       return `Value must be at least ${property.propmin}`;
     }
 
-    if (property.propmax !== undefined && value > property.propmax) {
+    if (property.propmax !== null && property.propmax !== undefined && value > property.propmax) {
       return `Value must be at most ${property.propmax}`;
     }
 
@@ -140,7 +140,8 @@ export function PropertyInputForm({
                   : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
               } ${loading ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
               placeholder={
-                property.propmin !== undefined && property.propmax !== undefined
+                property.propmin !== null && property.propmin !== undefined && 
+                property.propmax !== null && property.propmax !== undefined
                   ? `${property.propmin} - ${property.propmax}`
                   : 'Enter value'
               }
@@ -148,7 +149,8 @@ export function PropertyInputForm({
 
             {/* Hints and validation messages */}
             <div className="flex items-start justify-between gap-2">
-              {property.propmin !== undefined && property.propmax !== undefined && (
+              {property.propmin !== null && property.propmin !== undefined && 
+               property.propmax !== null && property.propmax !== undefined && (
                 <p className="text-xs text-gray-500">
                   Valid range: {property.propmin} - {property.propmax}
                 </p>
