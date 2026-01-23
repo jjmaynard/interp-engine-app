@@ -58,8 +58,8 @@ export async function loadProperties(): Promise<Property[]> {
     propiid: prop.propiid,
     propname: prop.propname,
     propuom: prop.propuom || undefined,
-    propmin: prop.propmin ? parseFloat(prop.propmin) : undefined,
-    propmax: prop.propmax ? parseFloat(prop.propmax) : undefined,
+    propmin: prop.propmin ?? undefined,
+    propmax: prop.propmax ?? undefined,
     propmod: prop.propmod || '',
     dataafuse: prop.dataafuse || false,
   }));
