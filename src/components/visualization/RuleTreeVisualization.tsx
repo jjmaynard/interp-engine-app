@@ -1,18 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import ReactFlow, {
-  Node,
-  Edge,
-  Background,
-  Controls,
-  MiniMap,
-  useNodesState,
-  useEdgesState,
-  Position,
-  NodeTypes,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+import { useEffect, useState, memo } from 'react';
 import type { RuleNode } from '@/types/interpretation';
 
 interface RuleTreeVisualizationProps {
@@ -21,182 +9,187 @@ interface RuleTreeVisualizationProps {
   evaluationResults?: Record<string, number>;
 }
 
+interface TreeNodeData {
+  id: string;
+  label: string;
+  type: 'evaluation' | 'operator' | 'hedge' | 'rule';
+  operator?: string;
+  hedge?: string;
+  value?: string;
+  rating?: number;
+  level: number;
+  children: TreeNodeData[];
+}
+
 // Custom node component
-function CustomNode({ data }: { data: any }) {
+const TreeNodeComponent = memo(({ node, isLast }: { node: TreeNodeData; isLast: boolean }) => {
   const getBgColor = () => {
-    if (data.rating !== undefined) {
-      if (data.rating >= 0.9) return 'bg-green-100 border-green-500';
-      if (data.rating >= 0.7) return 'bg-yellow-100 border-yellow-500';
-      if (data.rating >= 0.4) return 'bg-orange-100 border-orange-500';
+    if (node.rating !== undefined) {
+      if (node.rating >= 0.9) return 'bg-green-100 border-green-500';
+      if (node.rating >= 0.7) return 'bg-yellow-100 border-yellow-500';
+      if (node.rating >= 0.4) return 'bg-orange-100 border-orange-500';
       return 'bg-red-100 border-red-500';
     }
     
-    if (data.type === 'evaluation') return 'bg-blue-100 border-blue-500';
-    if (data.type === 'operator') return 'bg-purple-100 border-purple-500';
-    if (data.type === 'hedge') return 'bg-indigo-100 border-indigo-500';
+    if (node.type === 'evaluation') return 'bg-blue-100 border-blue-500';
+    if (node.type === 'operator') return 'bg-purple-100 border-purple-500';
+    if (node.type === 'hedge') return 'bg-indigo-100 border-indigo-500';
     return 'bg-gray-100 border-gray-400';
   };
 
   const getIcon = () => {
-    if (data.type === 'evaluation') return '📊';
-    if (data.type === 'operator') {
-      if (data.operator === 'and') return '∧';
-      if (data.operator === 'or') return '∨';
-      if (data.operator === 'product') return '×';
-      if (data.operator === 'sum') return '∑';
+    if (node.type === 'evaluation') return '📊';
+    if (node.type === 'operator') {
+      if (node.operator === 'and') return '∧';
+      if (node.operator === 'or') return '∨';
+      if (node.operator === 'product') return '×';
+      if (node.operator === 'sum') return '∑';
       return '○';
     }
-    if (data.type === 'hedge') return '⚡';
+    if (node.type === 'hedge') return '⚡';
     return '●';
   };
 
   return (
-    <div className={`px-4 py-3 rounded-lg border-2 shadow-md ${getBgColor()} min-w-[200px]`}>
-      <div className="flex items-center gap-2 mb-1">
-        <span className="text-lg">{getIcon()}</span>
-        <span className="font-semibold text-sm text-gray-900">
-          {data.label}
-        </span>
+    <div className="flex items-start">
+      <div className="flex flex-col items-center mr-4">
+        {!isLast && node.children.length > 0 && (
+          <div className="w-px h-full bg-gray-300 mt-8"></div>
+        )}
       </div>
-      
-      {data.type && (
-        <div className="text-xs text-gray-600 capitalize mb-1">
-          {data.type}
-        </div>
-      )}
-      
-      {data.operator && (
-        <div className="text-xs text-purple-700 font-medium">
-          Operator: {data.operator}
-        </div>
-      )}
-      
-      {data.hedge && (
-        <div className="text-xs text-indigo-700 font-medium">
-          Hedge: {data.hedge} ({data.value})
-        </div>
-      )}
-      
-      {data.rating !== undefined && (
-        <div className="mt-2 pt-2 border-t border-gray-300">
-          <div className="text-xs text-gray-600 mb-1">Rating</div>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 bg-gray-200 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full ${
-                  data.rating >= 0.9 ? 'bg-green-500' :
-                  data.rating >= 0.7 ? 'bg-yellow-500' :
-                  data.rating >= 0.4 ? 'bg-orange-500' : 'bg-red-500'
-                }`}
-                style={{ width: `${data.rating * 100}%` }}
-              />
-            </div>
-            <span className="text-xs font-bold text-gray-900">
-              {(data.rating * 100).toFixed(0)}%
+      <div className="flex-1 mb-4">
+        <div className={`px-4 py-3 rounded-lg border-2 shadow-md ${getBgColor()} inline-block`}>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-lg">{getIcon()}</span>
+            <span className="font-semibold text-sm text-gray-900">
+              {node.label}
             </span>
           </div>
+          
+          {node.type && (
+            <div className="text-xs text-gray-600 capitalize mb-1">
+              {node.type}
+            </div>
+          )}
+          
+          {node.operator && (
+            <div className="text-xs text-purple-700 font-medium">
+              Operator: {node.operator}
+            </div>
+          )}
+          
+          {node.hedge && (
+            <div className="text-xs text-indigo-700 font-medium">
+              Hedge: {node.hedge} ({node.value})
+            </div>
+          )}
+          
+          {node.rating !== undefined && (
+            <div className="mt-2 pt-2 border-t border-gray-300">
+              <div className="text-xs text-gray-600 mb-1">Rating</div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 bg-gray-200 rounded-full h-2 min-w-[80px]">
+                  <div
+                    className={`h-2 rounded-full ${
+                      node.rating >= 0.9 ? 'bg-green-500' :
+                      node.rating >= 0.7 ? 'bg-yellow-500' :
+                      node.rating >= 0.4 ? 'bg-orange-500' : 'bg-red-500'
+                    }`}
+                    style={{ width: `${node.rating * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs font-bold text-gray-900">
+                  {(node.rating * 100).toFixed(0)}%
+                </span>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+        
+        {node.children.length > 0 && (
+          <div className="ml-8 mt-2 border-l-2 border-gray-300 pl-4">
+            {node.children.map((child, idx) => (
+              <TreeNodeComponent
+                key={child.id}
+                node={child}
+                isLast={idx === node.children.length - 1}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+});
 
-const nodeTypes: NodeTypes = {
-  custom: CustomNode,
-};
+TreeNodeComponent.displayName = 'TreeNodeComponent';
 
 export function RuleTreeVisualization({
   tree,
   interpretationName,
   evaluationResults = {},
 }: RuleTreeVisualizationProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
 
-  // Convert flat tree to hierarchical nodes and edges
+  // Convert flat tree to hierarchical structure
   useEffect(() => {
     if (!tree || tree.length === 0) return;
 
-    const newNodes: Node[] = [];
-    const newEdges: Edge[] = [];
+    const nodes: TreeNodeData[] = [];
+    const stack: { node: TreeNodeData; level: number }[] = [];
     let nodeId = 0;
 
-    // Track indentation levels
-    const levelStack: { id: string; level: number }[] = [];
-    
-    tree.forEach((node, index) => {
-      const currentId = `node-${nodeId++}`;
-      const level = (node.levelName.match(/^\s*/)?.[0].length || 0) / 2;
-      const label = node.levelName.trim();
+    tree.forEach((item) => {
+      const level = (item.levelName.match(/^\s*/)?.[0].length || 0) / 2;
+      const label = item.levelName.trim();
 
-      // Determine node type
-      let nodeType = 'custom';
-      let nodeData: any = {
+      const nodeData: TreeNodeData = {
+        id: `node-${nodeId++}`,
         label,
         type: 'rule',
+        level,
+        children: [],
       };
 
-      // Check if it's an operator
-      if (node.Type) {
+      // Determine node type
+      if (item.Type) {
         nodeData.type = 'operator';
-        nodeData.operator = node.Type;
+        nodeData.operator = item.Type;
       }
 
-      // Check if it's a hedge
-      if (node.Value) {
+      if (item.Value) {
         nodeData.type = 'hedge';
         nodeData.hedge = label;
-        nodeData.value = node.Value;
+        nodeData.value = item.Value;
       }
 
-      // Check if it's an evaluation reference
-      if (node.RefId || node.rule_refid) {
+      if (item.RefId || item.rule_refid) {
         nodeData.type = 'evaluation';
-        const refId = node.RefId || node.rule_refid;
-        if (evaluationResults[refId!]) {
-          nodeData.rating = evaluationResults[refId!];
+        const refId = item.RefId || item.rule_refid;
+        if (refId && evaluationResults[refId]) {
+          nodeData.rating = evaluationResults[refId];
         }
       }
 
-      // Create node
-      newNodes.push({
-        id: currentId,
-        type: nodeType,
-        data: nodeData,
-        position: { x: level * 250, y: index * 120 },
-        sourcePosition: Position.Bottom,
-        targetPosition: Position.Top,
-      });
-
-      // Connect to parent based on indentation
-      while (levelStack.length > 0 && levelStack[levelStack.length - 1].level >= level) {
-        levelStack.pop();
+      // Find parent based on indentation
+      while (stack.length > 0 && stack[stack.length - 1].level >= level) {
+        stack.pop();
       }
 
-      if (levelStack.length > 0) {
-        const parentId = levelStack[levelStack.length - 1].id;
-        newEdges.push({
-          id: `edge-${parentId}-${currentId}`,
-          source: parentId,
-          target: currentId,
-          type: 'smoothstep',
-          animated: nodeData.rating !== undefined,
-          style: {
-            stroke: nodeData.rating !== undefined
-              ? nodeData.rating >= 0.7 ? '#22c55e' : '#ef4444'
-              : '#94a3b8',
-            strokeWidth: 2,
-          },
-        });
+      if (stack.length > 0) {
+        // Add as child to parent
+        stack[stack.length - 1].node.children.push(nodeData);
+      } else {
+        // Add as root node
+        nodes.push(nodeData);
       }
 
-      levelStack.push({ id: currentId, level });
+      stack.push({ node: nodeData, level });
     });
 
-    setNodes(newNodes);
-    setEdges(newEdges);
-  }, [tree, evaluationResults, setNodes, setEdges]);
+    setTreeData(nodes);
+  }, [tree, evaluationResults]);
 
   if (!tree || tree.length === 0) {
     return (
@@ -228,38 +221,20 @@ export function RuleTreeVisualization({
 
       {/* Visualization */}
       {isExpanded && (
-        <div style={{ height: '600px' }} className="border-t border-gray-200">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            nodeTypes={nodeTypes}
-            fitView
-            attributionPosition="bottom-left"
-          >
-            <Background color="#e2e8f0" gap={16} />
-            <Controls />
-            <MiniMap
-              nodeColor={(node) => {
-                const rating = node.data.rating;
-                if (rating !== undefined) {
-                  if (rating >= 0.9) return '#22c55e';
-                  if (rating >= 0.7) return '#eab308';
-                  if (rating >= 0.4) return '#f97316';
-                  return '#ef4444';
-                }
-                return '#94a3b8';
-              }}
-              maskColor="rgba(0, 0, 0, 0.1)"
+        <div className="p-6 max-h-[600px] overflow-auto bg-gray-50">
+          {treeData.map((node, idx) => (
+            <TreeNodeComponent
+              key={node.id}
+              node={node}
+              isLast={idx === treeData.length - 1}
             />
-          </ReactFlow>
+          ))}
         </div>
       )}
 
       {/* Legend */}
       {isExpanded && (
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div className="px-6 py-4 bg-gray-100 border-t border-gray-200">
           <h4 className="text-sm font-semibold text-gray-900 mb-3">Legend</h4>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
             <div className="flex items-center gap-2">
@@ -280,7 +255,7 @@ export function RuleTreeVisualization({
             </div>
           </div>
           <p className="mt-3 text-xs text-gray-600">
-            💡 <strong>Tip:</strong> Use mouse wheel to zoom, drag to pan, or use the controls in the bottom-left corner.
+            💡 <strong>Tip:</strong> The tree shows the hierarchical structure of the interpretation rules with color-coded ratings.
           </p>
         </div>
       )}
