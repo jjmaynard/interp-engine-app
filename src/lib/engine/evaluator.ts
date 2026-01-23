@@ -247,20 +247,41 @@ export function evaluateInterpretation(
   properties: Map<string, Property>,
   debug: boolean = false
 ): InterpretationResult {
-  console.log('[Evaluator] Tree object:', { hasTree: !!tree.tree, treeLength: tree.tree?.length || 0, treeName: tree.name });
-  console.log('[Evaluator] Tree.tree type:', Array.isArray(tree.tree) ? 'array' : typeof tree.tree);
+  console.log('[Evaluator] Tree object:', {
+    hasTreeProperty: !!tree.tree,
+    treeLength: tree.tree?.length || 0,
+    treeName: tree.name,
+    treeType: typeof tree.tree,
+    isArray: Array.isArray(tree.tree)
+  });
   
-  if (!tree.tree || tree.tree.length === 0) {
-    console.warn('[Evaluator] Tree is empty or invalid!');
-    console.warn('[Evaluator] tree.tree:', tree.tree);
-    return {
-      rating: NaN,
-      ratingClass: 'not rated',
-      propertyValues: {},
-      evaluationResults: {},
-      timestamp: new Date(),
-    };
+  // Handle case where tree might be the tree array itself wrapped incorrectly
+  let treeArray = tree.tree;
+  if (!treeArray || treeArray.length === 0) {
+    // Check if tree itself is an array
+    if (Array.isArray(tree)) {
+      console.warn('[Evaluator] tree parameter is an array, not an InterpretationTree object');
+      treeArray = tree as any;
+    } else if ((tree as any).treeStructure) {
+      console.warn('[Evaluator] Found treeStructure property instead of tree');
+      treeArray = (tree as any).treeStructure;
+    } else {
+      console.warn('[Evaluator] Tree is empty or invalid!');
+      console.warn('[Evaluator] tree object keys:', Object.keys(tree));
+      console.warn('[Evaluator] tree.tree:', tree.tree);
+      return {
+        rating: NaN,
+        ratingClass: 'not rated',
+        propertyValues: {},
+        evaluationResults: {},
+        timestamp: new Date(),
+      };
+    }
   }
+  
+  console.log('[Evaluator] Using tree array with', treeArray.length, 'nodes');
+
+  console.log('[Evaluator] Using tree array with', treeArray.length, 'nodes');
 
   const context: EvaluationContext = {
     propertyData,
@@ -270,7 +291,7 @@ export function evaluateInterpretation(
   };
 
   // Evaluate the root node
-  const result = evaluateNode(tree.tree[0], context);
+  const result = evaluateNode(treeArray[0], context);
 
   return {
     rating: result.rating,
