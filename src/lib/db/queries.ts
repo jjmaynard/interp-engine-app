@@ -206,7 +206,11 @@ export async function getAllProperties() {
     .from(properties)
     .orderBy(properties.propname);
   
-  return results;
+  return results.map(prop => ({
+    ...prop,
+    propmin: prop.propmin ? parseFloat(prop.propmin) : null,
+    propmax: prop.propmax ? parseFloat(prop.propmax) : null,
+  }));
 }
 
 /**
@@ -219,7 +223,15 @@ export async function getPropertyByName(name: string) {
     .where(eq(properties.propname, name))
     .limit(1);
   
-  return result || null;
+  if (!result) {
+    return null;
+  }
+  
+  return {
+    ...result,
+    propmin: result.propmin ? parseFloat(result.propmin) : null,
+    propmax: result.propmax ? parseFloat(result.propmax) : null,
+  };
 }
 
 /**
