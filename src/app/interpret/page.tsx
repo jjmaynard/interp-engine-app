@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { InterpretationResult, Property } from '@/types/interpretation';
+import type { InterpretationResult, Property, RuleNode } from '@/types/interpretation';
 import { InterpretationSelector } from '@/components/navigation/InterpretationSelector';
 import { PropertyFormSkeleton } from '@/components/layout/LoadingSkeleton';
 import { PropertyInputForm } from '@/components/forms/PropertyInputForm';
 import { InterpretationResultDisplay } from '@/components/results/InterpretationResult';
+import { RuleTreeVisualization } from '@/components/visualization/RuleTreeVisualization';
 
 export default function InterpretPage() {
   const [selectedInterp, setSelectedInterp] = useState<string>('');
   const [requiredProps, setRequiredProps] = useState<Property[]>([]);
+  const [ruleTree, setRuleTree] = useState<RuleNode[]>([]);
   const [result, setResult] = useState<InterpretationResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingProps, setLoadingProps] = useState(false);
@@ -19,6 +21,7 @@ export default function InterpretPage() {
   useEffect(() => {
     if (!selectedInterp) {
       setRequiredProps([]);
+      setRuleTree([]);
       setResult(null);
       return;
     }
@@ -33,14 +36,17 @@ export default function InterpretPage() {
         
         if (data.success && data.data.properties) {
           setRequiredProps(data.data.properties);
+          setRuleTree(data.data.tree || []);
           setResult(null);
         } else {
           setError(data.error || 'Failed to load properties');
           setRequiredProps([]);
+          setRuleTree([]);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load properties');
         setRequiredProps([]);
+        setRuleTree([]);
       } finally {
         setLoadingProps(false);
       }
@@ -168,6 +174,17 @@ export default function InterpretPage() {
           )}
         </div>
       </div>
+
+      {/* Rule Tree Visualization - Full Width Below */}
+      {ruleTree.length > 0 && (
+        <div className="mt-8">
+          <RuleTreeVisualization
+            tree={ruleTree}
+            interpretationName={selectedInterp}
+            evaluationResults={result?.evaluationResults}
+          />
+        </div>
+      )}
     </div>
   );
 }
