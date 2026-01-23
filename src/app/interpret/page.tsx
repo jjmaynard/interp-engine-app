@@ -59,6 +59,11 @@ export default function InterpretPage() {
   const handleEvaluate = async (propertyValues: Record<string, number | null>) => {
     if (!selectedInterp) return;
     
+    console.log('[Client] Starting evaluation for:', selectedInterp);
+    console.log('[Client] Property values being sent:', propertyValues);
+    console.log('[Client] Number of properties:', Object.keys(propertyValues).length);
+    console.log('[Client] First 3 property names:', Object.keys(propertyValues).slice(0, 3));
+    
     setLoading(true);
     setError(null);
     
@@ -72,15 +77,23 @@ export default function InterpretPage() {
         }
       );
       
+      console.log('[Client] Response status:', response.status);
+      
       const data = await response.json();
+      
+      console.log('[Client] Response data:', data);
       
       if (data.success) {
         setResult(data.data);
+        console.log('[Client] Result rating:', data.data.rating);
+        console.log('[Client] Result rating class:', data.data.ratingClass);
       } else {
         setError(data.error || 'Evaluation failed');
+        console.error('[Client] Evaluation failed:', data.error);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Evaluation failed');
+      console.error('[Client] Error during evaluation:', err);
     } finally {
       setLoading(false);
     }
