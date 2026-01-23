@@ -3,48 +3,16 @@
 import { useState, useEffect } from 'react';
 import type { PropertyData } from '@/lib/engine/evaluator';
 import type { InterpretationResult, Property } from '@/types/interpretation';
-
-interface InterpretationSummary {
-  name: string;
-  propertyCount: number;
-}
+import { InterpretationSelector } from '@/components/navigation/InterpretationSelector';
+import { LoadingSkeleton, PropertyFormSkeleton } from '@/components/layout/LoadingSkeleton';
 
 export default function InterpretPage() {
-  const [interpretations, setInterpretations] = useState<InterpretationSummary[]>([]);
   const [selectedInterp, setSelectedInterp] = useState<string>('');
   const [requiredProps, setRequiredProps] = useState<Property[]>([]);
   const [propertyValues, setPropertyValues] = useState<PropertyData>({});
   const [result, setResult] = useState<InterpretationResult | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Load interpretations from API
-  useEffect(() => {
-    async function loadInterpretations() {
-      try {
-        const response = await fetch('/api/interpret');
-        const data = await response.json();
-        
-        if (data.success) {
-          setInterpretations(data.data);
-          
-          // Select first interpretation by default
-          if (data.data.length > 0) {
-            setSelectedInterp(data.data[0].name);
-          }
-        } else {
-          setError(data.error || 'Failed to load interpretations');
-        }
-        
-        setLoading(false);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load interpretations');
-        setLoading(false);
-      }
-    }
-    
-    loadInterpretations();
-  }, []);
 
   // Load required properties when interpretation changes
   useEffect(() => {
@@ -112,52 +80,43 @@ export default function InterpretPage() {
     }));
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading interpretations...</div>
-      </div>
-    );
-  }
-
-  if (error && interpretations.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-red-600">Error: {error}</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">Soil Interpretation Demo</h1>
-
-      {/* Interpretation Selection */}
-      <div className="mb-8 p-6 bg-white rounded-lg shadow">
-        <label className="block text-sm font-medium mb-2">
-          Select Interpretation
-        </label>
-        <select
-          value={selectedInterp}
-          onChange={(e) => setSelectedInterp(e.target.value)}
-          className="w-full p-2 border rounded"
-        >
-          {interpretations.map((interp, idx) => (
-            <option key={idx} value={interp.name}>
-              {interp.name}
-            </option>
-          ))}
-        </select>
-        
-        <div className="mt-4 text-sm text-gray-600">
-          <p>
-            Available interpretations: {interpretations.length}
-          </p>
-          <p>
-            Required properties: {requiredProps.length}
-          </p>
-        </div>
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">Soil Interpretation Evaluator</h1>
+        <p className="text-lg text-gray-600">
+          Evaluate NRCS soil interpretations using property data and fuzzy logic
+        </p>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          <p className="font-medium">Error</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Interpretation Selection and Form */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Interpretation Selection */}
+          <div className="p-6 bg-white rounded-lg shadow-md">
+            <InterpretationSelector
+              value={selectedInterp}
+              onChange={setSelectedInterp}
+            />
+            
+            {selectedInterp && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-sm text-blue-900">
+                  <span className="font-medium">Selected:</span> {selectedInterp}
+                </p>
+                <p className="text-xs text-blue-700 mt-1">
+                  {requiredProps.length} properties required for evaluation
+                </p>
+              </div>
+            )}
+          </div>
 
       {/* Property Inputs */}
       {requiredProps.length > 0 && (
