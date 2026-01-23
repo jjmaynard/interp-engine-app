@@ -115,12 +115,12 @@ export default function InterpretPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading interpretation engine...</div>
+        <div className="text-xl">Loading interpretations...</div>
       </div>
     );
   }
 
-  if (error && !engine) {
+  if (error && interpretations.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-xl text-red-600">Error: {error}</div>
