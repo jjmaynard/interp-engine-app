@@ -170,6 +170,22 @@ export class InterpretationEngine {
   }
 
   /**
+   * Get the rule tree for an interpretation
+   * 
+   * @param interpretationName - Name of interpretation
+   * @returns Rule tree array
+   */
+  async getRuleTree(interpretationName: string): Promise<any[]> {
+    const tree = await this.getInterpretationTree(interpretationName);
+
+    if (!tree) {
+      throw new Error(`Interpretation not found: ${interpretationName}`);
+    }
+
+    return tree.tree || [];
+  }
+
+  /**
    * Get interpretation tree by name
    * 
    * @param name - Interpretation name
