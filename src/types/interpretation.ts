@@ -29,8 +29,8 @@ export interface Evaluation {
   'dataafuse.y'?: boolean;
   // Parsed from eval XML
   points?: EvaluationPoint[];
-  interpolation?: 'linear' | 'spline' | 'step';
-  crispExpression?: string;
+  interpolation?: 'linear' | 'spline' | 'step' | null;
+  crispExpression?: string | null;
   domainPoints?: Record<string, number>; // For categorical evaluations
 }
 
