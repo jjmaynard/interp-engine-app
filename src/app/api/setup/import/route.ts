@@ -4,6 +4,9 @@
  * Call this endpoint once after deployment to import data
  * DELETE THIS FILE after successful import for security
  * 
+ * Imports PRIMARY interpretations only (primaryinterp: true from NASIS)
+ * Component rules are included automatically in the interpretation trees
+ * 
  * Usage: POST https://your-app.vercel.app/api/setup/import
  * Or visit in browser: GET https://your-app.vercel.app/api/setup/import
  */
@@ -20,7 +23,7 @@ import {
 } from '@/lib/db/schema';
 
 // Import data from JSON files
-import interpretationTreesData from '@/data/interpretation_trees.json';
+import interpretationTreesData from '@/data/primary_interpretation_trees.json';
 import evaluationsData from '@/data/evaluations.json';
 import propertiesData from '@/data/properties.json';
 
