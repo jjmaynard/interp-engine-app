@@ -36,14 +36,29 @@ class DataCache {
     
     if (!this.interpretationTreesCache) {
       const dbResults = await getAllInterpretations();
-      this.interpretationTreesCache = dbResults.map(interp => ({
-        name: [interp.name],
-        tree: typeof interp.treeStructure === 'string' 
+      this.interpretationTreesCache = dbResults.map(interp => {
+        const parsed = typeof interp.treeStructure === 'string' 
           ? JSON.parse(interp.treeStructure) 
-          : interp.treeStructure,
-        properties: [], // Will be populated from links
-        property_count: 0,
-      }));
+          : interp.treeStructure;
+        
+        // If treeStructure is the full interpretation object with properties
+        if (parsed && typeof parsed === 'object' && 'tree' in parsed) {
+          return {
+            name: [interp.name],
+            tree: parsed.tree || [],
+            properties: parsed.properties || [],
+            property_count: parsed.property_count || parsed.properties?.length || 0,
+          };
+        }
+        
+        // Otherwise treeStructure is just the tree array
+        return {
+          name: [interp.name],
+          tree: parsed || [],
+          properties: [],
+          property_count: 0,
+        };
+      });
       this.lastCacheTime = Date.now();
     }
     
