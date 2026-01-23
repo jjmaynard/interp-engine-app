@@ -63,15 +63,10 @@ async function loadJSONFile<T>(filename: string): Promise<T> {
 async function importCategories(db: ReturnType<typeof getDb>) {
   console.log('\n📁 Importing categories...');
   
-  // Load interpretation category summary
-  const categoryData = await loadJSONFile<any[]>('interpretation_category_summary.csv');
-  
   const categoryMap = new Map<string, number>();
   const uniqueCategories = new Set<string>();
   
   // Extract unique categories from the data
-  // Note: This assumes your CSV has been converted to JSON
-  // Adjust based on your actual data structure
   const categoriesToInsert = [
     { name: 'Vegetative Productivity', description: 'Interpretations related to plant growth and productivity' },
     { name: 'Building Site Development', description: 'Interpretations for construction and development' },

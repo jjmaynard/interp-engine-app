@@ -1,0 +1,51 @@
+rulename,ruledesign,category
+AWM - Manure and Food Processing Waste,limitation,AWM
+ENG - Septic Tank Absorption Fields,limitation,ENG
+AWM - Land Application of Municipal Sewage Sludge,limitation,AWM
+FOR - Potential Erosion Hazard (Off-Road/Off-Trail)old,limitation,FOR
+AWM - Rapid Infiltration Disposal of Wastewater,limitation,AWM
+AWM - Slow Rate Process Treatment of Wastewater,limitation,AWM
+AWM - Overland Flow Process Treatment of Wastewater,limitation,AWM
+FOR - Soil Rutting Hazard,limitation,FOR
+FOR - Road Suitability (Natural Surface),limitation,FOR
+ENG - Shallow Excavations,limitation,ENG
+FOR - Potential Erosion Hazard (Road/Trail),limitation,FOR
+ENG - Dwellings W/O Basements,limitation,ENG
+FOR - Log Landing Suitability,limitation,FOR
+FOR - Construction Limitations for Haul Roads/Log Landings,limitation,FOR
+ENG - Dwellings With Basements,limitation,ENG
+ENG - Small Commercial Buildings,limitation,ENG
+ENG - Local Roads and Streets,limitation,ENG
+"ENG - Lawn, Landscape, Golf Fairway",limitation,ENG
+ENG - Sanitary Landfill (Trench),limitation,ENG
+ENG - Sewage Lagoons,limitation,ENG
+FOR - Harvest Equipment Operability,limitation,FOR
+FOR - Mechanical Site Preparation (Surface)(old),limitation,FOR
+Climate DRAFT,limitation,OTHER
+Profile - Depth DRAFT,limitation,OTHER
+Profile DRAFT,limitation,OTHER
+Landscape - Weathering Features DRAFT,limitation,OTHER
+Landscape Flooding (N/A),limitation,OTHER
+PRGM - SRPG (National Draft) Alpha Test,limitation,PRGM
+FOR - Mechanical Site Preparation (Deep)(old),limitation,FOR
+FOR - Mechanical Planting Suitability(old),limitation,FOR
+FOR - Hand Planting Suitability,limitation,FOR
+"GRL - Fencing, Post Depth =<24 inches",limitation,GRL
+"GRL - Fencing, Post Depth =<36 inches",limitation,GRL
+Landscape - Channeled Surface Features DRAFT,limitation,OTHER
+WMS - Pond Reservoir Area,limitation,WMS
+ENG - Sanitary Landfill (Area),limitation,ENG
+WMS - Tile Drains and Underground Outlets,limitation,WMS
+ENG - Daily Cover for Landfill,limitation,ENG
+FOR - Conservation Tree/Shrub Groups,class,FOR
+CPS - Filter Strips (393),limitation,CPS
+CPS - Contour Buffer Strips (332),limitation,CPS
+WLF - Herbaceous Tundra DRAFT,limitation,WLF
+WLF - Sedge-Grass Tundra DRAFT,limitation,WLF
+WLF - Upland Shrub Tundra DRAFT,limitation,WLF
+WLF - Tussock Tundra DRAFT,limitation,WLF
+"Too Arid (Aridic,Aridic-Ustic,Aridic-Xeric)",limitation,OTHER
+Too Arid (Aridic Moisture Regime),limitation,OTHER
+"Too Arid (All moist reg., excpt. Ustic, Udic, Xer",limitation,OTHER
+WLF - Upland Wild Herbaceous Plants,limitation,WLF
+AGR - Vegetating Grassed Waterway/Diversion/Drains DRAFT,limitation,AGR
