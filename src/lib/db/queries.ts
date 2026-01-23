@@ -139,6 +139,7 @@ export async function getAllEvaluations() {
     ...evaluation,
     eval: evaluation.evalxml || '',
     points: evaluation.points ? JSON.parse(evaluation.points as string) : null,
+    interpolation: evaluation.interpolation as 'linear' | 'spline' | 'step' | null,
   }));
 }
 
@@ -160,6 +161,7 @@ export async function getEvaluationByName(name: string) {
     ...result,
     eval: result.evalxml || '',
     points: result.points ? JSON.parse(result.points as string) : null,
+    interpolation: result.interpolation as 'linear' | 'spline' | 'step' | null,
   };
 }
 
@@ -191,6 +193,7 @@ export async function getInterpretationEvaluations(interpretationId: number) {
     ...evaluation,
     eval: evaluation.evalxml || '',
     points: evaluation.points ? JSON.parse(evaluation.points as string) : null,
+    interpolation: evaluation.interpolation as 'linear' | 'spline' | 'step' | null,
   }));
 }
 
