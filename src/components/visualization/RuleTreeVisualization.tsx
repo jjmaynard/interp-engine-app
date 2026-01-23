@@ -136,13 +136,21 @@ export function RuleTreeVisualization({
   useEffect(() => {
     if (!tree || tree.length === 0) return;
 
+    console.log('[TreeViz] Building tree from', tree.length, 'nodes');
+
     const nodes: TreeNodeData[] = [];
     const stack: { node: TreeNodeData; level: number }[] = [];
     let nodeId = 0;
+    let maxDepth = 0;
 
-    tree.forEach((item) => {
+    tree.forEach((item, idx) => {
       const level = (item.levelName.match(/^\s*/)?.[0].length || 0) / 2;
+      maxDepth = Math.max(maxDepth, level);
       const label = item.levelName.trim();
+
+      if (idx < 10) {
+        console.log(`[TreeViz] Node ${idx}: level=${level}, label="${label.substring(0, 50)}"`);
+      }
 
       const nodeData: TreeNodeData = {
         id: `node-${nodeId++}`,
@@ -187,6 +195,9 @@ export function RuleTreeVisualization({
 
       stack.push({ node: nodeData, level });
     });
+
+    console.log('[TreeViz] Built tree with', nodes.length, 'root nodes, max depth:', maxDepth);
+    console.log('[TreeViz] First root node has', nodes[0]?.children.length, 'children');
 
     setTreeData(nodes);
   }, [tree, evaluationResults]);
