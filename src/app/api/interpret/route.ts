@@ -84,10 +84,24 @@ export async function GET() {
     const engine = await getDefaultEngine();
     const interpretations = await engine.getAvailableInterpretations();
 
-    // Format for API response
-    const formatted = interpretations.map(interp => ({
-      name: Array.isArray(interp.name) ? interp.name[0] : interp.name,
-      propertyCount: interp.properties?.length || 0,
+    // Format for API response with actual property counts
+    const formatted = await Promise.all(interpretations.map(async (interp) => {
+      const name = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+      
+      try {
+        // Get actual required properties from the tree
+        const properties = await engine.getRequiredProperties(name);
+        return {
+          name,
+          propertyCount: properties.length,
+        };
+      } catch (error) {
+        // If we can't get properties, return 0
+        return {
+          name,
+          propertyCount: 0,
+        };
+      }
     }));
 
     return NextResponse.json({
