@@ -100,6 +100,52 @@ export function PropertyInputForm({
     setTouched({});
   };
 
+  const handleAutoFill = () => {
+    const autoValues: Record<string, number | null> = {};
+    
+    properties.forEach(prop => {
+      // Generate realistic dummy value based on property range
+      let dummyValue: number;
+      
+      if (prop.propmin !== null && prop.propmin !== undefined && 
+          prop.propmax !== null && prop.propmax !== undefined) {
+        // Generate value in middle 50% of range to avoid extremes
+        const range = prop.propmax - prop.propmin;
+        const quarterRange = range * 0.25;
+        const min = prop.propmin + quarterRange;
+        const max = prop.propmax - quarterRange;
+        dummyValue = Math.random() * (max - min) + min;
+        
+        // Round based on the range magnitude
+        if (range < 10) {
+          dummyValue = Math.round(dummyValue * 100) / 100; // 2 decimals
+        } else if (range < 100) {
+          dummyValue = Math.round(dummyValue * 10) / 10; // 1 decimal
+        } else {
+          dummyValue = Math.round(dummyValue); // whole number
+        }
+      } else if (prop.propmin !== null && prop.propmin !== undefined) {
+        // Only min specified - use min + some reasonable value
+        dummyValue = prop.propmin + Math.random() * 100;
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      } else if (prop.propmax !== null && prop.propmax !== undefined) {
+        // Only max specified - use middle range
+        dummyValue = (prop.propmax / 2) + (Math.random() * prop.propmax / 4);
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      } else {
+        // No range specified - use a moderate value
+        dummyValue = Math.random() * 50 + 10;
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      autoValues[prop.propname] = dummyValue;
+    });
+    
+    setValues(autoValues);
+    setErrors({});
+    setTouched({});
+  };
+
   if (properties.length === 0) {
     return (
       <div className="p-8 text-center text-gray-500">
@@ -194,6 +240,21 @@ export function PropertyInputForm({
           ) : (
             'Calculate Interpretation'
           )}
+        </button>
+        
+        <button
+          type="button"
+          onClick={handleAutoFill}
+          disabled={loading}
+          className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed font-medium"
+          title="Auto-fill with sample data"
+        >
+          <span className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Sample Data
+          </span>
         </button>
         
         <button
