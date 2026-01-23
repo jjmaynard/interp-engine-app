@@ -107,13 +107,37 @@ export function PropertyInputForm({
       // Generate realistic dummy value based on property range
       let dummyValue: number;
       
-      if (prop.propmin !== null && prop.propmin !== undefined && 
-          prop.propmax !== null && prop.propmax !== undefined) {
-        // Generate value in middle 50% of range to avoid extremes
-        const range = prop.propmax - prop.propmin;
+      // Special handling for common properties with unrealistic max values
+      const propLower = prop.propname.toLowerCase();
+      let effectiveMin = prop.propmin ?? 0;
+      let effectiveMax = prop.propmax ?? 100;
+      
+      // Slope: realistic range is 0-60%, even if database allows up to 999
+      if (propLower.includes('slope')) {
+        effectiveMax = Math.min(effectiveMax, 60);
+      }
+      // pH: realistic range is 3-11
+      else if (propLower.includes('ph') && !propLower.includes('depth')) {
+        effectiveMin = Math.max(effectiveMin, 3);
+        effectiveMax = Math.min(effectiveMax, 11);
+      }
+      // Percentage properties: cap at 100
+      else if (propLower.includes('percent') || propLower.includes('pct')) {
+        effectiveMax = Math.min(effectiveMax, 100);
+      }
+      // Bulk density: realistic range 0.5-2.0
+      else if (propLower.includes('bulk density') || propLower.includes('bulk dens')) {
+        effectiveMin = Math.max(effectiveMin, 0.5);
+        effectiveMax = Math.min(effectiveMax, 2.0);
+      }
+      
+      if (effectiveMin !== null && effectiveMin !== undefined && 
+          effectiveMax !== null && effectiveMax !== undefined) {
+        // Generate value in middle 50% of realistic range
+        const range = effectiveMax - effectiveMin;
         const quarterRange = range * 0.25;
-        const min = prop.propmin + quarterRange;
-        const max = prop.propmax - quarterRange;
+        const min = effectiveMin + quarterRange;
+        const max = effectiveMax - quarterRange;
         dummyValue = Math.random() * (max - min) + min;
         
         // Round based on the range magnitude
@@ -124,13 +148,13 @@ export function PropertyInputForm({
         } else {
           dummyValue = Math.round(dummyValue); // whole number
         }
-      } else if (prop.propmin !== null && prop.propmin !== undefined) {
+      } else if (effectiveMin !== null && effectiveMin !== undefined) {
         // Only min specified - use min + some reasonable value
-        dummyValue = prop.propmin + Math.random() * 100;
+        dummyValue = effectiveMin + Math.random() * 50;
         dummyValue = Math.round(dummyValue * 10) / 10;
-      } else if (prop.propmax !== null && prop.propmax !== undefined) {
+      } else if (effectiveMax !== null && effectiveMax !== undefined) {
         // Only max specified - use middle range
-        dummyValue = (prop.propmax / 2) + (Math.random() * prop.propmax / 4);
+        dummyValue = (effectiveMax / 2) + (Math.random() * effectiveMax / 4);
         dummyValue = Math.round(dummyValue * 10) / 10;
       } else {
         // No range specified - use a moderate value
