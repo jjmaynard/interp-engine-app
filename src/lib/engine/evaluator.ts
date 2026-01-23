@@ -59,9 +59,7 @@ export function evaluateNode(
     const evaluation = evaluations.get(node.RefId);
     
     if (!evaluation) {
-      if (debug) {
-        console.warn(`Evaluation not found: ${node.RefId}`);
-      }
+      console.warn(`[Evaluator] Evaluation not found: ${node.RefId}`);
       return { rating: NaN };
     }
 
@@ -69,9 +67,8 @@ export function evaluateNode(
     const property = properties.get(evaluation.propname);
     
     if (!property) {
-      if (debug) {
-        console.warn(`Property not found for evaluation: ${evaluation.evalname} (propname: ${evaluation.propname})`);
-      }
+      console.warn(`[Evaluator] Property not found for evaluation: ${evaluation.evalname} (propname: "${evaluation.propname}")`);
+      console.warn(`[Evaluator] Available properties in map:`, Array.from(properties.keys()).slice(0, 5));
       return { rating: NaN };
     }
 
@@ -79,8 +76,11 @@ export function evaluateNode(
     const propertyName = property.propname;
     const propertyValue = propertyData[propertyName];
 
-    if (debug) {
-      console.log(`Evaluating: ${evaluation.evalname} (${propertyName} = ${propertyValue})`);
+    if (debug || propertyValue === null || propertyValue === undefined) {
+      console.log(`[Evaluator] Evaluating: ${evaluation.evalname} (${propertyName} = ${propertyValue})`);
+      if (propertyValue === null || propertyValue === undefined) {
+        console.warn(`[Evaluator] Property value is null/undefined. Available input keys:`, Object.keys(propertyData).slice(0, 5));
+      }
     }
 
     // Evaluate the property

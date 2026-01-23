@@ -42,6 +42,10 @@ export async function POST(
     const body = await request.json();
     const propertyData = body.properties || body.propertyData || body;
 
+    console.log('[Evaluate API] Interpretation:', interpretationName);
+    console.log('[Evaluate API] Property data received:', Object.keys(propertyData).length, 'properties');
+    console.log('[Evaluate API] Sample properties:', Object.keys(propertyData).slice(0, 3));
+
     if (!propertyData || typeof propertyData !== 'object') {
       return NextResponse.json(
         { error: 'Property data is required' },
