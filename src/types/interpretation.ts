@@ -40,11 +40,11 @@ export interface Evaluation {
 export interface Property {
   propiid: string;
   propname: string;
-  propuom?: string; // Unit of measure
-  propmin?: number;
-  propmax?: number;
-  propmod: string;
-  dataafuse: boolean;
+  propuom?: string | null; // Unit of measure
+  propmin?: number | null;
+  propmax?: number | null;
+  propmod: string | null;
+  dataafuse: boolean | null;
 }
 
 /**
