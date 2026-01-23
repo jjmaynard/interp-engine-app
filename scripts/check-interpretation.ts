@@ -10,7 +10,7 @@ import { resolve } from 'path';
 config({ path: resolve(__dirname, '../.env') });
 
 import { getDb } from '../src/lib/db/client';
-import { interpretations, rules, evaluations, properties, interpretationProperties } from '../src/lib/db/schema';
+import { interpretations, evaluations, properties, interpretationProperties } from '../src/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 const db = getDb();
