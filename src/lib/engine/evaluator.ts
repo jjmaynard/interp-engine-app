@@ -59,9 +59,13 @@ export function evaluateNode(
     const evaluation = evaluations.get(node.RefId);
     
     if (!evaluation) {
-      console.warn(`[Evaluator] Evaluation not found: ${node.RefId}`);
+      console.warn(`[Evaluator] Evaluation not found for RefId: ${node.RefId}`);
       return { rating: NaN };
     }
+
+    console.log(`[Evaluator] Found evaluation: ${evaluation.evalname}`);
+    console.log(`[Evaluator] Evaluation.propname: "${evaluation.propname}"`);
+    console.log(`[Evaluator] Evaluation.propiid: "${evaluation.propiid}"`);
 
     // Get the property this evaluation uses
     const property = properties.get(evaluation.propname);
@@ -69,6 +73,11 @@ export function evaluateNode(
     if (!property) {
       console.warn(`[Evaluator] Property not found for evaluation: ${evaluation.evalname} (propname: "${evaluation.propname}")`);
       console.warn(`[Evaluator] Available properties in map:`, Array.from(properties.keys()).slice(0, 5));
+      console.warn(`[Evaluator] Trying to find property with propiid: "${evaluation.propiid}"`);
+      const propertyBypropiid = properties.get(evaluation.propiid || '');
+      if (propertyBypropiid) {
+        console.warn(`[Evaluator] Found property by propiid! propname: "${propertyBypropiid.propname}"`);
+      }
       return { rating: NaN };
     }
 
