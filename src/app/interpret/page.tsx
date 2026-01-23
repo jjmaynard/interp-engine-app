@@ -1,17 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { PropertyData } from '@/lib/engine/evaluator';
 import type { InterpretationResult, Property } from '@/types/interpretation';
 import { InterpretationSelector } from '@/components/navigation/InterpretationSelector';
-import { LoadingSkeleton, PropertyFormSkeleton } from '@/components/layout/LoadingSkeleton';
+import { PropertyFormSkeleton } from '@/components/layout/LoadingSkeleton';
+import { PropertyInputForm } from '@/components/forms/PropertyInputForm';
+import { InterpretationResultDisplay } from '@/components/results/InterpretationResult';
 
 export default function InterpretPage() {
   const [selectedInterp, setSelectedInterp] = useState<string>('');
   const [requiredProps, setRequiredProps] = useState<Property[]>([]);
-  const [propertyValues, setPropertyValues] = useState<PropertyData>({});
   const [result, setResult] = useState<InterpretationResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingProps, setLoadingProps] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load required properties when interpretation changes
