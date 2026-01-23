@@ -66,11 +66,11 @@ export function evaluateNode(
     }
 
     // Get the property this evaluation uses
-    const property = properties.get(evaluation.propiid || '');
+    const property = properties.get(evaluation.propname);
     
     if (!property) {
       if (debug) {
-        console.warn(`Property not found for evaluation: ${evaluation.evalname}`);
+        console.warn(`Property not found for evaluation: ${evaluation.evalname} (propname: ${evaluation.propname})`);
       }
       return { rating: NaN };
     }
