@@ -19,12 +19,12 @@ export interface Evaluation {
   propiid?: string;
   evaliid: number;
   evalname: string;
-  evaldesc: string;
+  evaldesc: string | null;
   eval: string; // XML string containing evaluation definition
   'dataafuse.x'?: boolean;
   evaluationtype: string; // 'Crisp', 'Fuzzy', 'Continuous'
-  invertevaluationresults: boolean;
-  propmod: string;
+  invertevaluationresults: boolean | null;
+  propmod: string | null;
   propname: string;
   'dataafuse.y'?: boolean;
   // Parsed from eval XML
