@@ -9,10 +9,10 @@ import {
   Property
 } from '@/types/interpretation';
 import {
-  loadInterpretationTrees,
-  loadEvaluations,
-  loadProperties
-} from './loader';
+  getAllInterpretations,
+  getAllEvaluations,
+  getAllProperties,
+} from '@/lib/db/queries';
 
 /**
  * Cache class for interpretation data
@@ -27,15 +27,23 @@ class DataCache {
   private cacheTTL: number = 60 * 60 * 1000; // 1 hour in milliseconds
 
   /**
-   * Get cached interpretation trees or load them
+   * Get cached interpretation trees or load them from database
    */
-  getInterpretationTrees(): InterpretationTree[] {
+  async getInterpretationTrees(): Promise<InterpretationTree[]> {
     if (this.shouldRefreshCache()) {
       this.clearCache();
     }
     
     if (!this.interpretationTreesCache) {
-      this.interpretationTreesCache = loadInterpretationTrees();
+      const dbResults = await getAllInterpretations();
+      this.interpretationTreesCache = dbResults.map(interp => ({
+        name: [interp.name],
+        tree: typeof interp.treeStructure === 'string' 
+          ? JSON.parse(interp.treeStructure) 
+          : interp.treeStructure,
+        properties: [], // Will be populated from links
+        property_count: 0,
+      }));
       this.lastCacheTime = Date.now();
     }
     
@@ -43,15 +51,15 @@ class DataCache {
   }
 
   /**
-   * Get cached evaluations or load them
+   * Get cached evaluations or load them from database
    */
-  getEvaluations(): Evaluation[] {
+  async getEvaluations(): Promise<Evaluation[]> {
     if (this.shouldRefreshCache()) {
       this.clearCache();
     }
     
     if (!this.evaluationsCache) {
-      this.evaluationsCache = loadEvaluations();
+      this.evaluationsCache = await getAllEvaluations();
       this.lastCacheTime = Date.now();
     }
     
@@ -59,15 +67,15 @@ class DataCache {
   }
 
   /**
-   * Get cached properties or load them
+   * Get cached properties or load them from database
    */
-  getProperties(): Property[] {
+  async getProperties(): Promise<Property[]> {
     if (this.shouldRefreshCache()) {
       this.clearCache();
     }
     
     if (!this.propertiesCache) {
-      this.propertiesCache = loadProperties();
+      this.propertiesCache = await getAllProperties();
       this.lastCacheTime = Date.now();
     }
     
@@ -77,9 +85,9 @@ class DataCache {
   /**
    * Get evaluation by name with caching
    */
-  getEvaluationByName(name: string): Evaluation | null {
+  async getEvaluationByName(name: string): Promise<Evaluation | null> {
     if (!this.evaluationsByNameCache) {
-      const evaluations = this.getEvaluations();
+      const evaluations = await this.getEvaluations();
       this.evaluationsByNameCache = new Map(
         evaluations.map(e => [e.evalname, e])
       );
@@ -91,9 +99,9 @@ class DataCache {
   /**
    * Get property by name with caching
    */
-  getPropertyByName(name: string): Property | null {
+  async getPropertyByName(name: string): Promise<Property | null> {
     if (!this.propertiesByNameCache) {
-      const properties = this.getProperties();
+      const properties = await this.getProperties();
       this.propertiesByNameCache = new Map(
         properties.map(p => [p.propname, p])
       );
