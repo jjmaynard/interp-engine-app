@@ -95,6 +95,8 @@ export function evaluateNode(
     // Evaluate the property
     const rating = evaluateProperty(propertyValue, evaluation);
 
+    console.log(`[Evaluator] Evaluation ${evaluation.evalname} (${evaluation.evaliid}) returned rating: ${rating}`);
+
     // Store result by both evaluation name AND evaliid for tree visualization
     const evaluationResults: Record<string, number> = {
       [evaluation.evalname]: rating
@@ -119,18 +121,22 @@ export function evaluateNode(
   
   if (node.Type && operatorTypes.includes(node.Type.toLowerCase())) {
     if (!node.children || node.children.length === 0) {
-      if (debug) {
-        console.warn(`Operator node has no children: ${node.Type}`);
-      }
+      console.warn(`[Evaluator] Operator node has no children: ${node.Type}`);
       return { rating: NaN };
     }
+
+    console.log(`[Evaluator] Processing operator node: ${node.Type}, children count: ${node.children.length}`);
 
     // Recursively evaluate all children
     const childResults = node.children.map((child: any) => evaluateNode(child, context));
     const childRatings = childResults.map((r: NodeEvaluationResult) => r.rating);
 
+    console.log(`[Evaluator] Child ratings for ${node.Type}:`, childRatings);
+
     // Apply the operator
     const rating = applyOperator(node.Type, childRatings);
+
+    console.log(`[Evaluator] Operator ${node.Type} result: ${rating}`);
 
     // Merge property values and evaluation results
     const propertyValues: Record<string, number | string | null> = {};
@@ -143,10 +149,6 @@ export function evaluateNode(
       if (result.evaluationResults) {
         Object.assign(evaluationResults, result.evaluationResults);
       }
-    }
-
-    if (debug) {
-      console.log(`Operator ${node.Type}: ${childRatings.join(', ')} => ${rating}`);
     }
 
     return { rating, propertyValues, evaluationResults };
@@ -330,6 +332,7 @@ export function evaluateInterpretation(
   }
 
   console.log('[Evaluator] Starting evaluation with root node');
+  console.log('[Evaluator] Root node type:', rootNode?.Type, 'RefId:', rootNode?.RefId, 'Children count:', rootNode?.children?.length);
 
   const context: EvaluationContext = {
     propertyData,
@@ -340,6 +343,8 @@ export function evaluateInterpretation(
 
   // Evaluate the root node
   const result = evaluateNode(rootNode, context);
+
+  console.log('[Evaluator] Final result rating:', result.rating);
 
   return {
     rating: result.rating,
