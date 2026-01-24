@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Sprout, FileText, GitBranch, CheckCircle2, Sparkles, Info } from 'lucide-react';
 import type { InterpretationResult, Property, RuleNode } from '@/types/interpretation';
 import { InterpretationSelector } from '@/components/navigation/InterpretationSelector';
 import { PropertyFormSkeleton } from '@/components/layout/LoadingSkeleton';
@@ -104,13 +105,20 @@ export default function InterpretPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">NRCS Soil Interpretation Engine</h1>
-        <p className="text-lg text-gray-600">
-          Evaluate soil interpretations using property data and fuzzy logic
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Modern Header with Gradient */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-green-500 mb-4 shadow-lg">
+            <Sprout className="w-8 h-8 text-white" strokeWidth={2.5} />
+          </div>
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-3">
+            NRCS Soil Interpretation Engine
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Evaluate soil interpretations using property data and fuzzy logic
+          </p>
+        </div>
 
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
@@ -120,20 +128,25 @@ export default function InterpretPage() {
       )}
 
       {/* Interpretation Selection */}
-      <div className="mb-6 p-6 bg-white rounded-lg shadow-md">
+      <div className="mb-6 p-6 bg-white rounded-2xl shadow-lg border border-gray-100">
         <InterpretationSelector
           value={selectedInterp}
           onChange={setSelectedInterp}
         />
         
         {selectedInterp && (
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm text-blue-900">
-              <span className="font-medium">Selected:</span> {selectedInterp}
-            </p>
-            <p className="text-xs text-blue-700 mt-1">
-              {requiredProps.length} properties required for evaluation
-            </p>
+          <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-100 rounded-xl">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-blue-900">
+                  {selectedInterp}
+                </p>
+                <p className="text-xs text-blue-700 mt-1">
+                  {requiredProps.length} properties required for evaluation
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -144,25 +157,27 @@ export default function InterpretPage() {
           {/* Left Column - Tabs and Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Tab Navigation */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="border-b border-gray-200">
-                <nav className="flex -mb-px">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="border-b border-gray-100">
+                <nav className="flex -mb-px p-1 bg-gray-50">
                   <button
                     onClick={() => setActiveTab('properties')}
-                    className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all ${
                       activeTab === 'properties'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
+                                        <FileText className="w-4 h-4" />
                     Property Input
                   </button>
                   <button
                     onClick={() => setActiveTab('tree')}
-                    className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all ${
                       activeTab === 'tree'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                                        <GitBranch className="w-4 h-4" />
                     }`}
                   >
                     Rule Tree
@@ -218,10 +233,13 @@ export default function InterpretPage() {
           <div className="space-y-6">
             {/* Info Card */}
             {!result && (
-              <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+              <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl shadow-md">
+                <div className="flex items-center gap-2 mb-3">
+                  <Info className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-blue-900">
                   How to Use
-                </h3>
+                  </h3>
+                </div>
                 <ol className="text-sm text-blue-800 space-y-2 list-decimal list-inside">
                   <li>Select an interpretation from the dropdown</li>
                   <li>Enter property values in the Property Input tab</li>
@@ -244,19 +262,31 @@ export default function InterpretPage() {
 
       {/* Initial state - No interpretation selected */}
       {!selectedInterp && (
-        <div className="p-12 bg-white rounded-lg shadow-md text-center">
+        <div className="p-12 bg-white rounded-2xl shadow-xl border border-gray-100 text-center">
           <div className="max-w-md mx-auto">
-            <div className="text-6xl mb-4">🌱</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-green-500 mb-6 shadow-lg">
+              <Sprout className="w-10 h-10 text-white" strokeWidth={2.5} />
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-3">
               Get Started
             </h2>
             <p className="text-gray-600 mb-6">
               Select a soil interpretation from the dropdown above to begin evaluating soil properties.
             </p>
-            <div className="text-sm text-gray-500 space-y-1">
-              <p>✓ Over 2,000 NRCS interpretations available</p>
-              <p>✓ Fuzzy logic-based evaluation engine</p>
-              <p>✓ Interactive property input and visualization</p>
+            <div className="grid grid-cols-1 gap-3 text-sm">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <span className="text-gray-700 text-left">Over 2,000 NRCS interpretations available</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                <span className="text-gray-700 text-left">Fuzzy logic-based evaluation engine</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <GitBranch className="w-5 h-5 text-purple-600 flex-shrink-0" />
+                <span className="text-gray-700 text-left">Interactive property input and visualization</span>
+              </div>
+              </div>
             </div>
           </div>
         </div>
