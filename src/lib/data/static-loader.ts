@@ -51,7 +51,7 @@ export function loadInterpretationTrees(): InterpretationTree[] {
     return interpretationsCache;
   }
   
-  const filePath = path.join(process.cwd(), 'data', 'interpretation_trees.json');
+  const filePath = path.join(process.cwd(), 'data', 'primary_interpretation_trees.json');
   const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   
   interpretationsCache = (data as any[]).map(interp => {
