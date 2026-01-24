@@ -104,62 +104,198 @@ export function PropertyInputForm({
     const autoValues: Record<string, number | null> = {};
     
     properties.forEach(prop => {
-      // Generate realistic dummy value based on property range
+      // Generate realistic dummy value based on property characteristics
       let dummyValue: number;
       
-      // Special handling for common properties with unrealistic max values
       const propLower = prop.propname.toLowerCase();
+      const propName = prop.propname;
       let effectiveMin = prop.propmin ?? 0;
       let effectiveMax = prop.propmax ?? 100;
       
-      // Slope: realistic range is 0-60%, even if database allows up to 999
-      if (propLower.includes('slope')) {
-        effectiveMax = Math.min(effectiveMax, 60);
-      }
-      // pH: realistic range is 3-11
-      else if (propLower.includes('ph') && !propLower.includes('depth')) {
-        effectiveMin = Math.max(effectiveMin, 3);
-        effectiveMax = Math.min(effectiveMax, 11);
-      }
-      // Percentage properties: cap at 100
-      else if (propLower.includes('percent') || propLower.includes('pct')) {
-        effectiveMax = Math.min(effectiveMax, 100);
-      }
-      // Bulk density: realistic range 0.5-2.0
-      else if (propLower.includes('bulk density') || propLower.includes('bulk dens')) {
-        effectiveMin = Math.max(effectiveMin, 0.5);
-        effectiveMax = Math.min(effectiveMax, 2.0);
+      // ===== SOIL DEPTH PROPERTIES =====
+      if (propLower.includes('depth') && !propLower.includes('ph')) {
+        // Depths in cm: typical soil depths are 0-200cm
+        effectiveMax = Math.min(effectiveMax, 200);
+        if (propLower.includes('restrictive') || propLower.includes('restriction')) {
+          // Restrictive layers typically at 50-150cm
+          dummyValue = 60 + Math.random() * 90;
+        } else if (propLower.includes('root') || propLower.includes('rooting')) {
+          // Root zones typically 30-120cm
+          dummyValue = 40 + Math.random() * 80;
+        } else {
+          // General depth measurements
+          dummyValue = 20 + Math.random() * 150;
+        }
+        dummyValue = Math.round(dummyValue);
       }
       
-      if (effectiveMin !== null && effectiveMin !== undefined && 
-          effectiveMax !== null && effectiveMax !== undefined) {
-        // Generate value in middle 50% of realistic range
-        const range = effectiveMax - effectiveMin;
-        const quarterRange = range * 0.25;
-        const min = effectiveMin + quarterRange;
-        const max = effectiveMax - quarterRange;
-        dummyValue = Math.random() * (max - min) + min;
-        
-        // Round based on the range magnitude
-        if (range < 10) {
-          dummyValue = Math.round(dummyValue * 100) / 100; // 2 decimals
-        } else if (range < 100) {
-          dummyValue = Math.round(dummyValue * 10) / 10; // 1 decimal
+      // ===== SLOPE PROPERTIES =====
+      else if (propLower.includes('slope')) {
+        // Slopes: realistic range 0-45%, with most soils under 30%
+        effectiveMax = Math.min(effectiveMax, 60);
+        // Weight towards lower slopes (more common)
+        dummyValue = Math.pow(Math.random(), 1.5) * 30;
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      // ===== pH PROPERTIES =====
+      else if (propLower.includes('ph') && !propLower.includes('depth')) {
+        // pH: realistic range 4.5-8.5, most soils 5.5-7.5
+        effectiveMin = Math.max(effectiveMin, 4.0);
+        effectiveMax = Math.min(effectiveMax, 9.0);
+        dummyValue = 5.5 + Math.random() * 2.0; // concentrated in 5.5-7.5
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      // ===== BULK DENSITY =====
+      else if (propLower.includes('bulk density') || propLower.includes('bulk dens')) {
+        // Bulk density: 0.9-1.8 g/cm³ (1.0-1.5 most common)
+        effectiveMin = Math.max(effectiveMin, 0.8);
+        effectiveMax = Math.min(effectiveMax, 2.0);
+        dummyValue = 1.1 + Math.random() * 0.5; // concentrated around 1.1-1.6
+        dummyValue = Math.round(dummyValue * 100) / 100;
+      }
+      
+      // ===== CLAY CONTENT =====
+      else if (propLower.includes('clay')) {
+        // Clay content: 5-60%, typical 15-35%
+        effectiveMax = Math.min(effectiveMax, 70);
+        dummyValue = 12 + Math.random() * 30;
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      // ===== SAND CONTENT =====
+      else if (propLower.includes('sand')) {
+        // Sand content: 10-85%, typical 20-60%
+        effectiveMax = Math.min(effectiveMax, 95);
+        dummyValue = 25 + Math.random() * 45;
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      // ===== SILT CONTENT =====
+      else if (propLower.includes('silt')) {
+        // Silt content: 5-70%, typical 15-50%
+        effectiveMax = Math.min(effectiveMax, 80);
+        dummyValue = 18 + Math.random() * 35;
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      // ===== ORGANIC MATTER =====
+      else if (propLower.includes('organic') || propLower.includes('om ')) {
+        // Organic matter: 0.5-10%, typical 1-4%
+        effectiveMax = Math.min(effectiveMax, 15);
+        dummyValue = 0.8 + Math.random() * 4;
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      // ===== PERMEABILITY / HYDRAULIC CONDUCTIVITY =====
+      else if (propLower.includes('permeability') || propLower.includes('ksat') || 
+               propLower.includes('hydraulic conductivity')) {
+        // Ksat typically 0.01-100 um/sec, log-scale distribution
+        dummyValue = Math.pow(10, Math.random() * 3 - 1); // 0.1 to 100
+        dummyValue = Math.round(dummyValue * 100) / 100;
+      }
+      
+      // ===== WATER TABLE / PONDING =====
+      else if (propLower.includes('water table') || propLower.includes('ponding') || 
+               propLower.includes('flooding')) {
+        // Depth to water table or duration: 0-200cm or 0-30 days
+        if (propLower.includes('depth')) {
+          dummyValue = 80 + Math.random() * 100; // typically deeper
+          dummyValue = Math.round(dummyValue);
         } else {
-          dummyValue = Math.round(dummyValue); // whole number
+          // Duration in days
+          dummyValue = Math.random() * 15;
+          dummyValue = Math.round(dummyValue);
         }
-      } else if (effectiveMin !== null && effectiveMin !== undefined) {
-        // Only min specified - use min + some reasonable value
-        dummyValue = effectiveMin + Math.random() * 50;
+      }
+      
+      // ===== CATION EXCHANGE CAPACITY (CEC) =====
+      else if (propLower.includes('cec') || propLower.includes('cation exchange')) {
+        // CEC: 2-40 meq/100g, typical 8-25
+        effectiveMax = Math.min(effectiveMax, 50);
+        dummyValue = 8 + Math.random() * 20;
         dummyValue = Math.round(dummyValue * 10) / 10;
-      } else if (effectiveMax !== null && effectiveMax !== undefined) {
-        // Only max specified - use middle range
-        dummyValue = (effectiveMax / 2) + (Math.random() * effectiveMax / 4);
+      }
+      
+      // ===== SALINITY / EC =====
+      else if (propLower.includes('ec') || propLower.includes('electrical conductivity') || 
+               propLower.includes('salinity')) {
+        // EC: 0-16 dS/m, most soils < 4
+        effectiveMax = Math.min(effectiveMax, 20);
+        dummyValue = Math.random() * 3; // concentrated in low range
         dummyValue = Math.round(dummyValue * 10) / 10;
-      } else {
-        // No range specified - use a moderate value
-        dummyValue = Math.random() * 50 + 10;
+      }
+      
+      // ===== SODIUM ADSORPTION RATIO (SAR) =====
+      else if (propLower.includes('sar') || propLower.includes('sodium adsorption')) {
+        // SAR: 0-30, most soils < 13
+        effectiveMax = Math.min(effectiveMax, 40);
+        dummyValue = Math.random() * 8;
         dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      // ===== ROCK FRAGMENTS =====
+      else if (propLower.includes('rock') || propLower.includes('gravel') || 
+               propLower.includes('fragment')) {
+        // Rock fragments: 0-80%, typical 5-35%
+        effectiveMax = Math.min(effectiveMax, 90);
+        dummyValue = Math.random() * 35;
+        dummyValue = Math.round(dummyValue);
+      }
+      
+      // ===== PERCENTAGE PROPERTIES =====
+      else if (propLower.includes('percent') || propLower.includes('pct') || propLower.includes('%')) {
+        effectiveMax = Math.min(effectiveMax, 100);
+        // General percentage: spread across range but weight towards middle
+        dummyValue = 20 + Math.random() * 60;
+        dummyValue = Math.round(dummyValue * 10) / 10;
+      }
+      
+      // ===== THICKNESS / WIDTH MEASUREMENTS =====
+      else if (propLower.includes('thickness') || propLower.includes('thk')) {
+        // Layer thickness: 5-100cm
+        dummyValue = 10 + Math.random() * 70;
+        dummyValue = Math.round(dummyValue);
+      }
+      
+      // ===== TAXONOMIC / CLASSIFICATION (integers) =====
+      else if (propLower.includes('taxon') || propLower.includes('order') || 
+               propLower.includes('suborder') || propLower.includes('great group')) {
+        // These are usually coded integers
+        effectiveMax = Math.min(effectiveMax, 100);
+        dummyValue = Math.floor(Math.random() * (effectiveMax - effectiveMin + 1)) + effectiveMin;
+      }
+      
+      // ===== DEFAULT CASE: Use property min/max with realistic constraints =====
+      else {
+        if (effectiveMin !== null && effectiveMin !== undefined && 
+            effectiveMax !== null && effectiveMax !== undefined) {
+          // Generate value in middle 60% of range (avoid extremes)
+          const range = effectiveMax - effectiveMin;
+          const buffer = range * 0.2;
+          const min = effectiveMin + buffer;
+          const max = effectiveMax - buffer;
+          dummyValue = Math.random() * (max - min) + min;
+          
+          // Round based on the range magnitude
+          if (range < 5) {
+            dummyValue = Math.round(dummyValue * 100) / 100; // 2 decimals
+          } else if (range < 50) {
+            dummyValue = Math.round(dummyValue * 10) / 10; // 1 decimal
+          } else {
+            dummyValue = Math.round(dummyValue); // whole number
+          }
+        } else if (effectiveMin !== null && effectiveMin !== undefined) {
+          dummyValue = effectiveMin + Math.random() * 30;
+          dummyValue = Math.round(dummyValue * 10) / 10;
+        } else if (effectiveMax !== null && effectiveMax !== undefined) {
+          dummyValue = (effectiveMax * 0.4) + (Math.random() * effectiveMax * 0.3);
+          dummyValue = Math.round(dummyValue * 10) / 10;
+        } else {
+          dummyValue = 20 + Math.random() * 40;
+          dummyValue = Math.round(dummyValue * 10) / 10;
+        }
       }
       
       autoValues[prop.propname] = dummyValue;
