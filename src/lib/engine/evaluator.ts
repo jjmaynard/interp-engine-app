@@ -95,10 +95,20 @@ export function evaluateNode(
     // Evaluate the property
     const rating = evaluateProperty(propertyValue, evaluation);
 
+    // Store result by both evaluation name AND evaliid for tree visualization
+    const evaluationResults: Record<string, number> = {
+      [evaluation.evalname]: rating
+    };
+    
+    // Also store by evaliid (as string) for tree node lookup
+    if (evaluation.evaliid) {
+      evaluationResults[String(evaluation.evaliid)] = rating;
+    }
+
     return {
       rating,
       propertyValues: { [propertyName]: propertyValue ?? null },
-      evaluationResults: { [evaluation.evalname]: rating },
+      evaluationResults,
     };
   }
 
