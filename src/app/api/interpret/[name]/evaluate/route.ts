@@ -58,6 +58,9 @@ export async function POST(
     const cached = cache.get(interpretationName, propertyData);
 
     if (cached) {
+      console.log('[Evaluate API] Returning cached result');
+      console.log('[Evaluate API] Cached rating:', cached.rating);
+      console.log('[Evaluate API] Cached rating class:', cached.ratingClass);
       return NextResponse.json({
         success: true,
         data: cached,
@@ -65,9 +68,16 @@ export async function POST(
       });
     }
 
+    console.log('[Evaluate API] No cache hit, evaluating...');
+
     // Get engine instance and evaluate
     const engine = await getDefaultEngine();
     const result = await engine.evaluate(interpretationName, propertyData);
+
+    console.log('[Evaluate API] Evaluation complete');
+    console.log('[Evaluate API] Result rating:', result.rating);
+    console.log('[Evaluate API] Result rating class:', result.ratingClass);
+    console.log('[Evaluate API] Evaluation results count:', Object.keys(result.evaluationResults || {}).length);
 
     // Cache result
     cache.set(interpretationName, propertyData, result);

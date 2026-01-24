@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import type { InterpretationResult } from '@/types/interpretation';
 
 interface InterpretationResultDisplayProps {
@@ -11,6 +12,15 @@ export function InterpretationResultDisplay({
   result,
   interpretationName,
 }: InterpretationResultDisplayProps) {
+  
+  useEffect(() => {
+    console.log('[ResultDisplay] Component rendered with result:', {
+      rating: result.rating,
+      ratingClass: result.ratingClass,
+      timestamp: result.timestamp,
+      evaluationResultsCount: Object.keys(result.evaluationResults || {}).length
+    });
+  }, [result]);
   
   const getRatingColor = (rating: number) => {
     if (rating >= 0.9) return 'bg-green-500';

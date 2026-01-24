@@ -252,6 +252,7 @@ export default function InterpretPage() {
             {/* Results Display */}
             {result && (
               <InterpretationResultDisplay
+                key={`result-${result.timestamp}`}
                 result={result}
                 interpretationName={selectedInterp}
               />
