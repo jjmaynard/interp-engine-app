@@ -365,38 +365,127 @@ export function evaluateProperty(
     return result;
   }
 
-  // Handle categorical/crisp evaluations
-  if (typeof x === 'string' && evaluation.crispExpression) {
-    // Parse crisp expression like: ="moderately well" or = "excessively" or "somewhat excessively"
+  // Handle crisp expressions (both categorical and numeric)
+  if (evaluation.crispExpression) {
     const expr = evaluation.crispExpression.trim();
     
-    // Handle simple equality: ="value"
-    const simpleMatch = expr.match(/^=\s*"([^"]+)"$/);
-    if (simpleMatch) {
-      const result = x === simpleMatch[1] ? 1 : 0;
-      console.log('[evaluateProperty] Crisp result:', {
-        expression: expr,
-        inputValue: x,
-        targetValue: simpleMatch[1],
-        result
-      });
-      return result;
+    // Handle string categorical crisp expressions
+    if (typeof x === 'string') {
+      // Handle simple equality: ="value"
+      const simpleMatch = expr.match(/^=\s*"([^"]+)"$/);
+      if (simpleMatch) {
+        const result = x === simpleMatch[1] ? 1 : 0;
+        console.log('[evaluateProperty] Crisp result:', {
+          expression: expr,
+          inputValue: x,
+          targetValue: simpleMatch[1],
+          result
+        });
+        return result;
+      }
+      
+      // Handle OR expressions: = "value1" or "value2"
+      const orMatch = expr.match(/^=\s*"([^"]+)"\s+or\s+"([^"]+)"$/);
+      if (orMatch) {
+        const result = (x === orMatch[1] || x === orMatch[2]) ? 1 : 0;
+        console.log('[evaluateProperty] Crisp OR result:', {
+          expression: expr,
+          inputValue: x,
+          matches: result === 1
+        });
+        return result;
+      }
+      
+      console.warn('[evaluateProperty] Unsupported string crisp expression:', expr);
+      return 0;
     }
     
-    // Handle OR expressions: = "value1" or "value2"
-    const orMatch = expr.match(/^=\s*"([^"]+)"\s+or\s+"([^"]+)"$/);
-    if (orMatch) {
-      const result = (x === orMatch[1] || x === orMatch[2]) ? 1 : 0;
-      console.log('[evaluateProperty] Crisp OR result:', {
-        expression: expr,
-        inputValue: x,
-        matches: result === 1
-      });
-      return result;
+    // Handle numeric crisp expressions
+    if (typeof x === 'number') {
+      // Remove HTML entities
+      const cleanExpr = expr
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .trim();
+      
+      // Handle numeric comparisons: <10, >=6.5, <=29, >50, =10, etc.
+      const numMatch = cleanExpr.match(/^([<>=]+)\s*([\d.]+)$/);
+      if (numMatch) {
+        const operator = numMatch[1];
+        const value = parseFloat(numMatch[2]);
+        let result = 0;
+        
+        switch (operator) {
+          case '<':
+            result = x < value ? 1 : 0;
+            break;
+          case '<=':
+            result = x <= value ? 1 : 0;
+            break;
+          case '>':
+            result = x > value ? 1 : 0;
+            break;
+          case '>=':
+            result = x >= value ? 1 : 0;
+            break;
+          case '=':
+            result = x === value ? 1 : 0;
+            break;
+          default:
+            console.warn('[evaluateProperty] Unknown operator:', operator);
+            return 0;
+        }
+        
+        console.log('[evaluateProperty] Numeric crisp result:', {
+          expression: cleanExpr,
+          inputValue: x,
+          operator,
+          compareValue: value,
+          result
+        });
+        return result;
+      }
+      
+      // Handle range expressions: >=7 and <10
+      const rangeMatch = cleanExpr.match(/^([<>=]+)\s*([\d.]+)\s+and\s+([<>=]+)\s*([\d.]+)$/);
+      if (rangeMatch) {
+        const op1 = rangeMatch[1];
+        const val1 = parseFloat(rangeMatch[2]);
+        const op2 = rangeMatch[3];
+        const val2 = parseFloat(rangeMatch[4]);
+        
+        let cond1 = false;
+        let cond2 = false;
+        
+        switch (op1) {
+          case '<': cond1 = x < val1; break;
+          case '<=': cond1 = x <= val1; break;
+          case '>': cond1 = x > val1; break;
+          case '>=': cond1 = x >= val1; break;
+          case '=': cond1 = x === val1; break;
+        }
+        
+        switch (op2) {
+          case '<': cond2 = x < val2; break;
+          case '<=': cond2 = x <= val2; break;
+          case '>': cond2 = x > val2; break;
+          case '>=': cond2 = x >= val2; break;
+          case '=': cond2 = x === val2; break;
+        }
+        
+        const result = (cond1 && cond2) ? 1 : 0;
+        console.log('[evaluateProperty] Numeric range crisp result:', {
+          expression: cleanExpr,
+          inputValue: x,
+          result
+        });
+        return result;
+      }
+      
+      console.warn('[evaluateProperty] Unsupported numeric crisp expression:', cleanExpr);
+      return 0;
     }
-    
-    console.warn('[evaluateProperty] Unsupported crisp expression format:', expr);
-    return 0;
   }
   
   if (typeof x === 'string' && evaluation.evalname) {
