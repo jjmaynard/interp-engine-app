@@ -365,9 +365,42 @@ export function evaluateProperty(
     return result;
   }
 
-  // Handle categorical evaluations
+  // Handle categorical/crisp evaluations
+  if (typeof x === 'string' && evaluation.crispExpression) {
+    // Parse crisp expression like: ="moderately well" or = "excessively" or "somewhat excessively"
+    const expr = evaluation.crispExpression.trim();
+    
+    // Handle simple equality: ="value"
+    const simpleMatch = expr.match(/^=\s*"([^"]+)"$/);
+    if (simpleMatch) {
+      const result = x === simpleMatch[1] ? 1 : 0;
+      console.log('[evaluateProperty] Crisp result:', {
+        expression: expr,
+        inputValue: x,
+        targetValue: simpleMatch[1],
+        result
+      });
+      return result;
+    }
+    
+    // Handle OR expressions: = "value1" or "value2"
+    const orMatch = expr.match(/^=\s*"([^"]+)"\s+or\s+"([^"]+)"$/);
+    if (orMatch) {
+      const result = (x === orMatch[1] || x === orMatch[2]) ? 1 : 0;
+      console.log('[evaluateProperty] Crisp OR result:', {
+        expression: expr,
+        inputValue: x,
+        matches: result === 1
+      });
+      return result;
+    }
+    
+    console.warn('[evaluateProperty] Unsupported crisp expression format:', expr);
+    return 0;
+  }
+  
   if (typeof x === 'string' && evaluation.evalname) {
-    console.warn('[evaluateProperty] Categorical evaluation not yet implemented for:', evaluation.evalname);
+    console.warn('[evaluateProperty] Categorical evaluation without crispExpression:', evaluation.evalname);
     // For now, return 0 for categorical - will need category mapping
     return 0;
   }
