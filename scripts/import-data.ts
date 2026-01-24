@@ -146,9 +146,9 @@ function parseEvaluationXML(xmlString: string): {
 
   try {
     // Extract DomainPoints
-    const domainMatch = xmlString.match(/<DomainPoints>(.*?)<\/DomainPoints>/s);
-    const rangeMatch = xmlString.match(/<RangePoints>(.*?)<\/RangePoints>/s);
-    const crispMatch = xmlString.match(/<CrispExpression>(.*?)<\/CrispExpression>/s);
+    const domainMatch = xmlString.match(/<DomainPoints>([\s\S]*?)<\/DomainPoints>/);
+    const rangeMatch = xmlString.match(/<RangePoints>([\s\S]*?)<\/RangePoints>/);
+    const crispMatch = xmlString.match(/<CrispExpression>([\s\S]*?)<\/CrispExpression>/);
 
     // Parse crisp expression if present
     const crispExpression = crispMatch ? crispMatch[1].trim() : null;
