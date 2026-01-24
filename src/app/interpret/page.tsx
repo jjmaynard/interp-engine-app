@@ -61,7 +61,7 @@ export default function InterpretPage() {
   }, [selectedInterp]);
 
   // Handle evaluation
-  const handleEvaluate = async (propertyValues: Record<string, number | null>) => {
+  const handleEvaluate = async (propertyValues: Record<string, number | string | null>) => {
     if (!selectedInterp) return;
     
     console.log('[Client] Starting evaluation for:', selectedInterp);
