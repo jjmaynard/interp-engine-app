@@ -1,6 +1,7 @@
 /**
  * Caching layer for interpretation engine data
  * Provides in-memory caching to improve performance
+ * Now uses static JSON files instead of database to avoid transfer quota limits
  */
 
 import {
@@ -9,10 +10,10 @@ import {
   Property
 } from '@/types/interpretation';
 import {
-  getAllInterpretations,
-  getAllEvaluations,
-  getAllProperties,
-} from '@/lib/db/queries';
+  loadInterpretationTrees,
+  loadEvaluations,
+  loadProperties,
+} from '@/lib/data/static-loader';
 
 /**
  * Cache class for interpretation data
@@ -27,7 +28,7 @@ class DataCache {
   private cacheTTL: number = 60 * 60 * 1000; // 1 hour in milliseconds
 
   /**
-   * Get cached interpretation trees or load them from database
+   * Get cached interpretation trees or load them from static files
    */
   async getInterpretationTrees(): Promise<InterpretationTree[]> {
     if (this.shouldRefreshCache()) {
@@ -35,30 +36,7 @@ class DataCache {
     }
     
     if (!this.interpretationTreesCache) {
-      const dbResults = await getAllInterpretations();
-      this.interpretationTreesCache = dbResults.map(interp => {
-        const parsed = typeof interp.treeStructure === 'string' 
-          ? JSON.parse(interp.treeStructure) 
-          : interp.treeStructure;
-        
-        // If treeStructure is the full interpretation object with properties
-        if (parsed && typeof parsed === 'object' && 'tree' in parsed) {
-          return {
-            name: [interp.name],
-            tree: parsed.tree || [],
-            properties: parsed.properties || [],
-            property_count: parsed.property_count || parsed.properties?.length || 0,
-          };
-        }
-        
-        // Otherwise treeStructure is just the tree array
-        return {
-          name: [interp.name],
-          tree: parsed || [],
-          properties: [],
-          property_count: 0,
-        };
-      });
+      this.interpretationTreesCache = loadInterpretationTrees();
       this.lastCacheTime = Date.now();
     }
     
@@ -66,7 +44,7 @@ class DataCache {
   }
 
   /**
-   * Get cached evaluations or load them from database
+   * Get cached evaluations or load them from static files
    */
   async getEvaluations(): Promise<Evaluation[]> {
     if (this.shouldRefreshCache()) {
@@ -74,7 +52,7 @@ class DataCache {
     }
     
     if (!this.evaluationsCache) {
-      this.evaluationsCache = await getAllEvaluations();
+      this.evaluationsCache = loadEvaluations();
       this.lastCacheTime = Date.now();
     }
     
@@ -82,7 +60,7 @@ class DataCache {
   }
 
   /**
-   * Get cached properties or load them from database
+   * Get cached properties or load them from static files
    */
   async getProperties(): Promise<Property[]> {
     if (this.shouldRefreshCache()) {
@@ -90,7 +68,7 @@ class DataCache {
     }
     
     if (!this.propertiesCache) {
-      this.propertiesCache = await getAllProperties();
+      this.propertiesCache = loadProperties();
       this.lastCacheTime = Date.now();
     }
     
