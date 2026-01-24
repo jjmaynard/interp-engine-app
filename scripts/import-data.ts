@@ -34,10 +34,14 @@ interface JSONEvaluation {
   evaliid: number;
   evalname: string;
   evaldesc?: string;
+  eval?: string; // XML string containing DomainPoints/RangePoints
   evaluationtype: string;
   invertevaluationresults?: boolean;
   propname: string;
   propmod: string;
+  propuom?: string;
+  propmin?: number;
+  propmax?: number;
   evalxml?: string;
   points?: any[];
   interpolation?: string;
@@ -129,16 +133,98 @@ async function importProperties(db: ReturnType<typeof getDb>) {
   console.log(`✅ Imported ${imported} properties (${skipped} skipped)`);
 }
 
+/**
+ * Parse XML evaluation data and extract DomainPoints and RangePoints
+ */
+function parseEvaluationXML(xmlString: string): { 
+  points: { x: number, y: number }[] | null,
+  crispExpression: string | null 
+} {
+  if (!xmlString) {
+    return { points: null, crispExpression: null };
+  }
+
+  try {
+    // Extract DomainPoints
+    const domainMatch = xmlString.match(/<DomainPoints>(.*?)<\/DomainPoints>/s);
+    const rangeMatch = xmlString.match(/<RangePoints>(.*?)<\/RangePoints>/s);
+    const crispMatch = xmlString.match(/<CrispExpression>(.*?)<\/CrispExpression>/s);
+
+    // Parse crisp expression if present
+    const crispExpression = crispMatch ? crispMatch[1].trim() : null;
+
+    // Parse domain and range points if both exist
+    if (domainMatch && rangeMatch) {
+      const domainContent = domainMatch[1];
+      const rangeContent = rangeMatch[1];
+
+      // Extract double values
+      const domainValues = Array.from(domainContent.matchAll(/<double>(.*?)<\/double>/g))
+        .map(m => parseFloat(m[1]));
+      const rangeValues = Array.from(rangeContent.matchAll(/<double>(.*?)<\/double>/g))
+        .map(m => parseFloat(m[1]));
+
+      // Create points array if we have matching domain and range values
+      if (domainValues.length > 0 && domainValues.length === rangeValues.length) {
+        const points = domainValues.map((x, i) => ({
+          x: x,
+          y: rangeValues[i]
+        }));
+        return { points, crispExpression };
+      }
+    }
+
+    return { points: null, crispExpression };
+  } catch (error) {
+    console.error('Error parsing evaluation XML:', error);
+    return { points: null, crispExpression: null };
+  }
+}
+
 async function importEvaluations(db: ReturnType<typeof getDb>) {
   console.log('\n📊 Importing evaluations...');
   
-  const evaluationsData = await loadJSONFile<JSONEvaluation[]>('evaluations.json');
+  const evaluationsData = await loadJSONFile<any[]>('evaluations.json');
   
   let imported = 0;
   let skipped = 0;
+  let parsedPoints = 0;
   
   for (const evaluation of evaluationsData) {
     try {
+      // Parse the XML to extract points and crisp expression
+      const { points, crispExpression } = evaluation.eval 
+        ? parseEvaluationXML(evaluation.eval)
+        : { points: null, crispExpression: null };
+
+      if (points && points.length > 0) {
+        parsedPoints++;
+      }
+
+      // Determine interpolation type based on evaluation type
+      let interpolation: string | null = null;
+      if (points && points.length > 0) {
+        const evalType = evaluation.evaluationtype?.toLowerCase();
+        switch (evalType) {
+          case 'arbitrarycurve':
+            interpolation = 'spline';
+            break;
+          case 'arbitrarylinear':
+          case 'linear':
+            interpolation = 'linear';
+            break;
+          case 'sigmoid':
+            interpolation = 'sigmoid';
+            break;
+          case 'trapezoid':
+          case 'triangle':
+            interpolation = 'linear';
+            break;
+          default:
+            interpolation = 'linear';
+        }
+      }
+
       await db
         .insert(evaluations)
         .values({
@@ -149,17 +235,17 @@ async function importEvaluations(db: ReturnType<typeof getDb>) {
           invertevaluationresults: evaluation.invertevaluationresults || false,
           propname: evaluation.propname,
           propmod: evaluation.propmod || '',
-          evalxml: evaluation.evalxml || null,
-          points: evaluation.points ? JSON.stringify(evaluation.points) : null,
-          interpolation: evaluation.interpolation || null,
-          crispExpression: evaluation.crispExpression || null,
+          evalxml: evaluation.eval || null,
+          points: points ? JSON.stringify(points) : null,
+          interpolation: interpolation,
+          crispExpression: crispExpression,
         })
         .onConflictDoNothing();
       
       imported++;
       
-      if (imported % 100 === 0) {
-        console.log(`  Imported ${imported} evaluations...`);
+      if (imported % 500 === 0) {
+        console.log(`  Imported ${imported} evaluations (${parsedPoints} with points)...`);
       }
     } catch (error) {
       skipped++;
@@ -167,7 +253,7 @@ async function importEvaluations(db: ReturnType<typeof getDb>) {
     }
   }
   
-  console.log(`✅ Imported ${imported} evaluations (${skipped} skipped)`);
+  console.log(`✅ Imported ${imported} evaluations (${parsedPoints} with fuzzy curves, ${skipped} skipped)`);
 }
 
 async function importInterpretations(
