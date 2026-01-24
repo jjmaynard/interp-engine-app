@@ -286,11 +286,11 @@ export default function InterpretPage() {
                 <GitBranch className="w-5 h-5 text-purple-600 flex-shrink-0" />
                 <span className="text-gray-700 text-left">Interactive property input and visualization</span>
               </div>
-              </div>
             </div>
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
