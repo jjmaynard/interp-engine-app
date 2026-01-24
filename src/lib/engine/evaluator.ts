@@ -339,7 +339,7 @@ export function getRequiredProperties(
 ): string[] {
   const propertyNames = new Set<string>();
 
-  function traverseNode(node: RuleNode) {
+  function traverseNode(node: RuleNode | any) {
     // Check if this node references an evaluation
     if (node.RefId || node.rule_refid) {
       const refId = node.RefId || node.rule_refid;
@@ -367,15 +367,23 @@ export function getRequiredProperties(
     }
 
     if (node.children) {
-      node.children.forEach(child => traverseNode(child));
+      node.children.forEach((child: any) => traverseNode(child));
     }
   }
 
-  // Handle both tree.tree (wrapped) and direct tree array
-  const treeArray = Array.isArray(tree.tree) ? tree.tree : (Array.isArray(tree) ? tree as any : []);
-  
-  if (treeArray && treeArray.length > 0) {
-    treeArray.forEach((node: RuleNode) => traverseNode(node));
+  // Handle different tree structures:
+  // 1. tree.tree is an object (single root node with children)
+  // 2. tree.tree is an array
+  // 3. tree itself is an array
+  if (tree.tree) {
+    if (Array.isArray(tree.tree)) {
+      tree.tree.forEach((node: RuleNode) => traverseNode(node));
+    } else if (typeof tree.tree === 'object') {
+      // tree.tree is the root node object
+      traverseNode(tree.tree);
+    }
+  } else if (Array.isArray(tree)) {
+    (tree as any[]).forEach((node: RuleNode) => traverseNode(node));
   }
 
   return Array.from(propertyNames);
