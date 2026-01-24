@@ -290,7 +290,7 @@ export function evaluateInterpretation(
     } else if (typeof tree.tree === 'object') {
       // New format: tree.tree is the root node object
       rootNode = tree.tree as RuleNode;
-      console.log('[Evaluator] Using hierarchical tree format with root node:', rootNode.name);
+      console.log('[Evaluator] Using hierarchical tree format with root node:', (rootNode as any).name);
     } else {
       console.warn('[Evaluator] tree.tree has unexpected type:', typeof tree.tree);
       return {
