@@ -8,6 +8,8 @@ import { PropertyInputForm } from '@/components/forms/PropertyInputForm';
 import { InterpretationResultDisplay } from '@/components/results/InterpretationResult';
 import { RuleTreeVisualization } from '@/components/visualization/RuleTreeVisualization';
 
+type TabType = 'properties' | 'tree';
+
 export default function InterpretPage() {
   const [selectedInterp, setSelectedInterp] = useState<string>('');
   const [requiredProps, setRequiredProps] = useState<Property[]>([]);
@@ -16,6 +18,7 @@ export default function InterpretPage() {
   const [loading, setLoading] = useState(false);
   const [loadingProps, setLoadingProps] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>('properties');
 
   // Load required properties when interpretation changes
   useEffect(() => {
@@ -23,6 +26,7 @@ export default function InterpretPage() {
       setRequiredProps([]);
       setRuleTree([]);
       setResult(null);
+      setActiveTab('properties');
       return;
     }
 
@@ -100,11 +104,11 @@ export default function InterpretPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Soil Interpretation Evaluator</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">NRCS Soil Interpretation Engine</h1>
         <p className="text-lg text-gray-600">
-          Evaluate NRCS soil interpretations using property data and fuzzy logic
+          Evaluate soil interpretations using property data and fuzzy logic
         </p>
       </div>
 
@@ -115,87 +119,146 @@ export default function InterpretPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Interpretation Selection and Form */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Interpretation Selection */}
-          <div className="p-6 bg-white rounded-lg shadow-md">
-            <InterpretationSelector
-              value={selectedInterp}
-              onChange={setSelectedInterp}
-            />
-            
-            {selectedInterp && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                <p className="text-sm text-blue-900">
-                  <span className="font-medium">Selected:</span> {selectedInterp}
-                </p>
-                <p className="text-xs text-blue-700 mt-1">
-                  {requiredProps.length} properties required for evaluation
-                </p>
-              </div>
-            )}
+      {/* Interpretation Selection */}
+      <div className="mb-6 p-6 bg-white rounded-lg shadow-md">
+        <InterpretationSelector
+          value={selectedInterp}
+          onChange={setSelectedInterp}
+        />
+        
+        {selectedInterp && (
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+            <p className="text-sm text-blue-900">
+              <span className="font-medium">Selected:</span> {selectedInterp}
+            </p>
+            <p className="text-xs text-blue-700 mt-1">
+              {requiredProps.length} properties required for evaluation
+            </p>
           </div>
-
-          {/* Property Input Form */}
-          {selectedInterp && (
-            <div className="p-6 bg-white rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">
-                Enter Property Values
-              </h2>
-              
-              {loadingProps ? (
-                <PropertyFormSkeleton count={5} />
-              ) : requiredProps.length > 0 ? (
-                <PropertyInputForm
-                  properties={requiredProps}
-                  onSubmit={handleEvaluate}
-                  loading={loading}
-                />
-              ) : (
-                <div className="p-8 text-center text-gray-500">
-                  <p>No properties available for this interpretation.</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Right Column - Results and Info */}
-        <div className="space-y-6">
-          {/* Info Card */}
-          {!result && (
-            <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                How to Use
-              </h3>
-              <ol className="text-sm text-blue-800 space-y-2 list-decimal list-inside">
-                <li>Select an interpretation from the dropdown</li>
-                <li>Enter all required property values</li>
-                <li>Click "Calculate Interpretation"</li>
-                <li>View your results and export if needed</li>
-              </ol>
-            </div>
-          )}
-
-          {/* Results Display */}
-          {result && selectedInterp && (
-            <InterpretationResultDisplay
-              result={result}
-              interpretationName={selectedInterp}
-            />
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Rule Tree Visualization - Full Width Below */}
-      {ruleTree.length > 0 && (
-        <div className="mt-8">
-          <RuleTreeVisualization
-            tree={ruleTree}
-            interpretationName={selectedInterp}
-            evaluationResults={result?.evaluationResults}
-          />
+      {/* Main Content - Only show if interpretation is selected */}
+      {selectedInterp && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Tabs and Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Tab Navigation */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="border-b border-gray-200">
+                <nav className="flex -mb-px">
+                  <button
+                    onClick={() => setActiveTab('properties')}
+                    className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === 'properties'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Property Input
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('tree')}
+                    className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                      activeTab === 'tree'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Rule Tree
+                  </button>
+                </nav>
+              </div>
+
+              {/* Tab Content */}
+              <div className="p-6">
+                {activeTab === 'properties' ? (
+                  <>
+                    <h2 className="text-xl font-semibold mb-4 text-gray-900">
+                      Enter Property Values
+                    </h2>
+                    
+                    {loadingProps ? (
+                      <PropertyFormSkeleton count={5} />
+                    ) : requiredProps.length > 0 ? (
+                      <PropertyInputForm
+                        properties={requiredProps}
+                        onSubmit={handleEvaluate}
+                        loading={loading}
+                      />
+                    ) : (
+                      <div className="p-8 text-center text-gray-500">
+                        <p>No properties available for this interpretation.</p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-xl font-semibold mb-4 text-gray-900">
+                      Decision Rule Tree
+                    </h2>
+                    {ruleTree.length > 0 ? (
+                      <RuleTreeVisualization
+                        tree={ruleTree}
+                        interpretationName={selectedInterp}
+                        evaluationResults={result?.evaluationResults}
+                      />
+                    ) : (
+                      <div className="p-8 text-center text-gray-500">
+                        <p>No rule tree available for this interpretation.</p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Results and Info */}
+          <div className="space-y-6">
+            {/* Info Card */}
+            {!result && (
+              <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                  How to Use
+                </h3>
+                <ol className="text-sm text-blue-800 space-y-2 list-decimal list-inside">
+                  <li>Select an interpretation from the dropdown</li>
+                  <li>Enter property values in the Property Input tab</li>
+                  <li>Click "Calculate Interpretation"</li>
+                  <li>View results and rule tree visualization</li>
+                </ol>
+              </div>
+            )}
+
+            {/* Results Display */}
+            {result && (
+              <InterpretationResultDisplay
+                result={result}
+                interpretationName={selectedInterp}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Initial state - No interpretation selected */}
+      {!selectedInterp && (
+        <div className="p-12 bg-white rounded-lg shadow-md text-center">
+          <div className="max-w-md mx-auto">
+            <div className="text-6xl mb-4">🌱</div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Get Started
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Select a soil interpretation from the dropdown above to begin evaluating soil properties.
+            </p>
+            <div className="text-sm text-gray-500 space-y-1">
+              <p>✓ Over 2,000 NRCS interpretations available</p>
+              <p>✓ Fuzzy logic-based evaluation engine</p>
+              <p>✓ Interactive property input and visualization</p>
+            </div>
+          </div>
         </div>
       )}
     </div>

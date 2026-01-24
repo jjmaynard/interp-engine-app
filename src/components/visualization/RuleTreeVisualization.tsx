@@ -137,20 +137,82 @@ export function RuleTreeVisualization({
     if (!tree || tree.length === 0) return;
 
     console.log('[TreeViz] Building tree from', tree.length, 'nodes');
+    console.log('[TreeViz] First node has children?', !!tree[0]?.children, 'length:', tree[0]?.children?.length);
 
+    // Check if tree already has children arrays built
+    if (tree[0]?.children) {
+      // Tree is already hierarchical, use directly
+      const convertNode = (node: RuleNode, depth: number = 0): TreeNodeData => {
+        const label = node.levelName?.trim() || '';
+        
+        const nodeData: TreeNodeData = {
+          id: `node-${Math.random()}`,
+          label: label.replace(/^[\s¦°\-│├└]+/, ''), // Remove box-drawing prefix
+          type: 'rule',
+          level: depth,
+          children: [],
+        };
+
+        // Determine node type
+        if (node.Type) {
+          nodeData.type = 'operator';
+          nodeData.operator = node.Type;
+        }
+        if (node.Value) {
+          nodeData.type = 'hedge';
+          nodeData.hedge = label;
+          nodeData.value = node.Value;
+        }
+        if (node.RefId || node.rule_refid) {
+          nodeData.type = 'evaluation';
+          const refId = node.RefId || node.rule_refid;
+          if (refId && evaluationResults[refId]) {
+            nodeData.rating = evaluationResults[refId];
+          }
+        }
+
+        // Recursively convert children
+        if (node.children && node.children.length > 0) {
+          nodeData.children = node.children.map(child => convertNode(child, depth + 1));
+        }
+
+        return nodeData;
+      };
+
+      const rootNode = convertNode(tree[0], 0);
+      console.log('[TreeViz] Using pre-built tree, depth from children arrays');
+      setTreeData([rootNode]);
+      return;
+    }
+
+    // Otherwise, tree is flat - parse from indentation
     const nodes: TreeNodeData[] = [];
     const stack: { node: TreeNodeData; level: number }[] = [];
     let nodeId = 0;
     let maxDepth = 0;
 
     tree.forEach((item, idx) => {
-      const level = (item.levelName.match(/^\s*/)?.[0].length || 0) / 2;
-      maxDepth = Math.max(maxDepth, level);
-      const label = item.levelName.trim();
+      // Parse indentation from R data.tree format
+      // Format: "    ¦   °--Label" where each level adds ~4 chars
+      // Count both spaces AND box-drawing characters before the label
+      const fullText = item.levelName;
+      const labelMatch = fullText.match(/^[\s¦°\-│├└]+(.+)$/);
+      const label = labelMatch ? labelMatch[1].trim() : fullText.trim();
+      
+      // Calculate depth by counting the visual indentation units
+      // Each level typically adds: "    " (4 spaces) or "¦   " or "°--"
+      const prefixLength = fullText.length - label.length - (fullText.match(label)?.[0]?.length || 0);
+      const level = Math.floor(prefixLength / 4);
 
       if (idx < 10) {
-        console.log(`[TreeViz] Node ${idx}: level=${level}, label="${label.substring(0, 50)}"`);
+        console.log(`[TreeViz] Node ${idx}: level=${level}, prefix="${fullText.substring(0, 20)}", label="${label.substring(0, 40)}"`);
       }
+
+      if (idx < 10) {
+        console.log(`[TreeViz] Node ${idx}: level=${level}, prefix="${fullText.substring(0, 20)}", label="${label.substring(0, 40)}"`);
+      }
+      
+      maxDepth = Math.max(maxDepth, level);
 
       const nodeData: TreeNodeData = {
         id: `node-${nodeId++}`,

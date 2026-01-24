@@ -9,20 +9,19 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:import": "tsx scripts/import-data.ts",
+    "db:setup": "npm run db:generate && npm run db:migrate && npm run db:import",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
-    "dotenv": "^17.2.3",
-    "drizzle-kit": "^0.31.8",
-    "drizzle-orm": "^0.45.1",
     "next": "16.1.4",
-    "pg": "^8.17.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "reactflow": "^11.11.4",
     "tailwind-merge": "^3.4.0",
     "xml2js": "^0.6.2",
     "zod": "^4.3.6"
@@ -32,7 +31,6 @@
     "@tailwindcss/postcss": "^4",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
-    "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/xml2js": "^0.4.14",
@@ -42,7 +40,6 @@
     "jest": "^30.2.0",
     "tailwindcss": "^4",
     "ts-jest": "^29.4.6",
-    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
