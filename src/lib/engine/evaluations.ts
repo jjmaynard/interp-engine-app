@@ -399,6 +399,21 @@ export function evaluateProperty(
         return result;
       }
       
+      // Handle matches pattern: matches "value1" or "value2" or "value3"
+      const matchesPattern = /^matches\s+"([^"]+)"(\s+or\s+"([^"]+)")*$/;
+      if (matchesPattern.test(expr)) {
+        // Extract all quoted values
+        const values = Array.from(expr.matchAll(/"([^"]+)"/g)).map(m => m[1]);
+        const result = values.includes(x) ? 1 : 0;
+        console.log('[evaluateProperty] Matches pattern result:', {
+          expression: expr,
+          inputValue: x,
+          possibleValues: values,
+          matches: result === 1
+        });
+        return result;
+      }
+      
       console.warn('[evaluateProperty] Unsupported string crisp expression:', expr);
       return 0;
     }
