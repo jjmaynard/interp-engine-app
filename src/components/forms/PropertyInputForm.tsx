@@ -109,8 +109,21 @@ export function PropertyInputForm({
       
       const propLower = prop.propname.toLowerCase();
       const propName = prop.propname;
-      let effectiveMin = prop.propmin ?? 0;
-      let effectiveMax = prop.propmax ?? 100;
+      
+      // Get actual min/max from property, default to reasonable values
+      let effectiveMin = typeof prop.propmin === 'number' ? prop.propmin : 
+                         (typeof prop.propmin === 'string' ? parseFloat(prop.propmin) : 0);
+      let effectiveMax = typeof prop.propmax === 'number' ? prop.propmax : 
+                         (typeof prop.propmax === 'string' ? parseFloat(prop.propmax) : 100);
+      
+      // Ensure valid range
+      if (isNaN(effectiveMin)) effectiveMin = 0;
+      if (isNaN(effectiveMax)) effectiveMax = 100;
+      if (effectiveMin > effectiveMax) {
+        const temp = effectiveMin;
+        effectiveMin = effectiveMax;
+        effectiveMax = temp;
+      }
       
       // ===== SOIL DEPTH PROPERTIES =====
       if (propLower.includes('depth') && !propLower.includes('ph')) {
@@ -235,12 +248,14 @@ export function PropertyInputForm({
         dummyValue = Math.round(dummyValue * 10) / 10;
       }
       
-      // ===== ROCK FRAGMENTS =====
+      // ===== ROCK FRAGMENTS / SIEVE PASSING =====
       else if (propLower.includes('rock') || propLower.includes('gravel') || 
-               propLower.includes('fragment')) {
-        // Rock fragments: 0-80%, typical 5-35%
-        effectiveMax = Math.min(effectiveMax, 90);
-        dummyValue = Math.random() * 35;
+               propLower.includes('fragment') || propLower.includes('sieve') ||
+               propLower.includes('passing')) {
+        // Rock fragments/sieve: typically 0-100% (weight percent)
+        // Use actual max if it's 100 or less (percentage), otherwise scale down
+        const maxPercent = Math.min(effectiveMax, 100);
+        dummyValue = Math.random() * Math.min(maxPercent, 40); // typical 0-40%
         dummyValue = Math.round(dummyValue);
       }
       
@@ -297,6 +312,9 @@ export function PropertyInputForm({
           dummyValue = Math.round(dummyValue * 10) / 10;
         }
       }
+      
+      // FINAL STEP: Ensure value is within the actual property min/max bounds
+      dummyValue = Math.max(effectiveMin, Math.min(effectiveMax, dummyValue));
       
       autoValues[prop.propname] = dummyValue;
     });
