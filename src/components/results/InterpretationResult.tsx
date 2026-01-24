@@ -152,7 +152,9 @@ export function InterpretationResultDisplay({
           <div>
             <h3 className="text-lg font-semibold mb-3 text-gray-900">Evaluation Breakdown</h3>
             <div className="space-y-3">
-              {Object.entries(result.evaluationResults).map(([key, value]) => (
+              {Object.entries(result.evaluationResults)
+                .filter(([key]) => isNaN(Number(key))) // Filter out numeric keys (evaliid)
+                .map(([key, value]) => (
                 <div key={key} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-700 font-medium">{key}</span>
