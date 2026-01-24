@@ -310,46 +310,68 @@ export function evaluateProperty(
 ): number {
   // Handle null/undefined values
   if (x === null || x === undefined) {
+    console.warn('[evaluateProperty] Property value is null/undefined for:', evaluation.evalname);
     return NaN;
   }
 
   const { interpolation, points, invertevaluationresults } = evaluation;
   const invert = invertevaluationresults === true;
 
+  console.log('[evaluateProperty] Evaluating:', {
+    evalname: evaluation.evalname,
+    propertyValue: x,
+    interpolation,
+    pointsCount: points?.length || 0,
+    invert,
+    hasPoints: !!points
+  });
+
   // Handle numeric evaluations
   if (typeof x === 'number' && points && points.length > 0) {
+    let result: number;
     switch (interpolation?.toLowerCase()) {
       case 'linear':
       case 'arbitrarylinear':
-        return linearInterpolation(x, points, invert);
+        result = linearInterpolation(x, points, invert);
+        break;
       
       case 'step':
       case 'crisp':
-        return stepFunction(x, points, invert);
+        result = stepFunction(x, points, invert);
+        break;
       
       case 'spline':
       case 'arbitrarycurve':
-        return splineInterpolation(x, points, invert);
+        result = splineInterpolation(x, points, invert);
+        break;
       
       case 'sigmoid':
         if (points.length >= 2) {
           const center = (points[0].x + points[1].x) / 2;
           const width = Math.abs(points[1].x - points[0].x);
-          return sigmoidEvaluation(x, center, width, invert);
+          result = sigmoidEvaluation(x, center, width, invert);
+        } else {
+          result = linearInterpolation(x, points, invert);
         }
-        return linearInterpolation(x, points, invert);
+        break;
       
       default:
         // Default to linear interpolation
-        return linearInterpolation(x, points, invert);
+        result = linearInterpolation(x, points, invert);
+        break;
     }
+    
+    console.log('[evaluateProperty] Result:', result);
+    return result;
   }
 
   // Handle categorical evaluations
   if (typeof x === 'string' && evaluation.evalname) {
+    console.warn('[evaluateProperty] Categorical evaluation not yet implemented for:', evaluation.evalname);
     // For now, return 0 for categorical - will need category mapping
     return 0;
   }
 
+  console.warn('[evaluateProperty] No points or invalid input type for:', evaluation.evalname, 'x:', x, 'type:', typeof x);
   return 0;
 }
