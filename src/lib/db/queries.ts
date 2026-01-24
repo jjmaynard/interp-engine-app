@@ -138,7 +138,7 @@ export async function getAllEvaluations() {
   return results.map(evaluation => ({
     ...evaluation,
     eval: evaluation.evalxml || '',
-    points: evaluation.points || null,
+    points: evaluation.points as { x: number; y: number }[] | undefined,
     interpolation: evaluation.interpolation as 'linear' | 'spline' | 'step' | null,
   }));
 }
@@ -160,7 +160,7 @@ export async function getEvaluationByName(name: string) {
   return {
     ...result,
     eval: result.evalxml || '',
-    points: result.points || null,
+    points: result.points as { x: number; y: number }[] | undefined,
     interpolation: result.interpolation as 'linear' | 'spline' | 'step' | null,
   };
 }
@@ -192,7 +192,7 @@ export async function getInterpretationEvaluations(interpretationId: number) {
   return results.map(evaluation => ({
     ...evaluation,
     eval: evaluation.evalxml || '',
-    points: evaluation.points || null,
+    points: evaluation.points as { x: number; y: number }[] | undefined,
     interpolation: evaluation.interpolation as 'linear' | 'spline' | 'step' | null,
   }));
 }
