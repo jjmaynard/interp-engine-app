@@ -40,11 +40,14 @@ export interface Evaluation {
 export interface Property {
   propiid: string;
   propname: string;
-  propuom?: string | null; // Unit of measure
+  propuom?: string | null; // Unit of measure (null for categorical)
   propmin?: number | null;
   propmax?: number | null;
   propmod: string | null;
   dataafuse: boolean | null;
+  // Derived fields for UI
+  choices?: string[]; // Valid choice values for categorical properties
+  isCategorical?: boolean; // True if property has no unit (categorical/choice)
 }
 
 /**

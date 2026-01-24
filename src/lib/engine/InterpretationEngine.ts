@@ -18,6 +18,7 @@ import {
   type PropertyData,
 } from './evaluator';
 import { dataCache } from '@/lib/data/cache';
+import { enhanceProperties } from './propertyUtils';
 
 /**
  * Configuration options for InterpretationEngine
@@ -144,7 +145,7 @@ export class InterpretationEngine {
   }
 
   /**
-   * Get required properties for an interpretation
+   * Get required properties for an interpretation with categorical metadata
    * 
    * @param interpretationName - Name of interpretation
    * @returns Array of required property names and definitions
@@ -164,9 +165,13 @@ export class InterpretationEngine {
       this.propertiesMap
     );
 
-    return propertyNames
+    const properties = propertyNames
       .map(name => this.propertiesMap.get(name))
       .filter((prop): prop is Property => prop !== undefined);
+
+    // Enhance properties with categorical metadata (choices, etc.)
+    const evaluations = Array.from(this.evaluationsMap.values());
+    return enhanceProperties(properties, evaluations);
   }
 
   /**

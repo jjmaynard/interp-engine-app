@@ -5,7 +5,7 @@ import type { Property } from '@/types/interpretation';
 
 interface PropertyInputFormProps {
   properties: Property[];
-  onSubmit: (values: Record<string, number | null>) => void;
+  onSubmit: (values: Record<string, number | string | null>) => void;
   loading?: boolean;
 }
 
@@ -14,13 +14,13 @@ export function PropertyInputForm({
   onSubmit,
   loading = false 
 }: PropertyInputFormProps) {
-  const [values, setValues] = useState<Record<string, number | null>>({});
+  const [values, setValues] = useState<Record<string, number | string | null>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   // Initialize values
   useEffect(() => {
-    const initialValues: Record<string, number | null> = {};
+    const initialValues: Record<string, number | string | null> = {};
     properties.forEach(prop => {
       initialValues[prop.propname] = null;
     });
@@ -29,20 +29,33 @@ export function PropertyInputForm({
     setTouched({});
   }, [properties]);
 
-  const validateField = (propname: string, value: number | null, property: Property): string => {
-    if (value === null || value === undefined) {
+  const validateField = (propname: string, value: number | string | null, property: Property): string => {
+    if (value === null || value === undefined || value === '') {
       return 'This field is required';
     }
 
-    if (isNaN(value)) {
+    // Categorical property validation
+    if (property.isCategorical) {
+      if (property.choices && property.choices.length > 0) {
+        if (typeof value === 'string' && !property.choices.includes(value)) {
+          return `Invalid choice`;
+        }
+      }
+      return ''; // Valid categorical value
+    }
+
+    // Numeric property validation
+    const numValue = typeof value === 'number' ? value : parseFloat(String(value));
+    
+    if (isNaN(numValue)) {
       return 'Please enter a valid number';
     }
 
-    if (property.propmin !== null && property.propmin !== undefined && value < property.propmin) {
+    if (property.propmin !== null && property.propmin !== undefined && numValue < property.propmin) {
       return `Value must be at least ${property.propmin}`;
     }
 
-    if (property.propmax !== null && property.propmax !== undefined && value > property.propmax) {
+    if (property.propmax !== null && property.propmax !== undefined && numValue > property.propmax) {
       return `Value must be at most ${property.propmax}`;
     }
 
@@ -50,12 +63,17 @@ export function PropertyInputForm({
   };
 
   const handleChange = (propname: string, value: string, property: Property) => {
-    const numValue = value === '' ? null : parseFloat(value);
-    setValues(prev => ({ ...prev, [propname]: numValue }));
+    // For categorical properties, store string value directly
+    // For numeric properties, parse to number
+    const finalValue = property.isCategorical 
+      ? value 
+      : (value === '' ? null : parseFloat(value));
+    
+    setValues(prev => ({ ...prev, [propname]: finalValue }));
 
     // Validate on change if already touched
     if (touched[propname]) {
-      const error = validateField(propname, numValue, property);
+      const error = validateField(propname, finalValue, property);
       setErrors(prev => ({ ...prev, [propname]: error }));
     }
   };
@@ -91,7 +109,7 @@ export function PropertyInputForm({
   };
 
   const handleReset = () => {
-    const resetValues: Record<string, number | null> = {};
+    const resetValues: Record<string, number | string | null> = {};
     properties.forEach(prop => {
       resetValues[prop.propname] = null;
     });
@@ -101,10 +119,18 @@ export function PropertyInputForm({
   };
 
   const handleAutoFill = () => {
-    const autoValues: Record<string, number | null> = {};
+    const autoValues: Record<string, number | string | null> = {};
     
     properties.forEach(prop => {
-      // Generate realistic dummy value based on property characteristics
+      // Handle categorical properties
+      if (prop.isCategorical && prop.choices && prop.choices.length > 0) {
+        // Pick a random choice for categorical properties
+        const randomIndex = Math.floor(Math.random() * prop.choices.length);
+        autoValues[prop.propname] = prop.choices[randomIndex];
+        return;
+      }
+      
+      // Generate realistic numeric dummy value based on property characteristics
       let dummyValue: number;
       
       const propLower = prop.propname.toLowerCase();
@@ -350,26 +376,50 @@ export function PropertyInputForm({
               <span className="text-red-500 ml-1">*</span>
             </label>
 
-            <input
-              id={`prop-${property.propname}`}
-              type="number"
-              step="any"
-              value={values[property.propname] ?? ''}
-              onChange={(e) => handleChange(property.propname, e.target.value, property)}
-              onBlur={() => handleBlur(property.propname, property)}
-              disabled={loading}
-              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 transition-colors ${
-                errors[property.propname] && touched[property.propname]
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-              } ${loading ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
-              placeholder={
-                property.propmin !== null && property.propmin !== undefined && 
-                property.propmax !== null && property.propmax !== undefined
-                  ? `${property.propmin} - ${property.propmax}`
-                  : 'Enter value'
-              }
-            />
+            {/* Categorical property - dropdown */}
+            {property.isCategorical && property.choices && property.choices.length > 0 ? (
+              <select
+                id={`prop-${property.propname}`}
+                value={values[property.propname] ?? ''}
+                onChange={(e) => handleChange(property.propname, e.target.value, property)}
+                onBlur={() => handleBlur(property.propname, property)}
+                disabled={loading}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 transition-colors ${
+                  errors[property.propname] && touched[property.propname]
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                } ${loading ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+              >
+                <option value="">Select {property.propname}</option>
+                {property.choices.map(choice => (
+                  <option key={choice} value={choice}>
+                    {choice}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              /* Numeric property - number input */
+              <input
+                id={`prop-${property.propname}`}
+                type="number"
+                step="any"
+                value={values[property.propname] ?? ''}
+                onChange={(e) => handleChange(property.propname, e.target.value, property)}
+                onBlur={() => handleBlur(property.propname, property)}
+                disabled={loading}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 transition-colors ${
+                  errors[property.propname] && touched[property.propname]
+                    ? 'border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                } ${loading ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                placeholder={
+                  property.propmin !== null && property.propmin !== undefined && 
+                  property.propmax !== null && property.propmax !== undefined
+                    ? `${property.propmin} - ${property.propmax}`
+                    : 'Enter value'
+                }
+              />
+            )}
 
             {/* Hints and validation messages */}
             <div className="flex items-start justify-between gap-2">
