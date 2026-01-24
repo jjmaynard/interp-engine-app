@@ -1,3 +1,5 @@
+import 'server-only';
+
 /**
  * Caching layer for interpretation engine data
  * Provides in-memory caching to improve performance

@@ -1,3 +1,5 @@
+import 'server-only';
+
 /**
  * Static Data Loader
  * Loads interpretation data from static JSON files instead of database
