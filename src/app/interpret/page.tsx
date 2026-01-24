@@ -177,9 +177,9 @@ export default function InterpretPage() {
                       activeTab === 'tree'
                         ? 'bg-white text-blue-600 shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
-                                        <GitBranch className="w-4 h-4" />
                     }`}
                   >
+                    <GitBranch className="w-4 h-4" />
                     Rule Tree
                   </button>
                 </nav>
