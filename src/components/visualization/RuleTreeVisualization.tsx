@@ -91,9 +91,9 @@ const TreeNodeComponent = memo(({ node, depth = 0 }: { node: TreeNodeData; depth
             {node.operator}
           </span>
         )}
-        {node.hedge && node.value && (
+        {node.hedge && (
           <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-200 text-indigo-800 font-mono">
-            {node.value}
+            {node.hedge}
           </span>
         )}
 
@@ -231,22 +231,28 @@ export function RuleTreeVisualization({
       };
 
       // Determine node type
-      if (item.Type) {
-        nodeData.type = 'operator';
-        nodeData.operator = item.Type;
-      }
-
-      if (item.Value) {
-        nodeData.type = 'hedge';
-        nodeData.hedge = label;
-        nodeData.value = item.Value;
-      }
-
       if (item.RefId || item.rule_refid) {
         nodeData.type = 'evaluation';
         const refId = item.RefId || item.rule_refid;
         if (refId && evaluationResults[refId]) {
           nodeData.rating = evaluationResults[refId];
+        }
+      } else if (item.Type) {
+        const operatorTypes = ['and', 'or', 'product', 'sum', 'times', 'add', 'multiply', 'divide', 
+                               'subtract', 'minus', 'plus', 'average', 'limit', 'power', 'weight',
+                               'alpha'];
+        const hedgeTypes = ['not', 'very', 'slightly', 'somewhat', 'extremely', 
+                           'null_or', 'null_not_rated', 'not_null_and'];
+        
+        if (operatorTypes.includes(item.Type.toLowerCase())) {
+          nodeData.type = 'operator';
+          nodeData.operator = item.Type;
+        } else if (hedgeTypes.includes(item.Type.toLowerCase())) {
+          nodeData.type = 'hedge';
+          nodeData.hedge = item.Type;
+          if (item.Value) {
+            nodeData.value = item.Value;
+          }
         }
       }
 
