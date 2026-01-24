@@ -182,7 +182,15 @@ export class InterpretationEngine {
       throw new Error(`Interpretation not found: ${interpretationName}`);
     }
 
-    return tree.tree || [];
+    // Handle both array and object tree formats
+    if (Array.isArray(tree.tree)) {
+      return tree.tree;
+    } else if (tree.tree && typeof tree.tree === 'object') {
+      // tree.tree is the root node object - wrap it in an array
+      return [tree.tree];
+    }
+    
+    return [];
   }
 
   /**
