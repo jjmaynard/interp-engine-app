@@ -384,13 +384,16 @@ export function evaluateProperty(
         return result;
       }
       
-      // Handle OR expressions: = "value1" or "value2"
-      const orMatch = expr.match(/^=\s*"([^"]+)"\s+or\s+"([^"]+)"$/);
-      if (orMatch) {
-        const result = (x === orMatch[1] || x === orMatch[2]) ? 1 : 0;
+      // Handle OR expressions: = "value1" or "value2" or "value3" ...
+      const orPattern = /^=\s*"([^"]+)"(\s+or\s+"([^"]+)")+$/;
+      if (orPattern.test(expr)) {
+        // Extract all quoted values
+        const values = Array.from(expr.matchAll(/"([^"]+)"/g)).map(m => m[1]);
+        const result = values.includes(x) ? 1 : 0;
         console.log('[evaluateProperty] Crisp OR result:', {
           expression: expr,
           inputValue: x,
+          possibleValues: values,
           matches: result === 1
         });
         return result;

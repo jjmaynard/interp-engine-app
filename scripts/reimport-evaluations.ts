@@ -19,7 +19,10 @@ const dataDir = path.join(__dirname, '../../data');
 /**
  * Parse XML evaluation data and extract DomainPoints and RangePoints
  */
-function parseEvaluationXML(xmlString: string): { 
+function parseEvaluationXML(
+  xmlString: string, 
+  evaluationType?: string
+): { 
   points: { x: number, y: number }[] | null,
   crispExpression: string | null 
 } {
@@ -37,15 +40,26 @@ function parseEvaluationXML(xmlString: string): {
     const crispExpression = crispMatch ? crispMatch[1].trim() : null;
 
     // Parse domain and range points if both exist
-    if (domainMatch && rangeMatch) {
+    if (domainMatch) {
       const domainContent = domainMatch[1];
-      const rangeContent = rangeMatch[1];
+      const rangeContent = rangeMatch ? rangeMatch[1] : '';
 
       // Extract double values
       const domainValues = Array.from(domainContent.matchAll(/<double>(.*?)<\/double>/g))
         .map(m => parseFloat(m[1]));
       const rangeValues = Array.from(rangeContent.matchAll(/<double>(.*?)<\/double>/g))
         .map(m => parseFloat(m[1]));
+
+      // Special handling for Sigmoid curves with empty RangePoints
+      // Sigmoid curves implicitly go from 0 to 1
+      if (domainValues.length > 0 && rangeValues.length === 0 && 
+          evaluationType?.toLowerCase() === 'sigmoid') {
+        const points = domainValues.map((x, i) => ({
+          x: x,
+          y: i / (domainValues.length - 1) // Distribute evenly from 0 to 1
+        }));
+        return { points, crispExpression };
+      }
 
       // Create points array if we have matching domain and range values
       if (domainValues.length > 0 && domainValues.length === rangeValues.length) {
@@ -93,7 +107,7 @@ async function reimportEvaluations() {
       try {
         // Parse the XML to extract points and crisp expression
         const { points, crispExpression } = evaluation.eval 
-          ? parseEvaluationXML(evaluation.eval)
+          ? parseEvaluationXML(evaluation.eval, evaluation.evaluationtype)
           : { points: null, crispExpression: null };
 
         if (points && points.length > 0) {
