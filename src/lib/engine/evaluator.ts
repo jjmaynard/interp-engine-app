@@ -49,35 +49,38 @@ interface NodeEvaluationResult {
  * @returns Node evaluation result
  */
 export function evaluateNode(
-  node: RuleNode,
+  node: RuleNode | any,
   context: EvaluationContext
 ): NodeEvaluationResult {
   const { propertyData, evaluations, properties, debug } = context;
 
-  // Handle leaf nodes (evaluations)
-  if (node.Type === 'Evaluation' && node.RefId) {
-    const evaluation = evaluations.get(node.RefId);
+  if (!node) {
+    console.warn('[Evaluator] Node is null or undefined');
+    return { rating: NaN };
+  }
+
+  // Handle evaluation nodes (has RefId or rule_refid, but no Type or non-operator Type)
+  // In hierarchical format, evaluation nodes have RefId but may or may not have Type
+  const isEvaluationNode = (node.RefId || node.rule_refid) && !isOperatorType(node.Type) && !isHedgeType(node.Type);
+  
+  if (isEvaluationNode || node.Type === 'Evaluation') {
+    const refId = node.RefId || node.rule_refid;
+    const evaluation = evaluations.get(String(refId));
     
     if (!evaluation) {
-      console.warn(`[Evaluator] Evaluation not found for RefId: ${node.RefId}`);
+      console.warn(`[Evaluator] Evaluation not found for RefId: ${refId}`);
       return { rating: NaN };
     }
 
-    console.log(`[Evaluator] Found evaluation: ${evaluation.evalname}`);
-    console.log(`[Evaluator] Evaluation.propname: "${evaluation.propname}"`);
-    console.log(`[Evaluator] Evaluation.propiid: "${evaluation.propiid}"`);
+    if (debug) {
+      console.log(`[Evaluator] Found evaluation: ${evaluation.evalname}`);
+    }
 
     // Get the property this evaluation uses
     const property = properties.get(evaluation.propname);
     
     if (!property) {
       console.warn(`[Evaluator] Property not found for evaluation: ${evaluation.evalname} (propname: "${evaluation.propname}")`);
-      console.warn(`[Evaluator] Available properties in map:`, Array.from(properties.keys()).slice(0, 5));
-      console.warn(`[Evaluator] Trying to find property with propiid: "${evaluation.propiid}"`);
-      const propertyBypropiid = properties.get(evaluation.propiid || '');
-      if (propertyBypropiid) {
-        console.warn(`[Evaluator] Found property by propiid! propname: "${propertyBypropiid.propname}"`);
-      }
       return { rating: NaN };
     }
 
@@ -85,11 +88,8 @@ export function evaluateNode(
     const propertyName = property.propname;
     const propertyValue = propertyData[propertyName];
 
-    if (debug || propertyValue === null || propertyValue === undefined) {
+    if (debug) {
       console.log(`[Evaluator] Evaluating: ${evaluation.evalname} (${propertyName} = ${propertyValue})`);
-      if (propertyValue === null || propertyValue === undefined) {
-        console.warn(`[Evaluator] Property value is null/undefined. Available input keys:`, Object.keys(propertyData).slice(0, 5));
-      }
     }
 
     // Evaluate the property
@@ -102,21 +102,25 @@ export function evaluateNode(
     };
   }
 
-  // Handle operator nodes (AND, OR, PRODUCT, etc.)
-  if (node.Type === 'Operator' && node.Value) {
+  // Handle operator nodes (and, or, product, sum, etc.)
+  const operatorTypes = ['and', 'or', 'product', 'sum', 'times', 'add', 'multiply', 'divide', 
+                         'subtract', 'minus', 'plus', 'average', 'limit', 'power', 'weight',
+                         'not_null_and', 'alpha'];
+  
+  if (node.Type && operatorTypes.includes(node.Type.toLowerCase())) {
     if (!node.children || node.children.length === 0) {
       if (debug) {
-        console.warn(`Operator node has no children: ${node.Value}`);
+        console.warn(`Operator node has no children: ${node.Type}`);
       }
       return { rating: NaN };
     }
 
     // Recursively evaluate all children
-    const childResults = node.children.map(child => evaluateNode(child, context));
+    const childResults = node.children.map((child: any) => evaluateNode(child, context));
     const childRatings = childResults.map(r => r.rating);
 
     // Apply the operator
-    const rating = applyOperator(node.Value, childRatings);
+    const rating = applyOperator(node.Type, childRatings);
 
     // Merge property values and evaluation results
     const propertyValues: Record<string, number | string | null> = {};
@@ -132,17 +136,20 @@ export function evaluateNode(
     }
 
     if (debug) {
-      console.log(`Operator ${node.Value}: ${childRatings.join(', ')} => ${rating}`);
+      console.log(`Operator ${node.Type}: ${childRatings.join(', ')} => ${rating}`);
     }
 
     return { rating, propertyValues, evaluationResults };
   }
 
-  // Handle hedge nodes (NOT, MULTIPLY, etc.)
-  if (node.Type === 'Hedge' && node.Value) {
+  // Handle hedge nodes (not, very, slightly, somewhat, extremely, null_or, null_not_rated, etc.)
+  const hedgeTypes = ['not', 'very', 'slightly', 'somewhat', 'extremely', 
+                      'null_or', 'null_not_rated'];
+  
+  if (node.Type && hedgeTypes.includes(node.Type.toLowerCase())) {
     if (!node.children || node.children.length === 0) {
       if (debug) {
-        console.warn(`Hedge node has no children: ${node.Value}`);
+        console.warn(`Hedge node has no children: ${node.Type}`);
       }
       return { rating: NaN };
     }
@@ -150,16 +157,12 @@ export function evaluateNode(
     // Evaluate the child (hedges typically have one child)
     const childResult = evaluateNode(node.children[0], context);
 
-    // Parse hedge parameter if present (e.g., "MULTIPLY 0.5")
-    const hedgeParts = node.Value.split(/\s+/);
-    const hedgeType = hedgeParts[0];
-    const hedgeParam = hedgeParts.length > 1 ? parseFloat(hedgeParts[1]) : undefined;
-
-    // Apply the hedge
-    const rating = applyHedge(hedgeType, childResult.rating, hedgeParam) as number;
+    // Apply the hedge (use Value if present, otherwise just the Type)
+    const hedgeValue = node.Value || node.Type;
+    const rating = applyHedge(node.Type, childResult.rating, node.Value ? parseFloat(node.Value) : undefined) as number;
 
     if (debug) {
-      console.log(`Hedge ${node.Value}: ${childResult.rating} => ${rating}`);
+      console.log(`Hedge ${node.Type}: ${childResult.rating} => ${rating}`);
     }
 
     return {
@@ -169,17 +172,10 @@ export function evaluateNode(
     };
   }
 
-  // Handle rule nodes (aggregation of children)
-  if (node.Type === 'Rule' || node.levelName) {
-    if (!node.children || node.children.length === 0) {
-      if (debug) {
-        console.warn(`Rule node has no children: ${node.levelName}`);
-      }
-      return { rating: NaN };
-    }
-
+  // Handle nodes with children but no Type (container/rule nodes)
+  if (node.children && node.children.length > 0) {
     // Recursively evaluate all children
-    const childResults = node.children.map(child => evaluateNode(child, context));
+    const childResults = node.children.map((child: any) => evaluateNode(child, context));
 
     // For rule nodes, typically use the first (and often only) child's rating
     const rating = childResults[0].rating;
@@ -198,17 +194,33 @@ export function evaluateNode(
     }
 
     if (debug) {
-      console.log(`Rule ${node.levelName}: => ${rating}`);
+      console.log(`Container node (${node.name}): => ${rating}`);
     }
 
     return { rating, propertyValues, evaluationResults };
   }
 
-  // Unknown node type
+  // Leaf node with no children and no RefId - might be a placeholder or metadata node
   if (debug) {
-    console.warn(`Unknown node type:`, node);
+    console.warn(`Unknown/unhandled node:`, { name: node.name, Type: node.Type, RefId: node.RefId });
   }
   return { rating: NaN };
+}
+
+// Helper functions to identify node types
+function isOperatorType(type: string | undefined): boolean {
+  if (!type) return false;
+  const operatorTypes = ['and', 'or', 'product', 'sum', 'times', 'add', 'multiply', 'divide', 
+                         'subtract', 'minus', 'plus', 'average', 'limit', 'power', 'weight',
+                         'not_null_and', 'alpha', 'Operator'];
+  return operatorTypes.includes(type.toLowerCase()) || type === 'Operator';
+}
+
+function isHedgeType(type: string | undefined): boolean {
+  if (!type) return false;
+  const hedgeTypes = ['not', 'very', 'slightly', 'somewhat', 'extremely', 
+                      'null_or', 'null_not_rated', 'Hedge'];
+  return hedgeTypes.includes(type.toLowerCase()) || type === 'Hedge';
 }
 
 /**
@@ -249,26 +261,38 @@ export function evaluateInterpretation(
 ): InterpretationResult {
   console.log('[Evaluator] Tree object:', {
     hasTreeProperty: !!tree.tree,
-    treeLength: tree.tree?.length || 0,
     treeName: tree.name,
     treeType: typeof tree.tree,
     isArray: Array.isArray(tree.tree)
   });
   
-  // Handle case where tree might be the tree array itself wrapped incorrectly
-  let treeArray = tree.tree;
-  if (!treeArray || treeArray.length === 0) {
-    // Check if tree itself is an array
-    if (Array.isArray(tree)) {
-      console.warn('[Evaluator] tree parameter is an array, not an InterpretationTree object');
-      treeArray = tree as any;
-    } else if ((tree as any).treeStructure) {
-      console.warn('[Evaluator] Found treeStructure property instead of tree');
-      treeArray = (tree as any).treeStructure;
+  // Handle different tree structures:
+  // 1. tree.tree is an object (single root node) - the new hierarchical format
+  // 2. tree.tree is an array - old flat format
+  // 3. tree itself is an array
+  let rootNode: RuleNode;
+  
+  if (tree.tree) {
+    if (Array.isArray(tree.tree)) {
+      // Old format: array of nodes
+      if (tree.tree.length === 0) {
+        console.warn('[Evaluator] Tree array is empty!');
+        return {
+          rating: NaN,
+          ratingClass: 'not rated',
+          propertyValues: {},
+          evaluationResults: {},
+          timestamp: new Date(),
+        };
+      }
+      rootNode = tree.tree[0];
+      console.log('[Evaluator] Using tree array format with', tree.tree.length, 'nodes');
+    } else if (typeof tree.tree === 'object') {
+      // New format: tree.tree is the root node object
+      rootNode = tree.tree as RuleNode;
+      console.log('[Evaluator] Using hierarchical tree format with root node:', rootNode.name);
     } else {
-      console.warn('[Evaluator] Tree is empty or invalid!');
-      console.warn('[Evaluator] tree object keys:', Object.keys(tree));
-      console.warn('[Evaluator] tree.tree:', tree.tree);
+      console.warn('[Evaluator] tree.tree has unexpected type:', typeof tree.tree);
       return {
         rating: NaN,
         ratingClass: 'not rated',
@@ -277,11 +301,25 @@ export function evaluateInterpretation(
         timestamp: new Date(),
       };
     }
+  } else if (Array.isArray(tree)) {
+    console.warn('[Evaluator] tree parameter is an array, not an InterpretationTree object');
+    rootNode = (tree as any)[0];
+  } else if ((tree as any).treeStructure) {
+    console.warn('[Evaluator] Found treeStructure property instead of tree');
+    rootNode = (tree as any).treeStructure;
+  } else {
+    console.warn('[Evaluator] Tree is empty or invalid!');
+    console.warn('[Evaluator] tree object keys:', Object.keys(tree));
+    return {
+      rating: NaN,
+      ratingClass: 'not rated',
+      propertyValues: {},
+      evaluationResults: {},
+      timestamp: new Date(),
+    };
   }
-  
-  console.log('[Evaluator] Using tree array with', treeArray.length, 'nodes');
 
-  console.log('[Evaluator] Using tree array with', treeArray.length, 'nodes');
+  console.log('[Evaluator] Starting evaluation with root node');
 
   const context: EvaluationContext = {
     propertyData,
@@ -291,7 +329,7 @@ export function evaluateInterpretation(
   };
 
   // Evaluate the root node
-  const result = evaluateNode(treeArray[0], context);
+  const result = evaluateNode(rootNode, context);
 
   return {
     rating: result.rating,
