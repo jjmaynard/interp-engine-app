@@ -55,28 +55,16 @@ export function loadInterpretationTrees(): InterpretationTree[] {
   const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   
   interpretationsCache = (data as any[]).map(interp => {
-    const parsed = typeof interp.treeStructure === 'string' 
-      ? JSON.parse(interp.treeStructure) 
-      : interp.treeStructure;
+    // primary_interpretation_trees.json structure: { name: string, tree: object, property_count?: number }
+    const treeName = typeof interp.name === 'string' ? interp.name : 
+                     Array.isArray(interp.name) ? interp.name[0] : 'Unknown';
     
-    // If treeStructure is the full interpretation object with properties
-    if (parsed && typeof parsed === 'object' && 'tree' in parsed) {
-      return {
-        name: [interp.name],
-        tree: parsed.tree || [],
-        properties: parsed.properties || [],
-        property_count: parsed.property_count || parsed.properties?.length || 0,
-        metadata: parsed.metadata || {},
-      };
-    }
-    
-    // Otherwise, assume tree is the structure itself
     return {
-      name: [interp.name],
-      tree: parsed || [],
-      properties: [],
-      property_count: 0,
-      metadata: {},
+      name: [treeName],
+      tree: interp.tree || {},
+      properties: interp.properties || [],
+      property_count: interp.property_count || 0,
+      metadata: interp.metadata || {},
     };
   });
   
