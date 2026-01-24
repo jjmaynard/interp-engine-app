@@ -45,11 +45,15 @@ export function InterpretationSelector({
     loadInterpretations();
   }, []);
 
-  const filteredInterpretations = interpretations.filter(interp =>
-    interp.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInterpretations = interpretations.filter(interp => {
+    const nameStr = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+    return nameStr.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
-  const selectedInterp = interpretations.find(i => i.name === value);
+  const selectedInterp = interpretations.find(i => {
+    const nameStr = Array.isArray(i.name) ? i.name[0] : i.name;
+    return nameStr === value;
+  });
 
   if (loading) {
     return (
@@ -86,7 +90,7 @@ export function InterpretationSelector({
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
-              {selectedInterp?.name || 'Choose an interpretation...'}
+              {selectedInterp ? (Array.isArray(selectedInterp.name) ? selectedInterp.name[0] : selectedInterp.name) : 'Choose an interpretation...'}
             </p>
             {selectedInterp && (
               <p className="text-xs text-gray-500 mt-1">
@@ -133,27 +137,30 @@ export function InterpretationSelector({
                 </div>
               ) : (
                 <div className="py-2">
-                  {filteredInterpretations.map((interp) => (
-                    <button
-                      key={interp.name}
-                      type="button"
-                      onClick={() => {
-                        onChange(interp.name);
-                        setIsOpen(false);
-                        setSearchTerm('');
-                      }}
-                      className={`w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors ${
-                        value === interp.name ? 'bg-blue-50 border-l-4 border-blue-500' : ''
-                      }`}
-                    >
-                      <div className="text-sm font-medium text-gray-900">
-                        {interp.name}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {interp.propertyCount} properties
-                      </div>
-                    </button>
-                  ))}
+                  {filteredInterpretations.map((interp) => {
+                    const nameStr = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+                    return (
+                      <button
+                        key={nameStr}
+                        type="button"
+                        onClick={() => {
+                          onChange(nameStr);
+                          setIsOpen(false);
+                          setSearchTerm('');
+                        }}
+                        className={`w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors ${
+                          value === nameStr ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                        }`}
+                      >
+                        <div className="text-sm font-medium text-gray-900">
+                          {nameStr}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {interp.propertyCount} properties
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
