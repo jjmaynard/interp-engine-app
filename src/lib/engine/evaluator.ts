@@ -355,7 +355,15 @@ export function evaluateInterpretation(
 
   // Merge evaluated property values with all submitted property data
   // This ensures the result shows all properties that were submitted, not just the ones evaluated
-  const allPropertyValues = { ...propertyData, ...(result.propertyValues || {}) };
+  const mergedValues = { ...propertyData, ...(result.propertyValues || {}) };
+  
+  // Filter out undefined values to match the expected return type
+  const allPropertyValues: Record<string, number | string | null> = {};
+  for (const [key, value] of Object.entries(mergedValues)) {
+    if (value !== undefined) {
+      allPropertyValues[key] = value;
+    }
+  }
 
   return {
     rating: result.rating,
