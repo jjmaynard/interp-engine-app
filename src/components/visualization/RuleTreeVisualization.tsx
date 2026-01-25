@@ -1,8 +1,12 @@
 'use client';
 
 import { useEffect, useState, memo } from 'react';
-import { BarChart3, GitMerge, Zap, Box, ChevronRight, ChevronDown } from 'lucide-react';
+import { BarChart3, GitMerge, Zap, Box, ChevronRight, ChevronDown, Network, List } from 'lucide-react';
 import type { RuleNode } from '@/types/interpretation';
+import { InteractiveTreeDiagram } from './InteractiveTreeDiagram';
+import { BranchAnalysis } from './BranchAnalysis';
+import { FuzzyCurvePlot } from './FuzzyCurvePlot';
+
 
 interface RuleTreeVisualizationProps {
   tree: RuleNode[];
@@ -130,6 +134,9 @@ export function RuleTreeVisualization({
 }: RuleTreeVisualizationProps) {
   const [isExpanded, setIsExpanded] = useState(true); // Start expanded since it's in its own dedicated tab
   const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
+  const [viewMode, setViewMode] = useState<'list' | 'interactive'>('list');
+  const [selectedNode, setSelectedNode] = useState<any | null>(null); // Enriched RuleNode
+  const [selectedEvaluation, setSelectedEvaluation] = useState<any | null>(null);
 
   // Convert flat tree to hierarchical structure
   useEffect(() => {
@@ -297,17 +304,44 @@ export function RuleTreeVisualization({
               {interpretationName}
             </p>
           </div>
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-md transition-colors text-sm font-medium"
-          >
-            {isExpanded ? 'Collapse' : 'Expand'}
-          </button>
+          <div className="flex items-center gap-3">
+            {/* View mode toggle */}
+            <div className="bg-white/10 rounded-lg p-1 flex gap-1">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                  viewMode === 'list' 
+                    ? 'bg-white text-purple-700 shadow-sm' 
+                    : 'text-white hover:bg-white/20'
+                }`}
+              >
+                <List className="w-4 h-4" />
+                List View
+              </button>
+              <button
+                onClick={() => setViewMode('interactive')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                  viewMode === 'interactive' 
+                    ? 'bg-white text-purple-700 shadow-sm' 
+                    : 'text-white hover:bg-white/20'
+                }`}
+              >
+                <Network className="w-4 h-4" />
+                Interactive
+              </button>
+            </div>
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-md transition-colors text-sm font-medium"
+            >
+              {isExpanded ? 'Collapse' : 'Expand'}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Visualization */}
-      {isExpanded && (
+      {isExpanded && viewMode === 'list' && (
         <div className="p-4 bg-gray-50">
           <div className="space-y-1">
             {treeData.map((node) => (
@@ -318,6 +352,17 @@ export function RuleTreeVisualization({
               />
             ))}
           </div>
+        </div>
+      )}
+      
+      {/* Interactive Tree Diagram */}
+      {isExpanded && viewMode === 'interactive' && tree && tree.length > 0 && (
+        <div className="p-4">
+          <InteractiveTreeDiagram 
+            tree={tree[0] as any}
+            onNodeClick={(node: any) => setSelectedNode(node)}
+            onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
+          />
         </div>
       )}
 
@@ -345,8 +390,53 @@ export function RuleTreeVisualization({
           </div>
           <p className="mt-3 text-xs text-gray-600 flex items-center gap-1">
             <Box className="w-3 h-3" />
-            <strong>Tip:</strong> The tree shows the hierarchical structure of the interpretation rules with color-coded ratings.
+            <strong>Tip:</strong> Switch to Interactive mode to explore the tree with zoom/pan controls and click nodes to analyze branches.
           </p>
+        </div>
+      )}
+      
+      {/* Branch Analysis Modal */}
+      {selectedNode && tree && tree.length > 0 && (
+        <BranchAnalysis
+          selectedNode={selectedNode}
+          rootNode={tree[0] as any}
+          onClose={() => setSelectedNode(null)}
+        />
+      )}
+      
+      {/* Fuzzy Curve Plot Modal */}
+      {selectedEvaluation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">Fuzzy Membership Curve</h2>
+              <button
+                onClick={() => setSelectedEvaluation(null)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+            
+            <FuzzyCurvePlot
+              points={selectedEvaluation.Points || []}
+              interpolation={selectedEvaluation.Interpolation || 'linear'}
+              inputValue={selectedEvaluation.inputValue || 0}
+              outputValue={selectedEvaluation.outputValue || 0}
+              title={selectedEvaluation.Property || 'Evaluation'}
+              propertyName={selectedEvaluation.Property}
+              invert={selectedEvaluation.Invert || false}
+            />
+            
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setSelectedEvaluation(null)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
