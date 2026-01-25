@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { Filter } from 'lucide-react';
 
 interface Interpretation {
   name: string;
@@ -13,6 +14,33 @@ interface InterpretationSelectorProps {
   className?: string;
 }
 
+// Category definitions based on NASIS interpretation prefixes
+const CATEGORIES = [
+  { value: 'all', label: 'All Categories', prefixes: [] },
+  { value: 'agriculture', label: 'Crop & Agriculture', prefixes: ['AGR', 'NCCPI', 'CPI', 'SOH', 'CPS', 'AWM'] },
+  { value: 'forestry', label: 'Forestry & Timber', prefixes: ['FOR'] },
+  { value: 'rangeland', label: 'Rangeland & Pasture', prefixes: ['GRL', 'FSG', 'RNG'] },
+  { value: 'wetlands', label: 'Wetlands & Wildlife', prefixes: ['WLF', 'WMS'] },
+  { value: 'developed', label: 'Developed & Urban', prefixes: ['ENG', 'URB', 'REC'] },
+  { value: 'conservation', label: 'Natural Areas & Conservation', prefixes: ['MIL', 'BLM', 'SAS', 'CZSS', 'NPS', 'USFS', 'GNB'] },
+  { value: 'specialized', label: 'Specialized Applications', prefixes: ['DHS', 'TROP', 'PFAS', 'FOTG', 'PRGM', 'SVI', 'CCH'] },
+  { value: 'other', label: 'Other & State-Specific', prefixes: ['MO', 'NEIRT', 'RTF', 'Wine'] }
+] as const;
+
+function getInterpretationCategory(name: string): string {
+  const nameStr = Array.isArray(name) ? name[0] : name;
+  const upperName = nameStr.toUpperCase();
+  
+  for (const category of CATEGORIES.slice(1)) { // Skip 'all'
+    for (const prefix of category.prefixes) {
+      if (upperName.startsWith(prefix + ' -') || upperName.startsWith(prefix + '-')) {
+        return category.value;
+      }
+    }
+  }
+  return 'other';
+}
+
 export function InterpretationSelector({ 
   value, 
   onChange, 
@@ -22,6 +50,7 @@ export function InterpretationSelector({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -45,10 +74,39 @@ export function InterpretationSelector({
     loadInterpretations();
   }, []);
 
-  const filteredInterpretations = interpretations.filter(interp => {
-    const nameStr = Array.isArray(interp.name) ? interp.name[0] : interp.name;
-    return nameStr.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredInterpretations = useMemo(() => {
+    return interpretations.filter(interp => {
+      const nameStr = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+      
+      // Filter by category
+      if (selectedCategory !== 'all') {
+        const interpCategory = getInterpretationCategory(nameStr);
+        if (interpCategory !== selectedCategory) {
+          return false;
+        }
+      }
+      
+      // Filter by search term
+      if (searchTerm) {
+        return nameStr.toLowerCase().includes(searchTerm.toLowerCase());
+      }
+      
+      return true;
+    });
+  }, [interpretations, selectedCategory, searchTerm]);
+
+  // Get category counts
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: interpretations.length };
+    
+    interpretations.forEach(interp => {
+      const nameStr = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+      const category = getInterpretationCategory(nameStr);
+      counts[category] = (counts[category] || 0) + 1;
+    });
+    
+    return counts;
+  }, [interpretations]);
 
   const selectedInterp = interpretations.find(i => {
     const nameStr = Array.isArray(i.name) ? i.name[0] : i.name;
@@ -80,6 +138,28 @@ export function InterpretationSelector({
       <label className="block text-sm font-medium text-gray-700 mb-2">
         Select Interpretation
       </label>
+      
+      {/* Category Filter */}
+      <div className="mb-3">
+        <div className="flex items-center gap-2 mb-2">
+          <Filter className="w-4 h-4 text-gray-500" />
+          <label className="text-xs font-medium text-gray-600">Filter by Category</label>
+        </div>
+        <select
+          value={selectedCategory}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setSearchTerm('');
+          }}
+          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          {CATEGORIES.map(cat => (
+            <option key={cat.value} value={cat.value}>
+              {cat.label} {categoryCounts[cat.value] ? `(${categoryCounts[cat.value]})` : ''}
+            </option>
+          ))}
+        </select>
+      </div>
       
       {/* Selected value display */}
       <button
@@ -168,7 +248,12 @@ export function InterpretationSelector({
             {/* Footer */}
             <div className="p-3 border-t border-gray-200 bg-gray-50">
               <p className="text-xs text-gray-600">
-                {interpretations.length} interpretations available
+                Showing {filteredInterpretations.length} of {interpretations.length} interpretations
+                {selectedCategory !== 'all' && (
+                  <span className="ml-1">
+                    in {CATEGORIES.find(c => c.value === selectedCategory)?.label}
+                  </span>
+                )}
               </p>
             </div>
           </div>
