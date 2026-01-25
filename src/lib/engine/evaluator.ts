@@ -61,7 +61,9 @@ export function evaluateNode(
 
   // Handle evaluation nodes (has RefId or rule_refid, but no Type or non-operator Type)
   // In hierarchical format, evaluation nodes have RefId but may or may not have Type
-  const isEvaluationNode = (node.RefId || node.rule_refid) && !isOperatorType(node.Type) && !isHedgeType(node.Type);
+  // IMPORTANT: If a node has children, it's a container/rule node, not a leaf evaluation node
+  const hasChildren = node.children && Array.isArray(node.children) && node.children.length > 0;
+  const isEvaluationNode = (node.RefId || node.rule_refid) && !isOperatorType(node.Type) && !isHedgeType(node.Type) && !hasChildren;
   
   if (isEvaluationNode || node.Type === 'Evaluation') {
     const refId = node.RefId || node.rule_refid;
