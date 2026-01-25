@@ -7,27 +7,37 @@ interface PropertyInputFormProps {
   properties: Property[];
   onSubmit: (values: Record<string, number | string | null>) => void;
   loading?: boolean;
+  values?: Record<string, number | string | null>;
+  onValuesChange?: (values: Record<string, number | string | null>) => void;
 }
 
 export function PropertyInputForm({ 
   properties, 
   onSubmit,
-  loading = false 
+  loading = false,
+  values: externalValues,
+  onValuesChange
 }: PropertyInputFormProps) {
-  const [values, setValues] = useState<Record<string, number | string | null>>({});
+  const [internalValues, setInternalValues] = useState<Record<string, number | string | null>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  // Initialize values
+  // Use controlled values if provided, otherwise use internal state
+  const values = externalValues || internalValues;
+  const setValues = onValuesChange || setInternalValues;
+
+  // Initialize values only if using internal state
   useEffect(() => {
-    const initialValues: Record<string, number | string | null> = {};
-    properties.forEach(prop => {
-      initialValues[prop.propname] = null;
-    });
-    setValues(initialValues);
+    if (!externalValues) {
+      const initialValues: Record<string, number | string | null> = {};
+      properties.forEach(prop => {
+        initialValues[prop.propname] = null;
+      });
+      setInternalValues(initialValues);
+    }
     setErrors({});
     setTouched({});
-  }, [properties]);
+  }, [properties, externalValues]);
 
   const validateField = (propname: string, value: number | string | null, property: Property): string => {
     if (value === null || value === undefined || value === '') {

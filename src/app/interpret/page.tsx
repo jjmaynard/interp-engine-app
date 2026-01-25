@@ -20,6 +20,7 @@ export default function InterpretPage() {
   const [loadingProps, setLoadingProps] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('properties');
+  const [propertyValues, setPropertyValues] = useState<Record<string, number | string | null>>({});
 
   // Load required properties when interpretation changes
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function InterpretPage() {
       setRuleTree([]);
       setResult(null);
       setActiveTab('properties');
+      setPropertyValues({});
       return;
     }
 
@@ -200,6 +202,8 @@ export default function InterpretPage() {
                         properties={requiredProps}
                         onSubmit={handleEvaluate}
                         loading={loading}
+                        values={propertyValues}
+                        onValuesChange={setPropertyValues}
                       />
                     ) : (
                       <div className="p-8 text-center text-gray-500">
