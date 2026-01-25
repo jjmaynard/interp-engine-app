@@ -351,10 +351,14 @@ export function evaluateInterpretation(
 
   console.log('[Evaluator] Final result rating:', result.rating);
 
+  // Merge evaluated property values with all submitted property data
+  // This ensures the result shows all properties that were submitted, not just the ones evaluated
+  const allPropertyValues = { ...propertyData, ...(result.propertyValues || {}) };
+
   return {
     rating: result.rating,
     ratingClass: lookupRatingClass(result.rating),
-    propertyValues: result.propertyValues || {},
+    propertyValues: allPropertyValues,
     evaluationResults: result.evaluationResults || {},
     timestamp: new Date(),
   };
