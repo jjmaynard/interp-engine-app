@@ -84,6 +84,21 @@ export function InterpretationResultDisplay({
     }
   };
 
+  // Get appropriate rating class label based on interpretation type
+  const getRatingClassLabel = () => {
+    if (isProductivity) {
+      // For productivity/suitability: higher is better
+      if (result.rating >= 0.9) return 'Very High';
+      if (result.rating >= 0.7) return 'High';
+      if (result.rating >= 0.4) return 'Moderate';
+      if (result.rating >= 0.1) return 'Low';
+      return 'Very Low';
+    } else {
+      // For limitations/hazards: use standard NRCS classes
+      return result.ratingClass;
+    }
+  };
+
   const exportAsJSON = () => {
     const dataStr = JSON.stringify(result, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -147,7 +162,7 @@ export function InterpretationResultDisplay({
             {/* Rating class badge */}
             <div className={`inline-flex items-center px-4 py-2 rounded-full ${getRatingBgColor(result.rating)}`}>
               <span className={`text-sm font-semibold ${getRatingTextColor(result.rating)} uppercase tracking-wide`}>
-                {result.ratingClass}
+                {getRatingClassLabel()}
               </span>
             </div>
           </div>
