@@ -16,7 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { RuleNode } from '@/types/interpretation';
-import { ChevronDown, ChevronRight, Eye, TrendingUp } from 'lucide-react';
+import { ChevronDown, ChevronRight, Eye, TrendingUp, Maximize2, Minimize2 } from 'lucide-react';
 
 // Note: tree nodes are enriched at runtime with additional properties
 interface InteractiveTreeDiagramProps {
@@ -25,9 +25,21 @@ interface InteractiveTreeDiagramProps {
   onShowCurve?: (evaluation: any) => void;
 }
 
+// Branch colors for differentiation
+const BRANCH_COLORS = [
+  '#3b82f6', // blue
+  '#10b981', // green
+  '#f59e0b', // amber
+  '#ef4444', // red
+  '#8b5cf6', // violet
+  '#ec4899', // pink
+  '#14b8a6', // teal
+  '#f97316', // orange
+];
+
 // Custom node component with rating visualization
 function DecisionNode({ data }: any) {
-  const { node, onExpand, isExpanded, onShowCurve, rating } = data;
+  const { node, onExpand, isExpanded, onShowCurve, rating, branchColor } = data;
   
   const getRatingColor = (rating: number | null | undefined): string => {
     if (rating === null || rating === undefined || isNaN(rating)) {
@@ -65,7 +77,11 @@ function DecisionNode({ data }: any) {
   return (
     <div 
       className="px-4 py-2 rounded-lg border-2 bg-white shadow-md min-w-[200px] max-w-[300px]"
-      style={{ borderColor: nodeColor }}
+      style={{ 
+        borderColor: branchColor || nodeColor,
+        borderLeftWidth: '4px',
+        borderLeftColor: branchColor || nodeColor
+      }}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -136,26 +152,42 @@ export function InteractiveTreeDiagram({
   onShowCurve 
 }: InteractiveTreeDiagramProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['root']));
+  const [isFullscreen, setIsFullscreen] = useState(false);
   
   // Convert tree to React Flow nodes and edges
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
     const nodes: Node[] = [];
     const edges: Edge[] = [];
     let nodeId = 0;
+    const branchColorMap = new Map<string, string>();
     
     const processNode = (
       treeNode: any, // Enriched RuleNode with additional properties
       parentId: string | null, 
       depth: number,
       siblingIndex: number,
-      totalSiblings: number
+      totalSiblings: number,
+      branchIndex: number = 0
     ): string => {
       const id = `node-${nodeId++}`;
       const isExpanded = expandedNodes.has(id) || depth === 0;
       
-      // Calculate position
-      const x = siblingIndex * 350 - (totalSiblings - 1) * 175;
-      const y = depth * 150;
+      // Assign branch color at depth 1
+      let branchColor: string | undefined;
+      if (depth === 1) {
+        branchColor = BRANCH_COLORS[siblingIndex % BRANCH_COLORS.length];
+        branchColorMap.set(id, branchColor);
+      } else if (depth > 1 && parentId) {
+        // Inherit color from parent's branch
+        branchColor = branchColorMap.get(parentId);
+        if (branchColor) branchColorMap.set(id, branchColor);
+      }
+      
+      // Calculate position with better spacing
+      const horizontalSpacing = 400; // Increased from 350
+      const verticalSpacing = 180; // Increased from 150
+      const x = siblingIndex * horizontalSpacing - (totalSiblings - 1) * (horizontalSpacing / 2);
+      const y = depth * verticalSpacing;
       
       nodes.push({
         id,
@@ -178,6 +210,7 @@ export function InteractiveTreeDiagram({
           isExpanded,
           onShowCurve,
           rating: (treeNode as any).rating,
+          branchColor,
         },
         sourcePosition: Position.Bottom,
         targetPosition: Position.Top,
@@ -194,10 +227,11 @@ export function InteractiveTreeDiagram({
             type: MarkerType.ArrowClosed,
             width: 20,
             height: 20,
+            color: branchColor || '#94a3b8',
           },
           style: {
             strokeWidth: 2,
-            stroke: '#94a3b8',
+            stroke: branchColor || '#94a3b8',
           },
         });
       }
@@ -205,7 +239,7 @@ export function InteractiveTreeDiagram({
       // Process children if expanded
       if (isExpanded && treeNode.children && treeNode.children.length > 0) {
         treeNode.children.forEach((child: any, index: number) => {
-          processNode(child, id, depth + 1, index, treeNode.children!.length);
+          processNode(child, id, depth + 1, index, treeNode.children!.length, depth === 0 ? index : branchIndex);
         });
       }
       
@@ -231,7 +265,30 @@ export function InteractiveTreeDiagram({
   }, [onNodeClick]);
   
   return (
-    <div className="w-full h-[600px] bg-gray-50 rounded-lg border border-gray-200">
+    <div className={`relative bg-gray-50 rounded-lg border border-gray-200 ${
+      isFullscreen 
+        ? 'fixed inset-0 z-50 w-screen h-screen rounded-none' 
+        : 'w-full h-[600px]'
+    }`}>
+      {/* Fullscreen toggle button */}
+      <button
+        onClick={() => setIsFullscreen(!isFullscreen)}
+        className="absolute top-4 right-4 z-10 px-3 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-300 flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+        title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+      >
+        {isFullscreen ? (
+          <>
+            <Minimize2 className="w-4 h-4" />
+            Exit Fullscreen
+          </>
+        ) : (
+          <>
+            <Maximize2 className="w-4 h-4" />
+            Fullscreen
+          </>
+        )}
+      </button>
+      
       <ReactFlow
         nodes={nodes}
         edges={edges}
