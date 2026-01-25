@@ -24,7 +24,7 @@ interface TreeNodeData {
 
 // Custom node component
 const TreeNodeComponent = memo(({ node, depth = 0 }: { node: TreeNodeData; depth?: number }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false); // Start expanded since it's in its own tab
   
   const getIcon = () => {
     if (node.type === 'evaluation') return <BarChart3 className="w-4 h-4" />;
@@ -128,7 +128,7 @@ export function RuleTreeVisualization({
   interpretationName,
   evaluationResults = {},
 }: RuleTreeVisualizationProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true); // Start expanded since it's in its own dedicated tab
   const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
 
   // Convert flat tree to hierarchical structure
