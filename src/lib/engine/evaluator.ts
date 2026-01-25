@@ -243,22 +243,54 @@ function isHedgeType(type: string | undefined): boolean {
 }
 
 /**
+ * Check if interpretation is a productivity type (higher is better)
+ * vs limitation type (higher is worse)
+ */
+function isProductivityType(interpretationName: string): boolean {
+  const name = interpretationName.toLowerCase();
+  return name.includes('nccpi') || 
+         name.includes('cpi') || 
+         name.includes('sqi') || 
+         name.includes('soh') || 
+         name.includes('yield') || 
+         name.includes('productivity') || 
+         name.includes('suitability') || 
+         name.includes('index') || 
+         name.includes('quality');
+}
+
+/**
  * Lookup rating class based on rating value
  * 
  * @param rating - Numeric rating value [0, 1]
- * @returns Rating class string (e.g., "Not suited", "Moderately suited", "Well suited")
+ * @param interpretationName - Name of the interpretation (to determine if productivity or limitation)
+ * @returns Rating class string
  */
-export function lookupRatingClass(rating: number): 'not rated' | 'slight' | 'moderate' | 'severe' | 'very severe' {
+export function lookupRatingClass(
+  rating: number, 
+  interpretationName?: string
+): 'not rated' | 'slight' | 'moderate' | 'severe' | 'very severe' {
   if (isNaN(rating)) {
     return 'not rated';
   }
 
-  // Standard NRCS rating classes
-  // Map fuzzy values to standard NRCS limitation classes
-  if (rating <= 0.1) return 'slight';
-  if (rating <= 0.3) return 'moderate';
-  if (rating <= 0.6) return 'severe';
-  return 'very severe';
+  // Check if this is a productivity interpretation (higher rating = better)
+  const isProductivity = interpretationName ? isProductivityType(interpretationName) : false;
+
+  if (isProductivity) {
+    // For productivity: high values are good (reverse the typical limitation scale)
+    // This matches what we see in interpretations like NCCPI, SQI, etc.
+    if (rating >= 0.9) return 'slight'; // Very High (minimal limitation)
+    if (rating >= 0.7) return 'moderate'; // High to Moderate
+    if (rating >= 0.4) return 'severe'; // Moderate to Low
+    return 'very severe'; // Low (significant limitation for productivity)
+  } else {
+    // For limitations: high values are bad (standard NRCS limitation classes)
+    if (rating <= 0.1) return 'slight';
+    if (rating <= 0.3) return 'moderate';
+    if (rating <= 0.6) return 'severe';
+    return 'very severe';
+  }
 }
 
 /**
@@ -367,7 +399,7 @@ export function evaluateInterpretation(
 
   return {
     rating: result.rating,
-    ratingClass: lookupRatingClass(result.rating),
+    ratingClass: lookupRatingClass(result.rating, tree.name?.[0] || ''),
     propertyValues: allPropertyValues,
     evaluationResults: result.evaluationResults || {},
     timestamp: new Date(),
