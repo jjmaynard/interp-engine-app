@@ -161,32 +161,47 @@ export function InteractiveTreeDiagram({
     let nodeId = 0;
     const branchColorMap = new Map<string, string>();
     
+    // Calculate tree width for better positioning
+    const calculateTreeWidth = (node: any): number => {
+      if (!node.children || node.children.length === 0) {
+        return 1;
+      }
+      return node.children.reduce((sum: number, child: any) => sum + calculateTreeWidth(child), 0);
+    };
+    
     const processNode = (
-      treeNode: any, // Enriched RuleNode with additional properties
+      treeNode: any,
       parentId: string | null, 
       depth: number,
-      siblingIndex: number,
-      totalSiblings: number,
+      leftOffset: number,
+      treeWidth: number,
       branchIndex: number = 0
-    ): string => {
+    ): { id: string; width: number } => {
       const id = `node-${nodeId++}`;
       const isExpanded = expandedNodes.has(id) || depth === 0;
       
       // Assign branch color at depth 1
       let branchColor: string | undefined;
       if (depth === 1) {
-        branchColor = BRANCH_COLORS[siblingIndex % BRANCH_COLORS.length];
+        branchColor = BRANCH_COLORS[branchIndex % BRANCH_COLORS.length];
         branchColorMap.set(id, branchColor);
       } else if (depth > 1 && parentId) {
-        // Inherit color from parent's branch
         branchColor = branchColorMap.get(parentId);
         if (branchColor) branchColorMap.set(id, branchColor);
       }
       
-      // Calculate position with better spacing
-      const horizontalSpacing = 400; // Increased from 350
-      const verticalSpacing = 180; // Increased from 150
-      const x = siblingIndex * horizontalSpacing - (totalSiblings - 1) * (horizontalSpacing / 2);
+      // Better spacing algorithm
+      const horizontalSpacing = 500; // Much wider spacing
+      const verticalSpacing = 200;
+      
+      // Calculate position based on tree structure
+      let currentWidth = treeWidth;
+      if (treeNode.children && treeNode.children.length > 0 && isExpanded) {
+        currentWidth = treeNode.children.reduce((sum: number, child: any) => 
+          sum + calculateTreeWidth(child), 0);
+      }
+      
+      const x = (leftOffset + currentWidth / 2) * horizontalSpacing;
       const y = depth * verticalSpacing;
       
       nodes.push({
@@ -237,16 +252,28 @@ export function InteractiveTreeDiagram({
       }
       
       // Process children if expanded
+      let childrenWidth = currentWidth;
       if (isExpanded && treeNode.children && treeNode.children.length > 0) {
+        let childLeftOffset = leftOffset;
         treeNode.children.forEach((child: any, index: number) => {
-          processNode(child, id, depth + 1, index, treeNode.children!.length, depth === 0 ? index : branchIndex);
+          const childTreeWidth = calculateTreeWidth(child);
+          const result = processNode(
+            child, 
+            id, 
+            depth + 1, 
+            childLeftOffset, 
+            childTreeWidth,
+            depth === 0 ? index : branchIndex
+          );
+          childLeftOffset += result.width;
         });
       }
       
-      return id;
+      return { id, width: currentWidth };
     };
     
-    processNode(tree, null, 0, 0, 1);
+    const rootWidth = calculateTreeWidth(tree);
+    processNode(tree, null, 0, 0, rootWidth, 0);
     
     return { nodes, edges };
   }, [tree, expandedNodes, onShowCurve]);
@@ -265,15 +292,15 @@ export function InteractiveTreeDiagram({
   }, [onNodeClick]);
   
   return (
-    <div className={`relative bg-gray-50 rounded-lg border border-gray-200 ${
+    <div className={`relative ${
       isFullscreen 
-        ? 'fixed inset-0 z-50 w-screen h-screen rounded-none' 
-        : 'w-full h-[600px]'
+        ? 'fixed inset-0 z-[9999] w-screen h-screen bg-gray-50' 
+        : 'w-full h-[600px] bg-gray-50 rounded-lg border border-gray-200'
     }`}>
       {/* Fullscreen toggle button */}
       <button
         onClick={() => setIsFullscreen(!isFullscreen)}
-        className="absolute top-4 right-4 z-10 px-3 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-300 flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+        className="absolute top-4 right-4 z-[10000] px-3 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-300 flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
         title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
       >
         {isFullscreen ? (
