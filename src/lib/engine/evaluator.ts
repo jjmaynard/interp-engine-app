@@ -97,9 +97,14 @@ export function evaluateNode(
 
     console.log(`[Evaluator] Evaluation ${evaluation.evalname} (${evaluation.evaliid}) returned rating: ${rating}`);
 
-    // Store result by both evaluation name AND evaliid for tree visualization
+    // Store result using tree node name (more user-friendly) instead of database evaluation name
+    // Use node.name if available, otherwise fall back to evaluation.evalname
+    const displayName = (node.name && Array.isArray(node.name)) 
+      ? node.name[0] 
+      : (node.name || evaluation.evalname);
+    
     const evaluationResults: Record<string, number> = {
-      [evaluation.evalname]: rating
+      [displayName]: rating
     };
     
     // Also store by evaliid (as string) for tree node lookup
