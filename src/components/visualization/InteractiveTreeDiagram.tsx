@@ -14,6 +14,7 @@ import ReactFlow, {
   NodeTypes,
   ConnectionMode,
   useReactFlow,
+  ReactFlowProvider,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { RuleNode } from '@/types/interpretation';
@@ -368,11 +369,13 @@ export function InteractiveTreeDiagram({
         )}
       </button>
       
-      <FlowContent 
-        initialNodes={initialNodes} 
-        initialEdges={initialEdges} 
-        onNodeClick={onNodeClick}
-      />
+      <ReactFlowProvider>
+        <FlowContent 
+          initialNodes={initialNodes} 
+          initialEdges={initialEdges} 
+          onNodeClick={onNodeClick}
+        />
+      </ReactFlowProvider>
     </div>
   );
 }
