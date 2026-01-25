@@ -24,7 +24,6 @@ export function PropertyInputForm({
 
   // Use controlled values if provided, otherwise use internal state
   const values = externalValues || internalValues;
-  const setValues = onValuesChange || setInternalValues;
 
   // Initialize values only if using internal state
   useEffect(() => {
@@ -79,7 +78,12 @@ export function PropertyInputForm({
       ? value 
       : (value === '' ? null : parseFloat(value));
     
-    setValues(prev => ({ ...prev, [propname]: finalValue }));
+    // Update values based on whether we're using controlled or internal state
+    if (onValuesChange) {
+      onValuesChange({ ...values, [propname]: finalValue });
+    } else {
+      setInternalValues(prev => ({ ...prev, [propname]: finalValue }));
+    }
 
     // Validate on change if already touched
     if (touched[propname]) {
@@ -123,7 +127,11 @@ export function PropertyInputForm({
     properties.forEach(prop => {
       resetValues[prop.propname] = null;
     });
-    setValues(resetValues);
+    if (onValuesChange) {
+      onValuesChange(resetValues);
+    } else {
+      setInternalValues(resetValues);
+    }
     setErrors({});
     setTouched({});
   };
@@ -355,7 +363,11 @@ export function PropertyInputForm({
       autoValues[prop.propname] = dummyValue;
     });
     
-    setValues(autoValues);
+    if (onValuesChange) {
+      onValuesChange(autoValues);
+    } else {
+      setInternalValues(autoValues);
+    }
     setErrors({});
     setTouched({});
   };
