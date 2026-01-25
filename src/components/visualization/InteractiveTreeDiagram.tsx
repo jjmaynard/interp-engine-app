@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -13,6 +13,7 @@ import ReactFlow, {
   Position,
   NodeTypes,
   ConnectionMode,
+  useReactFlow,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { RuleNode } from '@/types/interpretation';
@@ -146,6 +147,70 @@ const nodeTypes: NodeTypes = {
   decision: DecisionNode,
 };
 
+function FlowContent({ 
+  initialNodes, 
+  initialEdges, 
+  onNodeClick 
+}: { 
+  initialNodes: Node[], 
+  initialEdges: Edge[], 
+  onNodeClick?: (node: any) => void 
+}) {
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const { fitView } = useReactFlow();
+  
+  // Update nodes when expansion changes and trigger fitView
+  useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+    // Delay fitView to ensure nodes are rendered
+    setTimeout(() => {
+      fitView({ padding: 0.2, duration: 300 });
+    }, 50);
+  }, [initialNodes, initialEdges, setNodes, setEdges, fitView]);
+  
+  const onNodeClickHandler = useCallback((event: any, node: Node) => {
+    onNodeClick?.(node.data.node);
+  }, [onNodeClick]);
+  
+  return (
+    <>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onNodeClick={onNodeClickHandler}
+        nodeTypes={nodeTypes}
+        connectionMode={ConnectionMode.Loose}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        attributionPosition="bottom-left"
+        minZoom={0.1}
+        maxZoom={2}
+      >
+        <Background />
+        <Controls />
+        <MiniMap 
+          nodeColor={(node) => {
+            const rating = node.data?.rating;
+            if (rating === null || rating === undefined || isNaN(rating)) {
+              return '#9ca3af';
+            }
+            if (rating >= 0.8) return '#10b981';
+            if (rating >= 0.6) return '#84cc16';
+            if (rating >= 0.4) return '#fbbf24';
+            if (rating >= 0.2) return '#f97316';
+            return '#ef4444';
+          }}
+          maskColor="rgb(240, 240, 240, 0.6)"
+        />
+      </ReactFlow>
+    </>
+  );
+}
+
 export function InteractiveTreeDiagram({ 
   tree, 
   onNodeClick,
@@ -191,8 +256,8 @@ export function InteractiveTreeDiagram({
       }
       
       // Better spacing algorithm
-      const horizontalSpacing = 500; // Much wider spacing
-      const verticalSpacing = 200;
+      const horizontalSpacing = 300; // Reasonable spacing
+      const verticalSpacing = 150;
       
       // Calculate position based on tree structure
       let currentWidth = treeWidth;
@@ -278,19 +343,6 @@ export function InteractiveTreeDiagram({
     return { nodes, edges };
   }, [tree, expandedNodes, onShowCurve]);
   
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  
-  // Update nodes when expansion changes
-  useMemo(() => {
-    setNodes(initialNodes);
-    setEdges(initialEdges);
-  }, [initialNodes, initialEdges, setNodes, setEdges]);
-  
-  const onNodeClickHandler = useCallback((event: any, node: Node) => {
-    onNodeClick?.(node.data.node);
-  }, [onNodeClick]);
-  
   return (
     <div className={`relative ${
       isFullscreen 
@@ -316,34 +368,11 @@ export function InteractiveTreeDiagram({
         )}
       </button>
       
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeClick={onNodeClickHandler}
-        nodeTypes={nodeTypes}
-        connectionMode={ConnectionMode.Loose}
-        fitView
-        attributionPosition="bottom-left"
-      >
-        <Background />
-        <Controls />
-        <MiniMap 
-          nodeColor={(node) => {
-            const rating = node.data?.rating;
-            if (rating === null || rating === undefined || isNaN(rating)) {
-              return '#9ca3af';
-            }
-            if (rating >= 0.8) return '#10b981';
-            if (rating >= 0.6) return '#84cc16';
-            if (rating >= 0.4) return '#fbbf24';
-            if (rating >= 0.2) return '#f97316';
-            return '#ef4444';
-          }}
-          maskColor="rgb(240, 240, 240, 0.6)"
-        />
-      </ReactFlow>
+      <FlowContent 
+        initialNodes={initialNodes} 
+        initialEdges={initialEdges} 
+        onNodeClick={onNodeClick}
+      />
     </div>
   );
 }
