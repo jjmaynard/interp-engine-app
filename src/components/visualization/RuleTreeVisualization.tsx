@@ -308,7 +308,7 @@ export function RuleTreeVisualization({
 
       {/* Visualization */}
       {isExpanded && (
-        <div className="p-4 max-h-[600px] overflow-auto bg-gray-50">
+        <div className="p-4 bg-gray-50">
           <div className="space-y-1">
             {treeData.map((node) => (
               <TreeNodeComponent
