@@ -22,25 +22,66 @@ export function InterpretationResultDisplay({
     });
   }, [result]);
   
+  // Determine if this is a productivity/suitability interpretation (higher is better)
+  // vs a limitation/hazard interpretation (lower is better)
+  const isProductivityType = () => {
+    const name = interpretationName.toUpperCase();
+    
+    // Productivity/Suitability types (higher rating = better = green)
+    const productivityPrefixes = [
+      'NCCPI', 'CPI', 'SQI', 'SOH', // Productivity indices
+      'AGR -  SQI', 'AGR - SQI', // Soil Quality Index
+      'SUITABILITY', 'PRODUCTIVITY', 'INDEX',
+      'YIELD', 'POTENTIAL', 'QUALITY'
+    ];
+    
+    return productivityPrefixes.some(prefix => name.includes(prefix));
+  };
+  
+  const isProductivity = isProductivityType();
+  
   const getRatingColor = (rating: number) => {
-    if (rating >= 0.9) return 'bg-green-500';
-    if (rating >= 0.7) return 'bg-yellow-500';
-    if (rating >= 0.4) return 'bg-orange-500';
-    return 'bg-red-500';
+    if (isProductivity) {
+      // For productivity/suitability: high = green, low = red
+      if (rating >= 0.9) return 'bg-green-500';
+      if (rating >= 0.7) return 'bg-yellow-500';
+      if (rating >= 0.4) return 'bg-orange-500';
+      return 'bg-red-500';
+    } else {
+      // For limitations/hazards: low = green, high = red
+      if (rating >= 0.9) return 'bg-red-500';
+      if (rating >= 0.7) return 'bg-orange-500';
+      if (rating >= 0.4) return 'bg-yellow-500';
+      return 'bg-green-500';
+    }
   };
 
   const getRatingTextColor = (rating: number) => {
-    if (rating >= 0.9) return 'text-green-700';
-    if (rating >= 0.7) return 'text-yellow-700';
-    if (rating >= 0.4) return 'text-orange-700';
-    return 'text-red-700';
+    if (isProductivity) {
+      if (rating >= 0.9) return 'text-green-700';
+      if (rating >= 0.7) return 'text-yellow-700';
+      if (rating >= 0.4) return 'text-orange-700';
+      return 'text-red-700';
+    } else {
+      if (rating >= 0.9) return 'text-red-700';
+      if (rating >= 0.7) return 'text-orange-700';
+      if (rating >= 0.4) return 'text-yellow-700';
+      return 'text-green-700';
+    }
   };
 
   const getRatingBgColor = (rating: number) => {
-    if (rating >= 0.9) return 'bg-green-50';
-    if (rating >= 0.7) return 'bg-yellow-50';
-    if (rating >= 0.4) return 'bg-orange-50';
-    return 'bg-red-50';
+    if (isProductivity) {
+      if (rating >= 0.9) return 'bg-green-50';
+      if (rating >= 0.7) return 'bg-yellow-50';
+      if (rating >= 0.4) return 'bg-orange-50';
+      return 'bg-red-50';
+    } else {
+      if (rating >= 0.9) return 'bg-red-50';
+      if (rating >= 0.7) return 'bg-orange-50';
+      if (rating >= 0.4) return 'bg-yellow-50';
+      return 'bg-green-50';
+    }
   };
 
   const exportAsJSON = () => {
