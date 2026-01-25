@@ -108,7 +108,7 @@ export function fuzzyTimes(values: number[]): number {
 /**
  * Apply a fuzzy operator based on operator type string
  * 
- * @param operator - Operator type (AND, OR, PRODUCT, SUM, TIMES)
+ * @param operator - Operator type (AND, OR, PRODUCT, SUM, TIMES, AVERAGE, MULTIPLY, PLUS, etc.)
  * @param values - Array of fuzzy membership values
  * @returns Result of applying operator [0, 1]
  */
@@ -117,6 +117,9 @@ export function applyOperator(
   values: number[]
 ): number {
   const op = operator.toUpperCase();
+  
+  // Filter NaN values for most operators
+  const validValues = values.filter(v => !isNaN(v));
   
   switch (op) {
     case 'AND':
@@ -129,6 +132,7 @@ export function applyOperator(
     
     case 'PRODUCT':
     case 'PROD':
+    case 'MULTIPLY':
       return fuzzyProduct(values);
     
     case 'SUM':
@@ -136,6 +140,46 @@ export function applyOperator(
     
     case 'TIMES':
       return fuzzyTimes(values);
+    
+    case 'AVERAGE':
+    case 'AVG':
+    case 'MEAN':
+      // Arithmetic mean
+      if (validValues.length === 0) return NaN;
+      return validValues.reduce((sum, v) => sum + v, 0) / validValues.length;
+    
+    case 'PLUS':
+    case 'ADD':
+    case 'ADDITION':
+      // Simple addition (capped at 1.0 for fuzzy values)
+      if (validValues.length === 0) return NaN;
+      return Math.min(1.0, validValues.reduce((sum, v) => sum + v, 0));
+    
+    case 'MINUS':
+    case 'SUBTRACT':
+    case 'SUBTRACTION':
+      // Subtraction (floored at 0.0 for fuzzy values)
+      if (validValues.length === 0) return NaN;
+      if (validValues.length === 1) return validValues[0];
+      return Math.max(0.0, validValues[0] - validValues.slice(1).reduce((sum, v) => sum + v, 0));
+    
+    case 'DIVIDE':
+    case 'DIVISION':
+      // Division
+      if (validValues.length === 0) return NaN;
+      if (validValues.length === 1) return validValues[0];
+      const divisor = validValues.slice(1).reduce((prod, v) => prod * v, 1);
+      return divisor !== 0 ? Math.min(1.0, validValues[0] / divisor) : NaN;
+    
+    case 'NOT_NULL_AND':
+    case 'NOTNULLAND':
+      // AND operator that treats non-null values as 1.0 if null
+      const nonNullValues = values.map(v => isNaN(v) || v === null ? 1.0 : v);
+      return fuzzyAnd(nonNullValues);
+    
+    case 'ALPHA':
+      // Alpha operator (implementation may vary - using product for now)
+      return fuzzyProduct(values);
     
     default:
       console.warn(`Unknown operator: ${operator}, defaulting to AND`);
