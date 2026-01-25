@@ -35,10 +35,11 @@ function DecisionNode({ data }: any) {
     }
     
     // Determine if this is a productivity or limitation type
-    const isProductivity = node.label?.toLowerCase().includes('productivity') ||
-                          node.label?.toLowerCase().includes('nccpi') ||
-                          node.label?.toLowerCase().includes('sqi') ||
-                          node.label?.toLowerCase().includes('yield');
+    const nodeName = node.levelName || node.name || '';
+    const isProductivity = nodeName.toLowerCase().includes('productivity') ||
+                          nodeName.toLowerCase().includes('nccpi') ||
+                          nodeName.toLowerCase().includes('sqi') ||
+                          nodeName.toLowerCase().includes('yield');
     
     if (isProductivity) {
       // Green for high ratings
@@ -59,7 +60,7 @@ function DecisionNode({ data }: any) {
   
   const nodeColor = getRatingColor(rating);
   const hasChildren = node.children && node.children.length > 0;
-  const isFuzzyEvaluation = node.Evaluation?.Points && node.Evaluation.Points.length > 0;
+  const isFuzzyEvaluation = false; // Will need to check evaluation data differently
   
   return (
     <div 
@@ -69,13 +70,18 @@ function DecisionNode({ data }: any) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="text-sm font-semibold text-gray-900 truncate">
-            {node.label || node.Evaluation?.Property || 'Unknown'}
+            {node.levelName || node.name || node.Type || 'Unknown'}
           </div>
           
-          {node.Evaluation?.Property && (
+          {node.RefId && (
             <div className="text-xs text-gray-500 mt-1">
-              {node.Evaluation.Property}
-              {node.Evaluation.Operator && ` (${node.Evaluation.Operator})`}
+              RefId: {node.RefId}
+            </div>
+          )}
+          
+          {node.Type && (
+            <div className="text-xs text-purple-600 mt-1">
+              {node.Type}
             </div>
           )}
           
@@ -112,19 +118,6 @@ function DecisionNode({ data }: any) {
               ) : (
                 <ChevronRight className="w-4 h-4 text-gray-600" />
               )}
-            </button>
-          )}
-          
-          {isFuzzyEvaluation && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onShowCurve?.(node.Evaluation);
-              }}
-              className="p-1 hover:bg-blue-100 rounded transition-colors"
-              title="Show fuzzy curve"
-            >
-              <TrendingUp className="w-4 h-4 text-blue-600" />
             </button>
           )}
         </div>
@@ -170,7 +163,7 @@ export function InteractiveTreeDiagram({
         position: { x, y },
         data: {
           node: treeNode,
-          label: treeNode.label || treeNode.Evaluation?.Property || 'Unknown',
+          label: treeNode.levelName || treeNode.name || treeNode.Type || 'Unknown',
           onExpand: () => {
             setExpandedNodes(prev => {
               const next = new Set(prev);
@@ -184,7 +177,7 @@ export function InteractiveTreeDiagram({
           },
           isExpanded,
           onShowCurve,
-          rating: treeNode.rating,
+          rating: (treeNode as any).rating,
         },
         sourcePosition: Position.Bottom,
         targetPosition: Position.Top,

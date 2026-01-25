@@ -74,7 +74,7 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose }: BranchAnalys
       totalNodes++;
       maxDepth = Math.max(maxDepth, depth);
       
-      if (node.Evaluation) {
+      if (node.RefId || node.rule_refid) {
         evaluationNodes++;
       }
       
@@ -120,7 +120,7 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose }: BranchAnalys
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Branch Analysis</h2>
             <p className="text-sm text-gray-600 mt-1">
-              Analyzing: <span className="font-semibold">{selectedNode.label || selectedNode.Evaluation?.Property || 'Unknown Node'}</span>
+              Analyzing: <span className="font-semibold">{selectedNode.levelName || selectedNode.name || selectedNode.Type || 'Unknown Node'}</span>
             </p>
           </div>
           <button
@@ -177,12 +177,12 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose }: BranchAnalys
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold text-gray-900 truncate">
-                          {pathNode.node.label || pathNode.node.Evaluation?.Property || 'Unknown'}
+                          {pathNode.node.levelName || pathNode.node.name || pathNode.node.Type || 'Unknown'}
                         </div>
-                        {pathNode.node.Evaluation?.Property && (
+                        {pathNode.node.RefId && (
                           <div className="text-xs text-gray-500 mt-1">
-                            {pathNode.node.Evaluation.Property}
-                            {pathNode.node.Evaluation.Operator && ` • ${pathNode.node.Evaluation.Operator}`}
+                            RefId: {pathNode.node.RefId}
+                            {pathNode.node.Type && ` • ${pathNode.node.Type}`}
                           </div>
                         )}
                       </div>
@@ -217,45 +217,38 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose }: BranchAnalys
             
             <div className="space-y-2 text-sm">
               <div className="flex items-start gap-2">
-                <span className="font-semibold text-gray-700 min-w-[120px]">Label:</span>
-                <span className="text-gray-900">{selectedNode.label || 'N/A'}</span>
+                <span className="font-semibold text-gray-700 min-w-[120px]">Name:</span>
+                <span className="text-gray-900">{selectedNode.levelName || selectedNode.name || 'N/A'}</span>
               </div>
               
-              {selectedNode.Evaluation?.Property && (
+              {selectedNode.Type && (
                 <div className="flex items-start gap-2">
-                  <span className="font-semibold text-gray-700 min-w-[120px]">Property:</span>
-                  <span className="font-mono text-gray-900">{selectedNode.Evaluation.Property}</span>
+                  <span className="font-semibold text-gray-700 min-w-[120px]">Type:</span>
+                  <span className="font-mono text-purple-600">{selectedNode.Type}</span>
                 </div>
               )}
               
-              {selectedNode.Evaluation?.Operator && (
+              {selectedNode.RefId && (
                 <div className="flex items-start gap-2">
-                  <span className="font-semibold text-gray-700 min-w-[120px]">Operator:</span>
-                  <span className="font-mono text-blue-600">{selectedNode.Evaluation.Operator}</span>
+                  <span className="font-semibold text-gray-700 min-w-[120px]">Reference ID:</span>
+                  <span className="font-mono text-blue-600">{selectedNode.RefId}</span>
                 </div>
               )}
               
-              {selectedNode.Evaluation?.Expression && (
+              {selectedNode.Value && (
                 <div className="flex items-start gap-2">
-                  <span className="font-semibold text-gray-700 min-w-[120px]">Expression:</span>
+                  <span className="font-semibold text-gray-700 min-w-[120px]">Value:</span>
                   <span className="font-mono text-xs text-gray-700 bg-white px-2 py-1 rounded">
-                    {selectedNode.Evaluation.Expression}
+                    {selectedNode.Value}
                   </span>
                 </div>
               )}
               
-              {selectedNode.Evaluation?.Points && selectedNode.Evaluation.Points.length > 0 && (
-                <div className="flex items-start gap-2">
-                  <span className="font-semibold text-gray-700 min-w-[120px]">Fuzzy Points:</span>
-                  <span className="text-gray-900">{selectedNode.Evaluation.Points.length} control points</span>
-                </div>
-              )}
-              
-              {selectedNode.rating !== null && selectedNode.rating !== undefined && (
+              {(selectedNode as any).rating !== null && (selectedNode as any).rating !== undefined && (
                 <div className="flex items-start gap-2">
                   <span className="font-semibold text-gray-700 min-w-[120px]">Rating:</span>
-                  <span className={`font-semibold ${getRatingColor(selectedNode.rating)}`}>
-                    {(selectedNode.rating * 100).toFixed(2)}%
+                  <span className={`font-semibold ${getRatingColor((selectedNode as any).rating)}`}>
+                    {((selectedNode as any).rating * 100).toFixed(2)}%
                   </span>
                 </div>
               )}
