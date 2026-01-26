@@ -194,6 +194,19 @@ function enrichTreeWithRatings(node: any, evaluationResults: Record<string, numb
         enrichedNode.rating = firstChildRating;
       }
     }
+    
+    // If this node still doesn't have a rating but has children with ratings,
+    // aggregate them (happens for root nodes or complex containers)
+    if (!enrichedNode.rating && enrichedNode.children.length > 0) {
+      const childRatings = enrichedNode.children
+        .map((child: any) => child.rating)
+        .filter((r: any) => r !== undefined && !isNaN(r));
+      
+      if (childRatings.length > 0) {
+        // Use AND (min) as default aggregation for safety
+        enrichedNode.rating = Math.min(...childRatings);
+      }
+    }
   }
   
   return enrichedNode;
