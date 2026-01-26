@@ -346,15 +346,16 @@ export function InteractiveTreeDiagram({
   }, [tree, expandedNodes, onShowCurve]);
   
   const renderContent = () => (
-    <div className={`relative ${
+    <div className={`${
       isFullscreen 
-        ? 'fixed inset-0 z-[9999] w-screen h-screen bg-gray-50' 
-        : 'w-full h-[600px] bg-gray-50 rounded-lg border border-gray-200'
-    }`}>
+        ? 'fixed inset-0 w-screen h-screen bg-gray-50' 
+        : 'relative w-full h-[600px] bg-gray-50 rounded-lg border border-gray-200'
+    }`} style={isFullscreen ? { zIndex: 999999 } : undefined}>
       {/* Fullscreen toggle button */}
       <button
         onClick={() => setIsFullscreen(!isFullscreen)}
-        className="absolute top-4 right-4 z-[10000] px-3 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-300 flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+        className="absolute top-4 right-4 px-3 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-300 flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+        style={{ zIndex: 1000000 }}
         title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
       >
         {isFullscreen ? (
