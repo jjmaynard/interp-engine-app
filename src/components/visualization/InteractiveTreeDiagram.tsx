@@ -242,23 +242,27 @@ export function InteractiveTreeDiagram({
       depth: number,
       leftOffset: number,
       treeWidth: number,
-      branchIndex: number = 0
+      branchIndex: number = 0,
+      parentOperator?: string
     ): { id: string; width: number } => {
       const id = `node-${nodeId++}`;
       const isExpanded = expandedNodes.has(id) || depth === 0;
       
-      // Assign branch color at depth 1
+      // Check if this is an operator or hedge node (skip creating visual node)
+      const isOperator = treeNode.Type && !treeNode.RefId && !treeNode.rule_refid;
+      
+      // Assign branch color at depth 1 for evaluation nodes
       let branchColor: string | undefined;
-      if (depth === 1) {
+      if (depth === 1 && !isOperator) {
         branchColor = BRANCH_COLORS[branchIndex % BRANCH_COLORS.length];
         branchColorMap.set(id, branchColor);
-      } else if (depth > 1 && parentId) {
+      } else if (depth > 1 && parentId && !isOperator) {
         branchColor = branchColorMap.get(parentId);
         if (branchColor) branchColorMap.set(id, branchColor);
       }
       
       // Better spacing algorithm
-      const horizontalSpacing = 300; // Reasonable spacing
+      const horizontalSpacing = 300;
       const verticalSpacing = 150;
       
       // Calculate position based on tree structure
@@ -271,40 +275,49 @@ export function InteractiveTreeDiagram({
       const x = (leftOffset + currentWidth / 2) * horizontalSpacing;
       const y = depth * verticalSpacing;
       
-      nodes.push({
-        id,
-        type: 'decision',
-        position: { x, y },
-        data: {
-          node: treeNode,
-          label: treeNode.levelName || treeNode.name || treeNode.Type || 'Unknown',
-          onExpand: () => {
-            setExpandedNodes(prev => {
-              const next = new Set(prev);
-              if (next.has(id)) {
-                next.delete(id);
-              } else {
-                next.add(id);
-              }
-              return next;
-            });
+      // Only create visual node for evaluations (has RefId or rule_refid)
+      if (!isOperator) {
+        nodes.push({
+          id,
+          type: 'decision',
+          position: { x, y },
+          data: {
+            node: treeNode,
+            label: treeNode.levelName || treeNode.name || treeNode.Type || 'Unknown',
+            onExpand: () => {
+              setExpandedNodes(prev => {
+                const next = new Set(prev);
+                if (next.has(id)) {
+                  next.delete(id);
+                } else {
+                  next.add(id);
+                }
+                return next;
+              });
+            },
+            isExpanded,
+            onShowCurve,
+            rating: (treeNode as any).rating,
+            branchColor,
           },
-          isExpanded,
-          onShowCurve,
-          rating: (treeNode as any).rating,
-          branchColor,
-        },
-        sourcePosition: Position.Bottom,
-        targetPosition: Position.Top,
-      });
+          sourcePosition: Position.Bottom,
+          targetPosition: Position.Top,
+        });
+      }
       
-      if (parentId) {
+      // Create edge from parent if this is an evaluation node
+      if (parentId && !isOperator) {
         edges.push({
           id: `edge-${parentId}-${id}`,
           source: parentId,
           target: id,
           type: 'smoothstep',
           animated: false,
+          label: parentOperator || '',
+          labelStyle: { fill: '#6b7280', fontWeight: 600, fontSize: 12 },
+          labelBgStyle: { fill: '#ffffff', fillOpacity: 0.9 },
+          labelBgPadding: [8, 4] as [number, number],
+          labelBgBorderRadius: 4,
           markerEnd: {
             type: MarkerType.ArrowClosed,
             width: 20,
@@ -322,15 +335,20 @@ export function InteractiveTreeDiagram({
       let childrenWidth = currentWidth;
       if (isExpanded && treeNode.children && treeNode.children.length > 0) {
         let childLeftOffset = leftOffset;
+        
+        // Determine the operator for child edges
+        const childOperator = isOperator ? (treeNode.Type || '').toUpperCase() : undefined;
+        
         treeNode.children.forEach((child: any, index: number) => {
           const childTreeWidth = calculateTreeWidth(child);
           const result = processNode(
             child, 
-            id, 
-            depth + 1, 
+            isOperator ? parentId : id, // If this is operator, connect children to grandparent
+            isOperator ? depth : depth + 1, // Don't increase depth for operator nodes
             childLeftOffset, 
             childTreeWidth,
-            depth === 0 ? index : branchIndex
+            depth === 0 ? index : branchIndex,
+            isOperator ? (treeNode.Type || '').toUpperCase() : parentOperator
           );
           childLeftOffset += result.width;
         });
