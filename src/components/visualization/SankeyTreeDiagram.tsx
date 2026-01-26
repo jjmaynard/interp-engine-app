@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react';
+import { Maximize2, Minimize2, ZoomIn, ZoomOut, Move } from 'lucide-react';
 
 interface SankeyNode {
   id: string;
@@ -26,6 +26,10 @@ interface SankeyTreeDiagramProps {
 export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const svgRef = useRef<SVGSVGElement>(null);
   
   const { nodes, links, maxLevel } = useMemo(() => {
     const nodes: SankeyNode[] = [];
@@ -89,10 +93,10 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
   
   // Calculate layout positions
   const layout = useMemo(() => {
-    const width = 1200;
-    const height = 600;
-    const nodeHeight = 40;
-    const nodePadding = 20;
+    const nodeWidth = 180;
+    const nodeHeight = 50;
+    const nodePadding = 30;
+    const levelPadding = 250;
     
     // Group nodes by level
     const levelGroups = new Map<number, SankeyNode[]>();
@@ -103,24 +107,27 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
       levelGroups.get(node.level)!.push(node);
     });
     
-    // Calculate positions
-    const levelWidth = width / (maxLevel + 1);
+    // Calculate positions (left to right)
     const positions = new Map<string, { x: number; y: number; height: number }>();
     
     levelGroups.forEach((levelNodes, level) => {
       const totalHeight = levelNodes.length * (nodeHeight + nodePadding);
-      const startY = (height - totalHeight) / 2;
       
       levelNodes.forEach((node, index) => {
-        const x = (maxLevel - level) * levelWidth; // Reverse direction (right to left)
-        const y = startY + index * (nodeHeight + nodePadding);
-        const nodeDisplayHeight = Math.max(nodeHeight, node.value * 100); // Scale by rating
+        const x = level * levelPadding + 50; // Left to right
+        const y = index * (nodeHeight + nodePadding) + 50;
+        const nodeDisplayHeight = Math.max(nodeHeight, node.value * 80); // Scale by rating
         
         positions.set(node.id, { x, y, height: nodeDisplayHeight });
       });
     });
     
-    return { positions, width, height, nodeHeight };
+    // Calculate total dimensions
+    const width = (maxLevel + 1) * levelPadding + nodeWidth + 100;
+    const maxY = Math.max(...Array.from(positions.values()).map(p => p.y + p.height));
+    const height = maxY + 50;
+    
+    return { positions, width, height, nodeHeight, nodeWidth };
   }, [nodes, maxLevel]);
   
   // Get color for rating
@@ -135,6 +142,39 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.2, 3));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.2, 0.5));
   
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setZoom(prev => Math.max(0.3, Math.min(3, prev + delta)));
+    }
+  }, []);
+  
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.button === 0) { // Left click
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+    }
+  }, [pan]);
+  
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isPanning) {
+      setPan({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      });
+    }
+  }, [isPanning, panStart]);
+  
+  const handleMouseUp = useCallback(() => {
+    setIsPanning(false);
+  }, []);
+  
+  const resetView = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+  
   const renderContent = () => (
     <div className={`${
       isFullscreen 
@@ -146,7 +186,7 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-gray-900">Interpretation Flow Diagram</h3>
-            <p className="text-sm text-gray-600">Property evaluations flow through operators to produce the final rating</p>
+            <p className="text-sm text-gray-600">Property evaluations flow through operators to produce the final rating • <span className="font-medium">Drag to pan • Ctrl+Scroll to zoom</span></p>
           </div>
           
           <div className="flex items-center gap-2">
@@ -155,7 +195,7 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
               <button
                 onClick={handleZoomOut}
                 className="p-2 hover:bg-white rounded transition-colors"
-                title="Zoom out"
+                title="Zoom out (or Ctrl+Scroll)"
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
@@ -165,11 +205,21 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
               <button
                 onClick={handleZoomIn}
                 className="p-2 hover:bg-white rounded transition-colors"
-                title="Zoom in"
+                title="Zoom in (or Ctrl+Scroll)"
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
             </div>
+            
+            {/* Pan/Reset controls */}
+            <button
+              onClick={resetView}
+              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+              title="Reset view"
+            >
+              <Move className="w-4 h-4" />
+              Reset
+            </button>
             
             {/* Fullscreen toggle */}
             <button
@@ -194,19 +244,30 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
       </div>
       
       {/* Scrollable diagram area */}
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div 
+        className="flex-1 overflow-auto bg-gray-50"
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
+      >
         <div 
-          className="inline-block min-w-full"
+          className="inline-block"
           style={{ 
-            transform: `scale(${zoom})`,
-            transformOrigin: 'top left',
-            transition: 'transform 0.2s ease'
+            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+            transformOrigin: '0 0',
+            transition: isPanning ? 'none' : 'transform 0.1s ease',
+            minWidth: '100%',
+            minHeight: '100%'
           }}
         >
           <svg 
+            ref={svgRef}
             width={layout.width} 
             height={layout.height}
-            className="mx-auto"
+            style={{ display: 'block' }}
           >
         <defs>
           {/* Gradient for links */}
@@ -238,9 +299,9 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
           const targetNode = nodes.find(n => n.id === link.target);
           if (!sourceNode || !targetNode) return null;
           
-          const sourceX = sourcePos.x + 150; // Node width
+          const sourceX = sourcePos.x + layout.nodeWidth; // Right edge of source
           const sourceY = sourcePos.y + sourcePos.height / 2;
-          const targetX = targetPos.x;
+          const targetX = targetPos.x; // Left edge of target
           const targetY = targetPos.y + targetPos.height / 2;
           
           const strokeWidth = Math.max(3, link.value * 50);
@@ -300,7 +361,7 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
               <rect
                 x={pos.x}
                 y={pos.y}
-                width={150}
+                width={layout.nodeWidth}
                 height={pos.height}
                 fill={color}
                 stroke={isResult ? '#1f2937' : color}
@@ -309,17 +370,17 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
                 opacity={0.9}
               />
               <text
-                x={pos.x + 75}
+                x={pos.x + layout.nodeWidth / 2}
                 y={pos.y + pos.height / 2 - 5}
                 textAnchor="middle"
                 fontSize={isResult ? 14 : 12}
                 fontWeight={isResult ? 700 : 600}
                 fill="white"
               >
-                {node.name.length > 20 ? node.name.substring(0, 17) + '...' : node.name}
+                {node.name.length > 22 ? node.name.substring(0, 19) + '...' : node.name}
               </text>
               <text
-                x={pos.x + 75}
+                x={pos.x + layout.nodeWidth / 2}
                 y={pos.y + pos.height / 2 + 12}
                 textAnchor="middle"
                 fontSize={isResult ? 16 : 13}

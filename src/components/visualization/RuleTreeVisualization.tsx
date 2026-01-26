@@ -4,6 +4,7 @@ import { useEffect, useState, memo } from 'react';
 import { BarChart3, GitMerge, Zap, Box, ChevronRight, ChevronDown, Network, List, GitBranch, ArrowRightLeft, CircleDot } from 'lucide-react';
 import type { RuleNode } from '@/types/interpretation';
 import { InteractiveTreeDiagram } from './InteractiveTreeDiagram';
+import { InteractiveSankeyDiagram } from './InteractiveSankeyDiagram';
 import { BranchAnalysis } from './BranchAnalysis';
 import { FuzzyCurvePlot } from './FuzzyCurvePlot';
 import { SankeyTreeDiagram } from './SankeyTreeDiagram';
@@ -137,7 +138,7 @@ export function RuleTreeVisualization({
 }: RuleTreeVisualizationProps) {
   const [isExpanded, setIsExpanded] = useState(true); // Start expanded since it's in its own dedicated tab
   const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
-  const [viewMode, setViewMode] = useState<'list' | 'interactive' | 'sankey' | 'horizontal' | 'sunburst'>('sankey');
+  const [viewMode, setViewMode] = useState<'list' | 'interactive' | 'sankey' | 'horizontal' | 'sunburst' | 'interactive-sankey'>('sankey');
   const [selectedNode, setSelectedNode] = useState<any | null>(null); // Enriched RuleNode
   const [selectedEvaluation, setSelectedEvaluation] = useState<any | null>(null);
 
@@ -322,6 +323,17 @@ export function RuleTreeVisualization({
                 Flow
               </button>
               <button
+                onClick={() => setViewMode('interactive-sankey')}
+                className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                  viewMode === 'interactive-sankey' 
+                    ? 'bg-white text-purple-700 shadow-sm' 
+                    : 'text-white hover:bg-white/20'
+                }`}
+              >
+                <Network className="w-3.5 h-3.5" />
+                Interactive
+              </button>
+              <button
                 onClick={() => setViewMode('horizontal')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'horizontal' 
@@ -363,7 +375,7 @@ export function RuleTreeVisualization({
                 }`}
               >
                 <Network className="w-3.5 h-3.5" />
-                Nodes
+                Network
               </button>
             </div>
             <button
@@ -380,6 +392,16 @@ export function RuleTreeVisualization({
       {isExpanded && viewMode === 'sankey' && tree[0] && (
         <div className="p-4 bg-gray-50">
           <SankeyTreeDiagram tree={tree[0]} />
+        </div>
+      )}
+      
+      {isExpanded && viewMode === 'interactive-sankey' && enrichedTree && (
+        <div className="p-4 bg-gray-50">
+          <InteractiveSankeyDiagram
+            tree={enrichedTree}
+            onNodeClick={handleBranchClick}
+            onShowCurve={handleShowCurve}
+          />
         </div>
       )}
       
