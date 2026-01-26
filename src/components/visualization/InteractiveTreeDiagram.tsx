@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import ReactFlow, {
   Node,
   Edge,
@@ -344,7 +345,7 @@ export function InteractiveTreeDiagram({
     return { nodes, edges };
   }, [tree, expandedNodes, onShowCurve]);
   
-  return (
+  const renderContent = () => (
     <div className={`relative ${
       isFullscreen 
         ? 'fixed inset-0 z-[9999] w-screen h-screen bg-gray-50' 
@@ -378,4 +379,11 @@ export function InteractiveTreeDiagram({
       </ReactFlowProvider>
     </div>
   );
+  
+  // Use portal for fullscreen mode to escape parent constraints
+  if (isFullscreen && typeof window !== 'undefined') {
+    return createPortal(renderContent(), document.body);
+  }
+  
+  return renderContent();
 }
