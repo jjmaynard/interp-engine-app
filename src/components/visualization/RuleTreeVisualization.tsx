@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState, memo } from 'react';
-import { BarChart3, GitMerge, Zap, Box, ChevronRight, ChevronDown, Network, List, GitBranch } from 'lucide-react';
+import { BarChart3, GitMerge, Zap, Box, ChevronRight, ChevronDown, Network, List, GitBranch, ArrowRightLeft, CircleDot } from 'lucide-react';
 import type { RuleNode } from '@/types/interpretation';
 import { InteractiveTreeDiagram } from './InteractiveTreeDiagram';
 import { BranchAnalysis } from './BranchAnalysis';
 import { FuzzyCurvePlot } from './FuzzyCurvePlot';
 import { SankeyTreeDiagram } from './SankeyTreeDiagram';
+import { HorizontalTreeDiagram } from './HorizontalTreeDiagram';
+import { SunburstTreeDiagram } from './SunburstTreeDiagram';
 
 
 interface RuleTreeVisualizationProps {
@@ -135,7 +137,7 @@ export function RuleTreeVisualization({
 }: RuleTreeVisualizationProps) {
   const [isExpanded, setIsExpanded] = useState(true); // Start expanded since it's in its own dedicated tab
   const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
-  const [viewMode, setViewMode] = useState<'list' | 'interactive' | 'sankey'>('sankey');
+  const [viewMode, setViewMode] = useState<'list' | 'interactive' | 'sankey' | 'horizontal' | 'sunburst'>('sankey');
   const [selectedNode, setSelectedNode] = useState<any | null>(null); // Enriched RuleNode
   const [selectedEvaluation, setSelectedEvaluation] = useState<any | null>(null);
 
@@ -307,39 +309,61 @@ export function RuleTreeVisualization({
           </div>
           <div className="flex items-center gap-3">
             {/* View mode toggle */}
-            <div className="bg-white/10 rounded-lg p-1 flex gap-1">
+            <div className="bg-white/10 rounded-lg p-1 flex gap-1 flex-wrap">
               <button
                 onClick={() => setViewMode('sankey')}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'sankey' 
                     ? 'bg-white text-purple-700 shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
               >
-                <GitBranch className="w-4 h-4" />
+                <GitBranch className="w-3.5 h-3.5" />
                 Flow
               </button>
               <button
+                onClick={() => setViewMode('horizontal')}
+                className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                  viewMode === 'horizontal' 
+                    ? 'bg-white text-purple-700 shadow-sm' 
+                    : 'text-white hover:bg-white/20'
+                }`}
+              >
+                <ArrowRightLeft className="w-3.5 h-3.5" />
+                Horizontal
+              </button>
+              <button
+                onClick={() => setViewMode('sunburst')}
+                className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                  viewMode === 'sunburst' 
+                    ? 'bg-white text-purple-700 shadow-sm' 
+                    : 'text-white hover:bg-white/20'
+                }`}
+              >
+                <CircleDot className="w-3.5 h-3.5" />
+                Radial
+              </button>
+              <button
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'list' 
                     ? 'bg-white text-purple-700 shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
               >
-                <List className="w-4 h-4" />
+                <List className="w-3.5 h-3.5" />
                 List
               </button>
               <button
                 onClick={() => setViewMode('interactive')}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'interactive' 
                     ? 'bg-white text-purple-700 shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
               >
-                <Network className="w-4 h-4" />
-                Interactive
+                <Network className="w-3.5 h-3.5" />
+                Nodes
               </button>
             </div>
             <button
@@ -356,6 +380,18 @@ export function RuleTreeVisualization({
       {isExpanded && viewMode === 'sankey' && tree[0] && (
         <div className="p-4 bg-gray-50">
           <SankeyTreeDiagram tree={tree[0]} />
+        </div>
+      )}
+      
+      {isExpanded && viewMode === 'horizontal' && tree[0] && (
+        <div className="p-4 bg-gray-50">
+          <HorizontalTreeDiagram tree={tree[0]} />
+        </div>
+      )}
+      
+      {isExpanded && viewMode === 'sunburst' && tree[0] && (
+        <div className="p-4 bg-gray-50">
+          <SunburstTreeDiagram tree={tree[0]} />
         </div>
       )}
       
@@ -402,13 +438,13 @@ export function RuleTreeVisualization({
               <span className="text-gray-700">Hedge</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-green-100 border border-green-500"></div>
-              <span className="text-gray-700">High Rating (≥90%)</span>
+              <div className="w-16 h-3 bg-gradient-to-r from-green-500 to-red-500 rounded"></div>
+              <span className="text-gray-700">Rating (High → Low)</span>
             </div>
           </div>
           <p className="mt-3 text-xs text-gray-600 flex items-center gap-1">
             <Box className="w-3 h-3" />
-            <strong>Tip:</strong> Switch to Interactive mode to explore the tree with zoom/pan controls and click nodes to analyze branches.
+            <strong>Tip:</strong> Switch between visualization modes to explore different views of the interpretation tree.
           </p>
         </div>
       )}
