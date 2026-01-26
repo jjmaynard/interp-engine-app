@@ -129,18 +129,19 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
   };
   
   return (
-    <div className="relative w-full h-[800px] bg-white rounded-lg border border-gray-200 p-6">
+    <div className="relative w-full bg-white rounded-lg border border-gray-200 p-6 overflow-x-auto">
       <div className="mb-4">
         <h3 className="text-lg font-bold text-gray-900">Interpretation Flow Diagram</h3>
         <p className="text-sm text-gray-600">Property evaluations flow through operators to produce the final rating</p>
       </div>
       
-      <svg 
-        width={layout.width} 
-        height={layout.height} 
-        className="mx-auto"
-        style={{ maxWidth: '100%', height: 'auto' }}
-      >
+      <div className="min-w-[1200px]">
+        <svg 
+          width="100%" 
+          height={layout.height}
+          viewBox={`0 0 ${layout.width} ${layout.height}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
         <defs>
           {/* Gradient for links */}
           {links.map((link, i) => {
@@ -265,10 +266,10 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
           );
         })}
       </svg>
+      </div>
       
       {/* Legend */}
-      <div className="mt-6 flex items-center justify-center gap-6 text-sm">
-        <div className="flex items-center gap-2">
+      <div className="mt-6 flex items-center justify-center gap-6 text-sm flex-wrap">
           <div className="w-4 h-4 rounded bg-blue-500"></div>
           <span>Properties</span>
         </div>
