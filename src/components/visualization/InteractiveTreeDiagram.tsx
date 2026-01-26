@@ -75,7 +75,7 @@ function DecisionNode({ data }: any) {
   
   const nodeColor = getRatingColor(rating);
   const hasChildren = node.children && node.children.length > 0;
-  const isFuzzyEvaluation = false; // Will need to check evaluation data differently
+  const isFuzzyEvaluation = node.Evaluation && node.Evaluation.Points && node.Evaluation.Points.length > 0;
   
   return (
     <div 
@@ -123,6 +123,18 @@ function DecisionNode({ data }: any) {
         </div>
         
         <div className="flex flex-col gap-1">
+          {isFuzzyEvaluation && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onShowCurve?.(node.Evaluation);
+              }}
+              className="p-1 hover:bg-blue-100 rounded transition-colors"
+              title="Show fuzzy curve"
+            >
+              <TrendingUp className="w-4 h-4 text-blue-600" />
+            </button>
+          )}
           {hasChildren && (
             <button
               onClick={(e) => {
@@ -249,7 +261,8 @@ export function InteractiveTreeDiagram({
       const isExpanded = expandedNodes.has(id) || depth === 0;
       
       // Check if this is an operator or hedge node (skip creating visual node)
-      const isOperator = treeNode.Type && !treeNode.RefId && !treeNode.rule_refid;
+      // Exception: Always show root node (depth 0)
+      const isOperator = depth > 0 && treeNode.Type && !treeNode.RefId && !treeNode.rule_refid;
       
       // Assign branch color at depth 1 for evaluation nodes
       let branchColor: string | undefined;
