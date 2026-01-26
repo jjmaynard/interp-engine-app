@@ -395,12 +395,12 @@ export function RuleTreeVisualization({
         </div>
       )}
       
-      {isExpanded && viewMode === 'interactive-sankey' && enrichedTree && (
+      {isExpanded && viewMode === 'interactive-sankey' && tree && tree.length > 0 && (
         <div className="p-4 bg-gray-50">
           <InteractiveSankeyDiagram
-            tree={enrichedTree}
-            onNodeClick={handleBranchClick}
-            onShowCurve={handleShowCurve}
+            tree={tree[0] as any}
+            onNodeClick={(node: any) => setSelectedNode(node)}
+            onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
           />
         </div>
       )}
