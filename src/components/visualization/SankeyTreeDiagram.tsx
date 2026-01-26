@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
-import { Maximize2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface SankeyNode {
   id: string;
@@ -23,6 +24,9 @@ interface SankeyTreeDiagramProps {
 }
 
 export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  
   const { nodes, links, maxLevel } = useMemo(() => {
     const nodes: SankeyNode[] = [];
     const links: SankeyLink[] = [];
@@ -128,20 +132,82 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
     return '#ef4444'; // red
   };
   
-  return (
-    <div className="relative w-full bg-white rounded-lg border border-gray-200 p-6 overflow-x-auto">
-      <div className="mb-4">
-        <h3 className="text-lg font-bold text-gray-900">Interpretation Flow Diagram</h3>
-        <p className="text-sm text-gray-600">Property evaluations flow through operators to produce the final rating</p>
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.2, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.2, 0.5));
+  
+  const renderContent = () => (
+    <div className={`${
+      isFullscreen 
+        ? 'fixed inset-0 w-screen h-screen bg-gray-50 z-[999999] flex flex-col' 
+        : 'relative w-full bg-white rounded-lg border border-gray-200 flex flex-col'
+    }`}>
+      {/* Header with controls */}
+      <div className={`${isFullscreen ? 'bg-white border-b border-gray-200' : ''} p-4 flex-shrink-0`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Interpretation Flow Diagram</h3>
+            <p className="text-sm text-gray-600">Property evaluations flow through operators to produce the final rating</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {/* Zoom controls */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={handleZoomOut}
+                className="p-2 hover:bg-white rounded transition-colors"
+                title="Zoom out"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <span className="px-3 text-sm font-medium min-w-[60px] text-center">
+                {(zoom * 100).toFixed(0)}%
+              </span>
+              <button
+                onClick={handleZoomIn}
+                className="p-2 hover:bg-white rounded transition-colors"
+                title="Zoom in"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+            </div>
+            
+            {/* Fullscreen toggle */}
+            <button
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+              title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+            >
+              {isFullscreen ? (
+                <>
+                  <Minimize2 className="w-4 h-4" />
+                  Exit
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="w-4 h-4" />
+                  Fullscreen
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
       
-      <div className="min-w-[1200px]">
-        <svg 
-          width="100%" 
-          height={layout.height}
-          viewBox={`0 0 ${layout.width} ${layout.height}`}
-          preserveAspectRatio="xMidYMid meet"
+      {/* Scrollable diagram area */}
+      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+        <div 
+          className="inline-block min-w-full"
+          style={{ 
+            transform: `scale(${zoom})`,
+            transformOrigin: 'top left',
+            transition: 'transform 0.2s ease'
+          }}
         >
+          <svg 
+            width={layout.width} 
+            height={layout.height}
+            className="mx-auto"
+          >
         <defs>
           {/* Gradient for links */}
           {links.map((link, i) => {
@@ -265,27 +331,38 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
             </g>
           );
         })}
-      </svg>
+          </svg>
+        </div>
       </div>
       
       {/* Legend */}
-      <div className="mt-6 flex items-center justify-center gap-6 text-sm flex-wrap">
-          <div className="w-4 h-4 rounded bg-blue-500"></div>
-          <span>Properties</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-purple-500"></div>
-          <span>Operators</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded border-2 border-gray-800"></div>
-          <span>Final Result</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-12 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
-          <span>Rating (High → Low)</span>
+      <div className={`${isFullscreen ? 'bg-white border-t border-gray-200' : ''} p-4 flex-shrink-0`}>
+        <div className="flex items-center justify-center gap-6 text-sm flex-wrap">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-blue-500"></div>
+            <span>Properties</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-purple-500"></div>
+            <span>Operators</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded border-2 border-gray-800"></div>
+            <span>Final Result</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-12 h-1 bg-gradient-to-r from-green-500 to-red-500"></div>
+            <span>Rating (High → Low)</span>
+          </div>
         </div>
       </div>
     </div>
   );
+  
+  // Use portal for fullscreen mode
+  if (isFullscreen && typeof window !== 'undefined') {
+    return createPortal(renderContent(), document.body);
+  }
+  
+  return renderContent();
 }
