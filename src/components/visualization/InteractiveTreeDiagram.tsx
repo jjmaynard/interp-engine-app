@@ -79,34 +79,34 @@ function DecisionNode({ data }: any) {
   
   return (
     <div 
-      className="px-4 py-2 rounded-lg border-2 bg-white shadow-md min-w-[200px] max-w-[300px]"
+      className="px-5 py-3 rounded-lg border-2 bg-white shadow-lg min-w-[250px] max-w-[350px]"
       style={{ 
         borderColor: branchColor || nodeColor,
-        borderLeftWidth: '4px',
+        borderLeftWidth: '5px',
         borderLeftColor: branchColor || nodeColor
       }}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold text-gray-900 truncate">
+          <div className="text-base font-bold text-gray-900 leading-tight">
             {node.levelName || node.name || node.Type || 'Unknown'}
           </div>
           
           {node.RefId && (
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-sm text-gray-600 mt-1 font-medium">
               RefId: {node.RefId}
             </div>
           )}
           
           {node.Type && (
-            <div className="text-xs text-purple-600 mt-1">
+            <div className="text-sm text-purple-700 mt-1 font-semibold">
               {node.Type}
             </div>
           )}
           
           {rating !== null && rating !== undefined && !isNaN(rating) && (
             <div className="mt-2 flex items-center gap-2">
-              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
                 <div 
                   className="h-full rounded-full transition-all"
                   style={{ 
@@ -115,7 +115,7 @@ function DecisionNode({ data }: any) {
                   }}
                 />
               </div>
-              <span className="text-xs font-mono" style={{ color: nodeColor }}>
+              <span className="text-sm font-bold font-mono" style={{ color: nodeColor }}>
                 {(rating * 100).toFixed(0)}%
               </span>
             </div>
@@ -129,10 +129,10 @@ function DecisionNode({ data }: any) {
                 e.stopPropagation();
                 onShowCurve?.(node.Evaluation);
               }}
-              className="p-1 hover:bg-blue-100 rounded transition-colors"
+              className="p-1.5 hover:bg-blue-100 rounded transition-colors"
               title="Show fuzzy curve"
             >
-              <TrendingUp className="w-4 h-4 text-blue-600" />
+              <TrendingUp className="w-5 h-5 text-blue-600" />
             </button>
           )}
           {hasChildren && (
@@ -141,13 +141,13 @@ function DecisionNode({ data }: any) {
                 e.stopPropagation();
                 onExpand?.();
               }}
-              className="p-1 hover:bg-gray-100 rounded transition-colors"
+              className="p-1.5 hover:bg-gray-100 rounded transition-colors"
               title={isExpanded ? "Collapse" : "Expand"}
             >
               {isExpanded ? (
-                <ChevronDown className="w-4 h-4 text-gray-600" />
+                <ChevronDown className="w-5 h-5 text-gray-700" />
               ) : (
-                <ChevronRight className="w-4 h-4 text-gray-600" />
+                <ChevronRight className="w-5 h-5 text-gray-700" />
               )}
             </button>
           )}
@@ -230,7 +230,7 @@ export function InteractiveTreeDiagram({
   onNodeClick,
   onShowCurve 
 }: InteractiveTreeDiagramProps) {
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['root']));
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['node-0']));
   const [isFullscreen, setIsFullscreen] = useState(false);
   
   // Convert tree to React Flow nodes and edges
@@ -275,8 +275,8 @@ export function InteractiveTreeDiagram({
       }
       
       // Better spacing algorithm
-      const horizontalSpacing = 300;
-      const verticalSpacing = 150;
+      const horizontalSpacing = 400;
+      const verticalSpacing = 200;
       
       // Calculate position based on tree structure
       let currentWidth = treeWidth;
@@ -327,19 +327,19 @@ export function InteractiveTreeDiagram({
           type: 'smoothstep',
           animated: false,
           label: parentOperator || '',
-          labelStyle: { fill: '#6b7280', fontWeight: 600, fontSize: 12 },
-          labelBgStyle: { fill: '#ffffff', fillOpacity: 0.9 },
-          labelBgPadding: [8, 4] as [number, number],
-          labelBgBorderRadius: 4,
+          labelStyle: { fill: '#1f2937', fontWeight: 700, fontSize: 14 },
+          labelBgStyle: { fill: '#fef3c7', fillOpacity: 1, stroke: '#f59e0b', strokeWidth: 1 },
+          labelBgPadding: [10, 6] as [number, number],
+          labelBgBorderRadius: 6,
           markerEnd: {
             type: MarkerType.ArrowClosed,
-            width: 20,
-            height: 20,
-            color: branchColor || '#94a3b8',
+            width: 24,
+            height: 24,
+            color: branchColor || '#475569',
           },
           style: {
-            strokeWidth: 2,
-            stroke: branchColor || '#94a3b8',
+            strokeWidth: 3,
+            stroke: branchColor || '#475569',
           },
         });
       }
@@ -384,7 +384,7 @@ export function InteractiveTreeDiagram({
     <div className={`${
       isFullscreen 
         ? 'fixed inset-0 w-screen h-screen bg-gray-50' 
-        : 'relative w-full h-[600px] bg-gray-50 rounded-lg border border-gray-200'
+        : 'relative w-full h-[800px] bg-gray-50 rounded-lg border border-gray-200'
     }`} style={isFullscreen ? { zIndex: 999999 } : undefined}>
       {/* Fullscreen toggle button */}
       <button
