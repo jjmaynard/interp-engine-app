@@ -299,9 +299,10 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
           const targetNode = nodes.find(n => n.id === link.target);
           if (!sourceNode || !targetNode) return null;
           
-          const sourceX = sourcePos.x + layout.nodeWidth; // Right edge of source
+          // For left-to-right flow: source connects from right edge, target from left edge
+          const sourceX = sourcePos.x + layout.nodeWidth; // Right edge of source node
           const sourceY = sourcePos.y + sourcePos.height / 2;
-          const targetX = targetPos.x; // Left edge of target
+          const targetX = targetPos.x; // Left edge of target node
           const targetY = targetPos.y + targetPos.height / 2;
           
           const strokeWidth = Math.max(3, link.value * 50);

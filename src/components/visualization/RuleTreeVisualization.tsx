@@ -131,6 +131,30 @@ const TreeNodeComponent = memo(({ node, depth = 0 }: { node: TreeNodeData; depth
 
 TreeNodeComponent.displayName = 'TreeNodeComponent';
 
+// Helper function to enrich tree nodes with ratings
+function enrichTreeWithRatings(node: any, evaluationResults: Record<string, number>): any {
+  if (!node) return node;
+  
+  const enrichedNode = { ...node };
+  
+  // Add rating from evaluationResults if this is an evaluation node
+  if (node.RefId || node.rule_refid) {
+    const refId = node.RefId || node.rule_refid;
+    if (evaluationResults[refId] !== undefined) {
+      enrichedNode.rating = evaluationResults[refId];
+    }
+  }
+  
+  // Recursively enrich children
+  if (node.children && Array.isArray(node.children)) {
+    enrichedNode.children = node.children.map((child: any) => 
+      enrichTreeWithRatings(child, evaluationResults)
+    );
+  }
+  
+  return enrichedNode;
+}
+
 export function RuleTreeVisualization({
   tree,
   interpretationName,
@@ -141,6 +165,14 @@ export function RuleTreeVisualization({
   const [viewMode, setViewMode] = useState<'list' | 'interactive' | 'sankey' | 'horizontal' | 'sunburst' | 'interactive-sankey'>('sankey');
   const [selectedNode, setSelectedNode] = useState<any | null>(null); // Enriched RuleNode
   const [selectedEvaluation, setSelectedEvaluation] = useState<any | null>(null);
+  const [enrichedTree, setEnrichedTree] = useState<any>(null);
+
+  // Enrich tree with ratings
+  useEffect(() => {
+    if (tree && tree.length > 0) {
+      setEnrichedTree(enrichTreeWithRatings(tree[0], evaluationResults));
+    }
+  }, [tree, evaluationResults]);
 
   // Convert flat tree to hierarchical structure
   useEffect(() => {
@@ -366,17 +398,6 @@ export function RuleTreeVisualization({
                 <List className="w-3.5 h-3.5" />
                 List
               </button>
-              <button
-                onClick={() => setViewMode('interactive')}
-                className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
-                  viewMode === 'interactive' 
-                    ? 'bg-white text-purple-700 shadow-sm' 
-                    : 'text-white hover:bg-white/20'
-                }`}
-              >
-                <Network className="w-3.5 h-3.5" />
-                Network
-              </button>
             </div>
             <button
               onClick={() => setIsExpanded(!isExpanded)}
@@ -389,31 +410,31 @@ export function RuleTreeVisualization({
       </div>
 
       {/* Visualization */}
-      {isExpanded && viewMode === 'sankey' && tree[0] && (
+      {isExpanded && viewMode === 'sankey' && enrichedTree && (
         <div className="p-4 bg-gray-50">
-          <SankeyTreeDiagram tree={tree[0]} />
+          <SankeyTreeDiagram tree={enrichedTree} />
         </div>
       )}
       
-      {isExpanded && viewMode === 'interactive-sankey' && tree && tree.length > 0 && (
+      {isExpanded && viewMode === 'interactive-sankey' && enrichedTree && (
         <div className="p-4 bg-gray-50">
           <InteractiveSankeyDiagram
-            tree={tree[0] as any}
+            tree={enrichedTree}
             onNodeClick={(node: any) => setSelectedNode(node)}
             onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
           />
         </div>
       )}
       
-      {isExpanded && viewMode === 'horizontal' && tree[0] && (
+      {isExpanded && viewMode === 'horizontal' && enrichedTree && (
         <div className="p-4 bg-gray-50">
-          <HorizontalTreeDiagram tree={tree[0]} />
+          <HorizontalTreeDiagram tree={enrichedTree} />
         </div>
       )}
       
-      {isExpanded && viewMode === 'sunburst' && tree[0] && (
+      {isExpanded && viewMode === 'sunburst' && enrichedTree && (
         <div className="p-4 bg-gray-50">
-          <SunburstTreeDiagram tree={tree[0]} />
+          <SunburstTreeDiagram tree={enrichedTree} />
         </div>
       )}
       
@@ -432,10 +453,10 @@ export function RuleTreeVisualization({
       )}
       
       {/* Interactive Tree Diagram */}
-      {isExpanded && viewMode === 'interactive' && tree && tree.length > 0 && (
+      {isExpanded && viewMode === 'interactive' && enrichedTree && (
         <div className="p-4">
           <InteractiveTreeDiagram 
-            tree={tree[0] as any}
+            tree={enrichedTree}
             onNodeClick={(node: any) => setSelectedNode(node)}
             onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
           />
