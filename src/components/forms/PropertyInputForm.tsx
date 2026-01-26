@@ -139,7 +139,15 @@ export function PropertyInputForm({
   const handleAutoFill = () => {
     const autoValues: Record<string, number | string | null> = {};
     
+    // Track SRPG Climate properties for mutually exclusive handling
+    const srpgClimateProps: string[] = [];
+    
     properties.forEach(prop => {
+      // Track SRPG Climate properties
+      if (prop.propname.includes('SRPG Climate') && !prop.propname.includes('Temp. Regime')) {
+        srpgClimateProps.push(prop.propname);
+      }
+      
       // Handle categorical properties
       if (prop.isCategorical && prop.choices && prop.choices.length > 0) {
         // Pick a random choice for categorical properties
@@ -362,6 +370,18 @@ export function PropertyInputForm({
       
       autoValues[prop.propname] = dummyValue;
     });
+    
+    // SPECIAL HANDLING: SRPG Climate properties are mutually exclusive indicators
+    // Only ONE climate type should be active (value of 1), others should be 0
+    if (srpgClimateProps.length > 0) {
+      // Pick one random climate type to be active
+      const activeClimate = srpgClimateProps[Math.floor(Math.random() * srpgClimateProps.length)];
+      
+      // Set all SRPG Climate properties to 0, except the chosen one
+      srpgClimateProps.forEach(propName => {
+        autoValues[propName] = propName === activeClimate ? 1 : 0;
+      });
+    }
     
     if (onValuesChange) {
       onValuesChange(autoValues);

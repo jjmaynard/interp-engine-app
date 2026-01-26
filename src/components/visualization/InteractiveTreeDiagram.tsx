@@ -279,7 +279,7 @@ export function InteractiveTreeDiagram({
       
       // Better spacing algorithm
       const horizontalSpacing = 400;
-      const verticalSpacing = 200;
+      const verticalSpacing = 300; // Increased from 200 for better readability
       
       // Calculate position based on tree structure
       let currentWidth = treeWidth;
@@ -341,8 +341,9 @@ export function InteractiveTreeDiagram({
             color: branchColor || '#475569',
           },
           style: {
-            strokeWidth: 3,
+            strokeWidth: 4, // Increased from 3 for better visibility
             stroke: branchColor || '#475569',
+            opacity: 1, // Ensure full opacity
           },
         });
       }
@@ -391,7 +392,7 @@ export function InteractiveTreeDiagram({
       isFullscreen 
         ? 'fixed inset-0 w-screen h-screen bg-gray-50' 
         : 'relative w-full h-[800px] bg-gray-50 rounded-lg border border-gray-200'
-    }`} style={isFullscreen ? { zIndex: 999999 } : undefined}>
+    }`} style={isFullscreen ? { zIndex: 9999999 } : undefined}>
       {/* Fullscreen toggle button */}
       <button
         onClick={() => setIsFullscreen(!isFullscreen)}
