@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Maximize2, Minimize2 } from 'lucide-react';
+import { Maximize2, Minimize2, ZoomIn, ZoomOut, Move } from 'lucide-react';
 
 interface SunburstTreeProps {
   tree: any;
@@ -11,22 +11,27 @@ interface SunburstTreeProps {
 export function SunburstTreeDiagram({ tree }: SunburstTreeProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const { paths, centerRadius, maxRadius } = useMemo(() => {
     const paths: any[] = [];
     const centerRadius = 60;
     const ringWidth = 80;
     let maxDepth = 0;
+    let nodeCounter = 0; // Add unique counter for node IDs
 
     const processNode = (
       node: any,
       depth: number,
       startAngle: number,
-      endAngle: number,
-      parentId: string = 'root'
+      endAngle: number
     ) => {
       maxDepth = Math.max(maxDepth, depth);
-      const nodeId = `${parentId}-${depth}`;
+      const nodeId = `node-${nodeCounter++}`; // Use unique counter instead of parent-based ID
       const isOperator = node.Type && !node.RefId && !node.rule_refid;
 
       if (!isOperator) {
@@ -56,12 +61,12 @@ export function SunburstTreeDiagram({ tree }: SunburstTreeProps) {
           const childEndAngle = childStartAngle + childAngleSpan;
           const effectiveDepth = isOperator ? depth : depth + 1;
           
-          processNode(child, effectiveDepth, childStartAngle, childEndAngle, nodeId);
+          processNode(child, effectiveDepth, childStartAngle, childEndAngle);
         });
       }
     };
 
-    processNode(tree, 0, 0, 360, 'root');
+    processNode(tree, 0, 0, 360);
 
     return {
       paths,
@@ -127,6 +132,42 @@ export function SunburstTreeDiagram({ tree }: SunburstTreeProps) {
   const centerX = size / 2;
   const centerY = size / 2;
 
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.2, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.2, 0.3));
+  
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setZoom(prev => Math.max(0.3, Math.min(3, prev + delta)));
+    }
+  }, []);
+  
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (e.button === 0) {
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+    }
+  }, [pan]);
+  
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (isPanning) {
+      setPan({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      });
+    }
+  }, [isPanning, panStart]);
+  
+  const handleMouseUp = useCallback(() => {
+    setIsPanning(false);
+  }, []);
+  
+  const resetView = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+
   const renderContent = () => (
     <div className={`${
       isFullscreen
@@ -138,31 +179,87 @@ export function SunburstTreeDiagram({ tree }: SunburstTreeProps) {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold text-gray-900">Radial Sunburst Diagram</h3>
-            <p className="text-sm text-gray-600">Hierarchical structure displayed as concentric rings</p>
+            <p className="text-sm text-gray-600">Hierarchical structure displayed as concentric rings • <span className="font-medium">Drag to pan • Ctrl+Scroll to zoom</span></p>
           </div>
 
-          <button
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
-          >
-            {isFullscreen ? (
-              <>
-                <Minimize2 className="w-4 h-4" />
-                Exit
-              </>
-            ) : (
-              <>
-                <Maximize2 className="w-4 h-4" />
-                Fullscreen
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Zoom controls */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={handleZoomOut}
+                className="p-2 hover:bg-white rounded transition-colors"
+                title="Zoom out (or Ctrl+Scroll)"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <span className="px-3 text-sm font-medium min-w-[60px] text-center">
+                {(zoom * 100).toFixed(0)}%
+              </span>
+              <button
+                onClick={handleZoomIn}
+                className="p-2 hover:bg-white rounded transition-colors"
+                title="Zoom in (or Ctrl+Scroll)"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+            </div>
+            
+            {/* Reset button */}
+            <button
+              onClick={resetView}
+              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+              title="Reset view"
+            >
+              <Move className="w-4 h-4" />
+              Reset
+            </button>
+
+            {/* Fullscreen button */}
+            <button
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+            >
+              {isFullscreen ? (
+                <>
+                  <Minimize2 className="w-4 h-4" />
+                  Exit
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="w-4 h-4" />
+                  Fullscreen
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Diagram area */}
-      <div className="flex-1 overflow-auto bg-gray-50 p-6 flex items-center justify-center">
-        <svg width={size} height={size} className="drop-shadow-lg">
+      <div 
+        className="flex-1 overflow-auto bg-gray-50"
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
+      >
+        <div 
+          className="inline-block min-w-full min-h-full flex items-center justify-center p-12"
+          style={{ 
+            transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+            transformOrigin: 'center center',
+            transition: isPanning ? 'none' : 'transform 0.1s ease'
+          }}
+        >
+          <svg 
+            ref={svgRef}
+            width={size} 
+            height={size} 
+            className="drop-shadow-lg"
+            style={{ display: 'block' }}
+          >
           {/* Center circle */}
           <circle
             cx={centerX}
@@ -240,11 +337,12 @@ export function SunburstTreeDiagram({ tree }: SunburstTreeProps) {
               </g>
             );
           })}
-        </svg>
+          </svg>
+        </div>
 
         {/* Hover tooltip */}
         {hoveredNode && (
-          <div className="absolute top-4 right-4 bg-white rounded-lg shadow-xl p-4 border border-gray-200 max-w-xs">
+          <div className="fixed top-20 right-4 bg-white rounded-lg shadow-xl p-4 border border-gray-200 max-w-xs z-50">
             {paths.find((p: any) => p.id === hoveredNode) && (
               <>
                 <div className="font-semibold text-gray-900 mb-2">
