@@ -345,8 +345,12 @@ export function InteractiveTreeDiagram({
       }
       
       // Process children if expanded
+      // For operator nodes, always process children (they inherit parent's expanded state)
       let childrenWidth = currentWidth;
-      if (isExpanded && treeNode.children && treeNode.children.length > 0) {
+      const shouldProcessChildren = treeNode.children && treeNode.children.length > 0 && 
+                                     (isOperator || isExpanded);
+      
+      if (shouldProcessChildren) {
         let childLeftOffset = leftOffset;
         
         // Determine the operator for child edges
