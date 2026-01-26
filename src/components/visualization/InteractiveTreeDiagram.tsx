@@ -240,6 +240,9 @@ export function InteractiveTreeDiagram({
     let nodeId = 0;
     const branchColorMap = new Map<string, string>();
     
+    console.log('Building tree from:', tree);
+    console.log('Expanded nodes:', expandedNodes);
+    
     // Calculate tree width for better positioning
     const calculateTreeWidth = (node: any): number => {
       if (!node.children || node.children.length === 0) {
@@ -376,6 +379,9 @@ export function InteractiveTreeDiagram({
     
     const rootWidth = calculateTreeWidth(tree);
     processNode(tree, null, 0, 0, rootWidth, 0);
+    
+    console.log('Generated nodes:', nodes.length, nodes);
+    console.log('Generated edges:', edges.length, edges);
     
     return { nodes, edges };
   }, [tree, expandedNodes, onShowCurve]);
