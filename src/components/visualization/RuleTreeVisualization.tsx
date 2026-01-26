@@ -10,6 +10,8 @@ import { FuzzyCurvePlot } from './FuzzyCurvePlot';
 import { SankeyTreeDiagram } from './SankeyTreeDiagram';
 import { HorizontalTreeDiagram } from './HorizontalTreeDiagram';
 import { SunburstTreeDiagram } from './SunburstTreeDiagram';
+import { applyOperator } from '@/lib/engine/operators';
+import { applyHedge } from '@/lib/engine/hedges';
 
 
 interface RuleTreeVisualizationProps {
@@ -145,11 +147,53 @@ function enrichTreeWithRatings(node: any, evaluationResults: Record<string, numb
     }
   }
   
-  // Recursively enrich children
+  // Recursively enrich children first (bottom-up calculation)
   if (node.children && Array.isArray(node.children)) {
     enrichedNode.children = node.children.map((child: any) => 
       enrichTreeWithRatings(child, evaluationResults)
     );
+    
+    // After enriching children, calculate intermediate node ratings
+    // Check if this is an operator node
+    const operatorTypes = ['and', 'or', 'product', 'prod', 'multiply', 'sum', 'times', 
+                           'average', 'avg', 'mean', 'plus', 'add', 'addition', 
+                           'minus', 'subtract', 'subtraction', 'min', 'max'];
+    
+    if (node.Type && operatorTypes.includes(node.Type.toLowerCase())) {
+      // Extract child ratings
+      const childRatings = enrichedNode.children
+        .map((child: any) => child.rating)
+        .filter((r: any) => r !== undefined && !isNaN(r));
+      
+      // Apply operator to calculate this node's rating
+      if (childRatings.length > 0) {
+        enrichedNode.rating = applyOperator(node.Type, childRatings);
+      }
+    }
+    
+    // Check if this is a hedge node
+    const hedgeTypes = ['not', 'very', 'slightly', 'somewhat', 'extremely', 
+                        'null_or', 'null_not_rated', 'multiply', 'mult', 'power', 'limit'];
+    
+    if (node.Type && hedgeTypes.includes(node.Type.toLowerCase())) {
+      // Hedges typically have one child
+      if (enrichedNode.children.length > 0) {
+        const childRating = enrichedNode.children[0].rating;
+        if (childRating !== undefined && !isNaN(childRating)) {
+          const hedgeValue = node.Value ? parseFloat(node.Value) : undefined;
+          enrichedNode.rating = applyHedge(node.Type, childRating, hedgeValue) as number;
+        }
+      }
+    }
+    
+    // Handle nodes with children but no explicit Type (container nodes)
+    // Use the first child's rating
+    if (!node.Type && enrichedNode.children.length > 0 && !enrichedNode.rating) {
+      const firstChildRating = enrichedNode.children[0].rating;
+      if (firstChildRating !== undefined && !isNaN(firstChildRating)) {
+        enrichedNode.rating = firstChildRating;
+      }
+    }
   }
   
   return enrichedNode;
