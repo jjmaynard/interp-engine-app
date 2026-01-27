@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronRight, ChevronDown, Maximize2, Minimize2, ZoomIn, ZoomOut } from 'lucide-react';
+import { ChevronRight, ChevronDown, Maximize2, Minimize2, ZoomIn, ZoomOut, Expand, Minimize } from 'lucide-react';
 
 interface HorizontalTreeProps {
   tree: any;
@@ -12,6 +12,27 @@ export function HorizontalTreeDiagram({ tree }: HorizontalTreeProps) {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['node-0']));
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoom, setZoom] = useState(1);
+  
+  // Collect all node IDs for expand/collapse all
+  const getAllNodeIds = (node: any, prefix = 'node', result: string[] = []): string[] => {
+    result.push(prefix);
+    if (node.children && node.children.length > 0) {
+      node.children.forEach((child: any, index: number) => {
+        getAllNodeIds(child, `${prefix}-${index}`, result);
+      });
+    }
+    return result;
+  };
+  
+  const allNodeIds = useMemo(() => getAllNodeIds(tree, 'node-0'), [tree]);
+  
+  const expandAll = () => {
+    setExpandedNodes(new Set(allNodeIds));
+  };
+  
+  const collapseAll = () => {
+    setExpandedNodes(new Set(['node-0']));
+  };
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.2, 2));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.2, 0.5));
@@ -161,6 +182,26 @@ export function HorizontalTreeDiagram({ tree }: HorizontalTreeProps) {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Expand/Collapse all buttons */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={expandAll}
+                className="px-3 py-2 hover:bg-white rounded transition-colors flex items-center gap-1.5 text-sm font-medium"
+                title="Expand all nodes"
+              >
+                <Expand className="w-4 h-4" />
+                Expand All
+              </button>
+              <button
+                onClick={collapseAll}
+                className="px-3 py-2 hover:bg-white rounded transition-colors flex items-center gap-1.5 text-sm font-medium"
+                title="Collapse all nodes"
+              >
+                <Minimize className="w-4 h-4" />
+                Collapse All
+              </button>
+            </div>
+            
             {/* Zoom controls */}
             <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
               <button

@@ -291,7 +291,7 @@ export function InteractiveTreeDiagram({
       const x = (leftOffset + currentWidth / 2) * horizontalSpacing;
       const y = depth * verticalSpacing;
       
-      // Only create visual node for evaluations (has RefId or rule_refid)
+      // Only create visual node for evaluations (has RefId or rule_refid) or root
       if (!isOperator) {
         nodes.push({
           id,
@@ -319,33 +319,34 @@ export function InteractiveTreeDiagram({
           sourcePosition: Position.Bottom,
           targetPosition: Position.Top,
         });
-      }
-      
-      // Create edge from parent if this is an evaluation node
-      if (parentId && !isOperator) {
-        edges.push({
-          id: `edge-${parentId}-${id}`,
-          source: parentId,
-          target: id,
-          type: 'smoothstep',
-          animated: false,
-          label: parentOperator || '',
-          labelStyle: { fill: '#1f2937', fontWeight: 700, fontSize: 14 },
-          labelBgStyle: { fill: '#fef3c7', fillOpacity: 1, stroke: '#f59e0b', strokeWidth: 1 },
-          labelBgPadding: [10, 6] as [number, number],
-          labelBgBorderRadius: 6,
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 24,
-            height: 24,
-            color: branchColor || '#475569',
-          },
-          style: {
-            strokeWidth: 4, // Increased from 3 for better visibility
-            stroke: branchColor || '#475569',
-            opacity: 1, // Ensure full opacity
-          },
-        });
+        
+        // Create edge from parent if we have a parent
+        // This happens for evaluation nodes that have a visible parent
+        if (parentId) {
+          edges.push({
+            id: `edge-${parentId}-${id}`,
+            source: parentId,
+            target: id,
+            type: 'smoothstep',
+            animated: false,
+            label: parentOperator || '',
+            labelStyle: { fill: '#1f2937', fontWeight: 700, fontSize: 14 },
+            labelBgStyle: { fill: '#fef3c7', fillOpacity: 1, stroke: '#f59e0b', strokeWidth: 1 },
+            labelBgPadding: [10, 6] as [number, number],
+            labelBgBorderRadius: 6,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 24,
+              height: 24,
+              color: branchColor || '#475569',
+            },
+            style: {
+              strokeWidth: 4,
+              stroke: branchColor || '#475569',
+              opacity: 1,
+            },
+          });
+        }
       }
       
       // Process children if expanded
@@ -364,12 +365,12 @@ export function InteractiveTreeDiagram({
           const childTreeWidth = calculateTreeWidth(child);
           const result = processNode(
             child, 
-            isOperator ? parentId : id, // If this is operator, connect children to grandparent
+            isOperator ? parentId : id, // If this is operator, pass through parent ID, otherwise use current node ID
             isOperator ? depth : depth + 1, // Don't increase depth for operator nodes
             childLeftOffset, 
             childTreeWidth,
             depth === 0 ? index : branchIndex,
-            isOperator ? (treeNode.Type || '').toUpperCase() : parentOperator
+            childOperator || parentOperator // Pass operator label from this node or from parent
           );
           childLeftOffset += result.width;
         });
