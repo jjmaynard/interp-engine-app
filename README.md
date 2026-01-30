@@ -22,17 +22,25 @@ This application implements the NRCS soil interpretation methodology, based on t
 
 ### Supported Interpretations
 
-Currently loaded: 3 interpretations
-- AGR - California Revised Storie Index (CA)
-- Dust PM10 and PM2.5 Generation
-- Erodibility Factor Maximum
+**Currently loaded: 2,111+ complete NASIS interpretations** 🎉
+
+Includes all national, state, regional, and specialized interpretations:
+- **Vegetative Productivity** - Agriculture, forestry, rangeland (AGR, FOR, GRL, NCCPI, etc.)
+- **Building Site Development** - Engineering and construction (ENG, URB)
+- **Sanitary Facilities** - Septic systems and waste management
+- **Water Management** - Irrigation, drainage, ponds (WMS, AWM)
+- **Recreational Development** - Parks, trails, playgrounds (REC)
+- **Wildlife Habitat** - Wildlife and pollinator habitat (WLF)
+- **Conservation Practices** - NRCS conservation standards (CPS)
+- **Regional Interpretations** - State and local specific
+- **And many more categories...**
 
 **Data Files:** All data stored in `src/data/` directory
-- `interpretation_trees.json` - 3 interpretations with rule trees
-- `evaluations.json` - 167,000+ evaluation curve definitions
-- `properties.json` - 67,000+ soil property definitions
+- `primary_interpretation_trees.json` - **2,111+ interpretations** with complete rule trees (55 MB)
+- `evaluations.json` - 167,000+ evaluation curve definitions (14 MB)
+- `properties.json` - 67,000+ soil property definitions (1.7 MB)
 
-**Expandable:** Additional interpretations (400+ available) can be added by updating JSON files.
+**Complete NASIS Database:** All interpretations from the USDA-NRCS National Soil Information System.
 
 ## Technology Stack
 
@@ -291,26 +299,32 @@ Database schema files and migrations exist but are not currently used. The appli
 
 The application loads all data from static JSON files in the `src/data/` directory:
 
-1. **interpretation_trees.json** - Rule trees for 3 interpretations with hierarchical structure
-2. **evaluations.json** - 167,000+ evaluation curve definitions for fuzzy logic
-3. **properties.json** - 67,000+ soil property definitions
+1. **primary_interpretation_trees.json** - **2,111+ complete NASIS interpretations** with hierarchical rule trees (55 MB)
+2. **evaluations.json** - 167,000+ evaluation curve definitions for fuzzy logic (14 MB)
+3. **properties.json** - 67,000+ soil property definitions (1.7 MB)
 
-**Adding New Interpretations:**
+**Complete NASIS Database:**
 
-To add more interpretations, export them from the R `InterpretationEngine` package and add to the JSON files:
+The application includes the **entire USDA-NRCS National Soil Information System interpretation database**:
+- Built from 14,279+ interpretation rules
+- Covers all national, state, regional, and specialized interpretations
+- Organized into 12 major categories
+- Includes both national standards and state-specific interpretations
 
-```r
-library(InterpretationEngine)
-interpretation <- initRuleset("Your Interpretation Name")
-# Export to JSON format and append to interpretation_trees.json
-```
+**Categories Include:**
+- Vegetative Productivity (Agriculture, Forestry, Rangeland)
+- Building Site Development (Engineering, Construction)
+- Sanitary Facilities (Septic, Waste Management)
+- Water Management (Irrigation, Drainage, Ponds)
+- Recreational Development (Parks, Trails, Playgrounds)
+- Wildlife Habitat (Wildlife, Pollinators)
+- Conservation Practices (NRCS Standards)
+- Soil Features (Soil Health, Carbon, Compaction)
+- Construction Materials (Gravel, Sand, Topsoil)
+- Regional Interpretations (State/Local Specific)
+- And more...
 
-**Current Interpretations:**
-1. AGR - California Revised Storie Index (CA)
-2. Dust PM10 and PM2.5 Generation
-3. Erodibility Factor Maximum
-
-**Capacity:** Can support 400+ interpretations in JSON format (expandable as needed).
+**Data Source:** Exported from R `InterpretationEngine` package with complete NASIS metadata.
 
 ## Contributing
 

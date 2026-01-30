@@ -12,9 +12,9 @@ The NRCS Soil Interpretation Engine is a production-ready Next.js web applicatio
 
 **Location:** `src/data/`
 
-- **interpretation_trees.json** - 3 interpretations with hierarchical rule trees
-- **evaluations.json** - 167,000+ evaluation curve definitions
-- **properties.json** - 67,000+ soil property definitions
+- **primary_interpretation_trees.json** - **2,111+ complete NASIS interpretations** (55 MB)
+- **evaluations.json** - 167,000+ evaluation curve definitions (14 MB)
+- **properties.json** - 67,000+ soil property definitions (1.7 MB)
 
 **Why JSON instead of PostgreSQL:**
 - ✅ No database setup required
@@ -22,7 +22,8 @@ The NRCS Soil Interpretation Engine is a production-ready Next.js web applicatio
 - ✅ Faster data loading (bundled at build time)
 - ✅ No connection pooling or quota issues
 - ✅ Version control friendly
-- ✅ Suitable for current scale (3-400 interpretations)
+- ✅ Suitable for current scale (2,111 interpretations, 55 MB total)
+- ✅ Complete NASIS database in single file
 
 ### Technology Stack
 
@@ -84,8 +85,9 @@ The NRCS Soil Interpretation Engine is a production-ready Next.js web applicatio
 ### Current Approach
 
 ```typescript
-// src/lib/data/static-loader.ts
-import interpretationTreesData from '@/data/interpretation_trees.json';
+// src/lib/data/loader.ts
+// Using primary_interpretation_trees.json with complete NASIS database (2,111+ interpretations)
+import interpretationTreesData from '@/data/primary_interpretation_trees.json';
 import evaluationsData from '@/data/evaluations.json';
 import propertiesData from '@/data/properties.json';
 
@@ -175,19 +177,48 @@ npm run db:setup
 
 ## Current Interpretations
 
-1. **AGR - California Revised Storie Index (CA)**
-   - Agricultural suitability for California soils
-   - Multi-factor rating (profile, texture, slope, modifying factors)
+**Complete NASIS Database: 2,111+ Interpretations** 🎉
 
-2. **Dust PM10 and PM2.5 Generation**
-   - Dust generation potential from soil
-   - Factors: dryness index, gypsum content, silt/clay content
+The application includes the **entire USDA-NRCS National Soil Information System** interpretation database, organized into 12 major categories:
 
-3. **Erodibility Factor Maximum**
-   - Maximum K-factor for water erosion
-   - Based on soil erodibility and slope
+### Interpretation Categories
 
-**Expandable:** 400+ additional NRCS interpretations available from R package
+1. **Vegetative Productivity** - Agriculture, forestry, rangeland production
+   - Examples: NCCPI, Storie Index, crop yield ratings, forest productivity
+
+2. **Building Site Development** - Engineering and construction
+   - Examples: Dwellings, roads, foundations, buildings
+
+3. **Sanitary Facilities** - Septic and waste management
+   - Examples: Septic tank absorption, lagoons, sewage disposal
+
+4. **Water Management** - Irrigation, drainage, water structures
+   - Examples: Irrigation, drainage, ponds, reservoirs, embankments
+
+5. **Recreational Development** - Parks and recreation
+   - Examples: Playgrounds, picnic areas, trails, campsites
+
+6. **Wildlife Habitat** - Wildlife and ecosystem services
+   - Examples: Wildlife habitat, pollinator habitat, wetlands
+
+7. **Conservation Practices** - NRCS conservation standards
+   - Examples: Cover crop, conservation tillage, buffers
+
+8. **Soil Features** - Soil characteristics and health
+   - Examples: Soil health, carbon sequestration, compaction susceptibility
+
+9. **Construction Materials** - Soil as material source
+   - Examples: Gravel source, sand source, topsoil, roadfill
+
+10. **Regional Interpretations** - State and local specific
+    - Examples: State-specific productivity ratings, local practices
+
+11. **Specialized Applications** - Agency-specific interpretations
+    - Examples: Military, BLM, National Parks Service
+
+12. **General** - Miscellaneous and uncategorized
+
+**Data Source:** Complete NASIS export built from 14,279+ interpretation rules
 
 ## Performance Metrics
 
@@ -298,9 +329,9 @@ interp-engine-app/
 │   │   └── db/                # Database (unused)
 │   ├── types/                 # TypeScript definitions
 │   ├── data/                  # Static JSON files ⭐
-│   │   ├── interpretation_trees.json
-│   │   ├── evaluations.json
-│   │   └── properties.json
+│   │   ├── primary_interpretation_trees.json  # 2,111+ interpretations (55 MB)
+│   │   ├── evaluations.json                   # 167K+ curves (14 MB)
+│   │   └── properties.json                    # 67K+ properties (1.7 MB)
 │   └── __tests__/             # Jest tests
 ├── docs/                       # Documentation
 ├── drizzle/                    # DB migrations (unused)
@@ -311,8 +342,9 @@ interp-engine-app/
 ## Future Enhancements
 
 ### Short Term
-- [ ] Add more interpretations (400+ available)
-- [ ] CSV batch upload
+- [ ] Category filtering and search
+- [ ] Interpretation metadata display (description, date, source)
+- [ ] CSV batch upload for multiple soil samples
 - [ ] Export results to PDF/Excel
 - [ ] Comparison mode (multiple interpretations side-by-side)
 

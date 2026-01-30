@@ -18,9 +18,9 @@ npm run dev
 ```
 
 **Data Source:** Static JSON files (no database required)
-- `src/data/interpretation_trees.json` - 3 interpretations
-- `src/data/evaluations.json` - 167K+ evaluation curves  
-- `src/data/properties.json` - 67K+ property definitions
+- `src/data/primary_interpretation_trees.json` - **2,111+ complete NASIS interpretations** (55 MB)
+- `src/data/evaluations.json` - 167K+ evaluation curves (14 MB)
+- `src/data/properties.json` - 67K+ property definitions (1.7 MB)
 
 ## What's Been Built
 
