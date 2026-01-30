@@ -1,12 +1,14 @@
 # NRCS Soil Interpretation Engine - Project Summary
 
-## Project Completion Status: Phases 1-4 Complete ✅
+## Project Completion Status: Phases 1-3 Complete ✅
 
-All four foundational phases of the NRCS Soil Interpretation Engine have been successfully implemented. The system is now production-ready with a complete API, database integration, and comprehensive testing.
+Three foundational phases of the NRCS Soil Interpretation Engine have been successfully implemented. The system is production-ready with a complete API, static JSON data loading, result caching, and comprehensive testing.
+
+**Note:** The application uses static JSON files for data storage. PostgreSQL integration (Phase 4) was prototyped but is NOT currently active. All data is loaded from JSON files in `src/data/` directory.
 
 ## Quick Start
 
-### For Developers (JSON Mode - No Database Required)
+### For Developers
 ```bash
 git clone <repository>
 cd interp-engine-app
@@ -15,19 +17,10 @@ npm run dev
 # Visit http://localhost:3000
 ```
 
-### For Production (With PostgreSQL)
-```bash
-# 1. Install and setup
-npm install
-cp .env.example .env
-# Edit .env: DATABASE_URL="postgresql://..."
-
-# 2. Setup database
-npm run db:setup
-
-# 3. Run application
-npm run dev
-```
+**Data Source:** Static JSON files (no database required)
+- `src/data/interpretation_trees.json` - 3 interpretations
+- `src/data/evaluations.json` - 167K+ evaluation curves  
+- `src/data/properties.json` - 67K+ property definitions
 
 ## What's Been Built
 
@@ -82,29 +75,27 @@ npm run dev
 **Key Files:** 12 files (~1500 lines)
 **Documentation:** [docs/PHASE3_COMPLETE.md](docs/PHASE3_COMPLETE.md)
 
-### Phase 4: PostgreSQL Integration ✅
-**Completed:** Database migration with connection pooling
+### Phase 4: PostgreSQL Integration ⏸️
+**Status:** Prototyped but NOT currently implemented
 
-#### Database Schema (7 tables)
-- `categories` - Interpretation categories (8 default)
-- `interpretations` - Soil interpretations with tree structures
-- `properties` - Property definitions (~67K records)
-- `evaluations` - Evaluation curves (~167K records)
-- `interpretation_properties` - Junction table
-- `interpretation_evaluations` - Junction table
-- `evaluation_results_cache` - Persistent cache with TTL
+Database schema and migration files exist in the codebase but are **not actively used**. The application uses static JSON files instead for the following reasons:
 
-#### Features
-- Drizzle ORM for type-safe queries
-- Connection pooling (2-10 connections)
-- Data migration scripts
-- Database query functions
+- Simpler deployment (no database dependencies)
+- Faster development iteration
+- Avoids database quota/connection limits
+- All 3 interpretations + 167K evaluations fit in JSON
+
+**Available but unused:**
+- Database schema definitions (`src/lib/db/schema.ts`)
+- Migration files (`drizzle/` directory)
+- Database query functions (`src/lib/db/queries.ts`)
+- Drizzle ORM integration
+
+**Future:** PostgreSQL can be activated if needed for:
+- Storing user-generated data
+- Audit logging
 - Persistent result caching
-- npm scripts for database management
-- Drizzle Studio GUI support
-
-**Key Files:** 10 files (~1200 lines)
-**Documentation:** [docs/PHASE4_COMPLETE.md](docs/PHASE4_COMPLETE.md), [DATABASE_SETUP.md](DATABASE_SETUP.md)
+- Scaling beyond 400 interpretations
 
 ## Technology Stack
 
@@ -112,17 +103,14 @@ npm run dev
 |-----------|-----------|---------|
 | Framework | Next.js 16 | React framework with App Router |
 | Language | TypeScript 5+ | Type safety |
-| Database | PostgreSQL 14+ | Data persistence |
-| ORM | Drizzle | Type-safe database queries |
+| Data Storage | Static JSON files | Interpretations, evaluations, properties |
+| Data Loading | File system imports | Direct JSON file imports |
 | Validation | Zod | Runtime type checking |
 | Testing | Jest | Unit and integration tests |
 | Styling | Tailwind CSS 4 | Utility-first CSS |
-| Caching | LRU Cache + PostgreSQL | Result caching |
+| Caching | LRU Cache (in-memory) | Result caching |
 | API | REST + Server Actions | Multiple access patterns |
-
-## Performance Metrics
-
-- **API Response:** <50ms (cached), <200ms (uncached)
+| Database (unused) | PostgreSQL + Drizzle | Available but not active |
 - **Cache Hit Rate:** ~65% typical
 - **Database Queries:** <10ms with indexes
 - **Connection Pool:** 2-10 connections (configurable)
@@ -164,10 +152,10 @@ npm run db:studio       # Launch Drizzle Studio GUI
 - **Passing Tests:** 17+
 - **API Endpoints:** 8
 - **Server Actions:** 7
-- **Database Tables:** 7
-- **Supported Interpretations:** 3 (400+ ready to import)
+- **Data Storage:** Static JSON files
+- **Supported Interpretations:** 3 (400+ can be added)
 - **Dependencies:** 25+
-- **Development Phases:** 4 completed
+- **Development Phases:** 3 completed, 1 prototyped
 
 ## API Usage Examples
 
@@ -219,98 +207,118 @@ const result = await apiClient.evaluate(
 );
 ```
 
-## Database Setup
+## Data Management
 
-### Quick Setup
+### Current Approach: Static JSON Files
+
+The application loads all data from static JSON files:
+
 ```bash
-# 1. Install PostgreSQL (if not installed)
-# Ubuntu: sudo apt-get install postgresql
-# macOS: brew install postgresql@16
-
-# 2. Create database
-psql -U postgres
-CREATE DATABASE interp_engine;
-\q
-
-# 3. Configure environment
-cp .env.example .env
-# Edit .env: DATABASE_URL="postgresql://..."
-
-# 4. Run setup
-npm run db:setup
+src/data/
+├── interpretation_trees.json  # 3 interpretations
+├── evaluations.json           # 167,000+ evaluation curves
+└── properties.json            # 67,000+ property definitions
 ```
 
-See [DATABASE_SETUP.md](DATABASE_SETUP.md) for detailed instructions.
+**Advantages:**
+- No database required
+- Simple deployment (static files)
+- Fast loading (imported at build time)
+- Version control friendly
+
+**Adding New Interpretations:**
+
+1. Export from R InterpretationEngine package:
+```r
+library(InterpretationEngine)
+interpretation <- initRuleset("Your Interpretation Name")
+# Export to JSON and add to src/data/interpretation_trees.json
+```
+
+2. Restart the application to reload data
+
+### Future: Database Option (Not Active)
+
+PostgreSQL integration was prototyped but is not currently used. Database schema files exist in `src/lib/db/` and `drizzle/` directories if needed in the future.
 
 ## Documentation
 
 ### Phase Documentation
-- [Phase 1 Complete](docs/PHASE1_COMPLETE.md) - Foundation (TypeScript, data loading)
-- [Phase 1 Summary](docs/PHASE1_SUMMARY.md)
+- [Phase 1 Complete](docs/PHASE1_COMPLETE.md) - Foundation (TypeScript, JSON data loading)
 - [Phase 2 Complete](docs/PHASE2_COMPLETE.md) - Engine (fuzzy logic, operators)
-- [Phase 2 Summary](docs/PHASE2_SUMMARY.md)
 - [Phase 3 Complete](docs/PHASE3_COMPLETE.md) - API (endpoints, caching, validation)
-- [Phase 3 Summary](docs/PHASE3_SUMMARY.md)
-- [Phase 4 Complete](docs/PHASE4_COMPLETE.md) - Database (PostgreSQL, migrations)
-- [Phase 4 Summary](docs/PHASE4_SUMMARY.md)
+- [Phase 4 Summary](docs/PHASE4_SUMMARY.md) - Database (prototyped, not active)
+
+**Note:** Phase 4 (PostgreSQL) was prototyped but the application uses static JSON files instead.
 
 ### Setup Guides
-- [Database Setup Guide](DATABASE_SETUP.md) - PostgreSQL installation and configuration
 - [README.md](README.md) - Main project README
+- [Interactive Visualizations](docs/interactive_visualizations.md) - Tree visualization features
+- [Missing Data Analysis](docs/missing_data_analysis.md) - Property data handling
 
 ## Deployment
 
 ### Production Checklist
 - [ ] Set `NODE_ENV=production`
-- [ ] Configure PostgreSQL with SSL
-- [ ] Set appropriate connection pool size (10-20)
-- [ ] Run database migrations
-- [ ] Import production data
-- [ ] Configure environment variables
+- [ ] Ensure JSON data files are included in build
+- [ ] Configure environment variables (if any)
 - [ ] Set up monitoring/logging
 - [ ] Configure CORS as needed
 - [ ] Test health endpoint
+- [ ] Verify data files load correctly
 
 ### Recommended Platforms
 
-**Vercel + Neon (Easiest)**
+**Vercel (Recommended)**
 ```bash
 vercel deploy
-# Add Neon PostgreSQL from integrations
+# No database required - uses static JSON files
 ```
 
-**Vercel + Vercel Postgres**
+**Netlify**
 ```bash
-vercel deploy
-# Add Postgres from Storage tab
+netlify deploy
+# Automatic detection of Next.js
 ```
 
-**Railway**
-- Deploy app + PostgreSQL in one click
-- Auto-configure DATABASE_URL
+**Any Node.js Host**
+- Static files are bundled with the application
+- No database configuration needed
+- Simple deployment process
 
-**Render**
-- Deploy web service
-- Add PostgreSQL instance
-- Link services
+**Docker**
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --production
+COPY . .
+RUN npm run build
+CMD ["npm", "start"]
+```
 
-## Next Steps (Future Phases)
+## Next Steps (Future Enhancements)
 
-### Phase 5: Advanced Features
-- [ ] Full-text search on interpretations
-- [ ] User authentication and authorization
-- [ ] Audit logging for all evaluations
-- [ ] Spatial data integration (PostGIS)
-- [ ] Analytics dashboard
-- [ ] GraphQL API
-- [ ] WebSocket support for real-time updates
+### Data Management
+- [ ] Activate PostgreSQL integration for user data
+- [ ] Add more interpretations (400+ available)
+- [ ] Dynamic interpretation loading
+- [ ] Import/export functionality
+- [ ] Data versioning
 
-### Performance Enhancements
-- [ ] Redis caching layer
-- [ ] Read replicas for database scaling
-- [ ] Query optimization and materialized views
-- [ ] CDN integration
-- [ ] Image optimization
+### Features
+- [ ] User authentication and saved evaluations
+- [ ] Batch evaluation from CSV upload
+- [ ] Spatial analysis integration (GeoJSON input)
+- [ ] Comparison mode (multiple interpretations)
+- [ ] Export results to PDF/Excel
+- [ ] API rate limiting dashboard
+
+### Performance
+- [ ] Redis caching for API results
+- [ ] CDN for static assets
+- [ ] Service worker for offline capability
+- [ ] Lazy loading for large datasets
 
 ### Developer Experience
 - [ ] OpenAPI/Swagger documentation
@@ -361,4 +369,4 @@ This project is based on the R `InterpretationEngine` package developed by USDA-
 
 **Project Status:** Production Ready 🚀
 
-All four foundational phases complete with comprehensive testing, documentation, and deployment support. The system is ready for production use with either JSON or PostgreSQL data storage.
+Three foundational phases complete with comprehensive testing, documentation, and deployment support. The system is production-ready using static JSON files for data storage. PostgreSQL integration exists but is not currently active.
