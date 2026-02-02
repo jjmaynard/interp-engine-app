@@ -44,7 +44,7 @@ export function loadProperties(): Property[] {
  */
 export function getInterpretationByName(name: string): InterpretationTree | null {
   const trees = loadInterpretationTrees();
-  return trees.find(t => t.name[0] === name) || null;
+  return trees.find(t => t.rulename === name) || null;
 }
 
 /**
@@ -53,7 +53,7 @@ export function getInterpretationByName(name: string): InterpretationTree | null
  */
 export function getInterpretationNames(): string[] {
   const trees = loadInterpretationTrees();
-  return trees.map(t => t.name[0]);
+  return trees.map(t => t.rulename);
 }
 
 /**
@@ -63,9 +63,9 @@ export function getInterpretationNames(): string[] {
 export function getInterpretationSummaries(): InterpretationSummary[] {
   const trees = loadInterpretationTrees();
   return trees.map(interp => ({
-    name: interp.name[0],
-    propertyCount: interp.properties?.length || 0,
-    hasProperties: (interp.properties?.length || 0) > 0
+    name: interp.rulename,
+    propertyCount: interp.property_count || interp.properties?.length || 0,
+    hasProperties: (interp.property_count || interp.properties?.length || 0) > 0
   }));
 }
 

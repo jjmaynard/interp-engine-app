@@ -81,9 +81,16 @@ export interface HierarchicalRuleNode {
  * Complete interpretation tree with rules and properties
  */
 export interface InterpretationTree {
-  name: string[];
-  tree: RuleNode[];
-  properties?: Property[];
+  interpiid: number;
+  rulename: string;
+  ruledesign: string;
+  tree: any; // Tree structure from NASIS
+  properties?: Array<{ 
+    propiid: string;
+    propname?: string;
+    evaluation?: string;
+  }>;
+  property_count?: number;
 }
 
 /**

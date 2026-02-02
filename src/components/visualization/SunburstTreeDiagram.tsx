@@ -265,8 +265,8 @@ export function SunburstTreeDiagram({ tree }: SunburstTreeProps) {
             cx={centerX}
             cy={centerY}
             r={centerRadius}
-            fill="#6366f1"
-            stroke="#4f46e5"
+            fill={tree?.rating !== undefined && tree?.rating !== null ? getRatingColor(tree.rating) : '#6366f1'}
+            stroke={tree?.rating !== undefined && tree?.rating !== null ? getRatingColor(tree.rating * 0.9) : '#4f46e5'}
             strokeWidth={2}
           />
           <text

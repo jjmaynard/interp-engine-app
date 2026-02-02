@@ -221,6 +221,7 @@ export default function InterpretPage() {
                         tree={ruleTree}
                         interpretationName={selectedInterp}
                         evaluationResults={result?.evaluationResults}
+                        finalRating={result?.rating}
                       />
                     ) : (
                       <div className="p-8 text-center text-gray-500">

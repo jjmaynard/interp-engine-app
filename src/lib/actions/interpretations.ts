@@ -139,7 +139,7 @@ export async function getAvailableInterpretations(): Promise<
     const interpretations = await engine.getAvailableInterpretations();
 
     const formatted = interpretations.map(interp => ({
-      name: Array.isArray(interp.name) ? interp.name[0] : interp.name,
+      name: interp.rulename || 'Unknown',
       propertyCount: interp.properties?.length || 0,
     }));
 
@@ -211,7 +211,7 @@ export async function getInterpretationTree(
     const engine = await getDefaultEngine();
     const trees = await engine.getAvailableInterpretations();
     const tree = trees.find(t => 
-      Array.isArray(t.name) ? t.name[0] === interpretationName : t.name === interpretationName
+      t.rulename === interpretationName
     );
 
     if (!tree) {

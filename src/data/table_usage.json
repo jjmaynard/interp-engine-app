@@ -1,0 +1,147 @@
+[
+  {
+    "sql_tables": "component",
+    "n_properties": 3573,
+    "n_interpretations": 2106
+  },
+  {
+    "sql_tables": "chorizon",
+    "n_properties": 2025,
+    "n_interpretations": 1894
+  },
+  {
+    "sql_tables": "comonth",
+    "n_properties": 482,
+    "n_interpretations": 1542
+  },
+  {
+    "sql_tables": "cosoilmoist",
+    "n_properties": 262,
+    "n_interpretations": 1456
+  },
+  {
+    "sql_tables": "corestrictions",
+    "n_properties": 241,
+    "n_interpretations": 1353
+  },
+  {
+    "sql_tables": "chtexturegrp",
+    "n_properties": 240,
+    "n_interpretations": 825
+  },
+  {
+    "sql_tables": "chtexture",
+    "n_properties": 165,
+    "n_interpretations": 701
+  },
+  {
+    "sql_tables": "mapunit",
+    "n_properties": 109,
+    "n_interpretations": 274
+  },
+  {
+    "sql_tables": "cogeomordesc",
+    "n_properties": 60,
+    "n_interpretations": 154
+  },
+  {
+    "sql_tables": "chfrags",
+    "n_properties": 45,
+    "n_interpretations": 103
+  },
+  {
+    "sql_tables": "cosurffrags",
+    "n_properties": 43,
+    "n_interpretations": 642
+  },
+  {
+    "sql_tables": "copmgrp",
+    "n_properties": 33,
+    "n_interpretations": 128
+  },
+  {
+    "sql_tables": "legend",
+    "n_properties": 31,
+    "n_interpretations": 72
+  },
+  {
+    "sql_tables": "copm",
+    "n_properties": 23,
+    "n_interpretations": 124
+  },
+  {
+    "sql_tables": "chtexturemod",
+    "n_properties": 20,
+    "n_interpretations": 388
+  },
+  {
+    "sql_tables": "cosurfmorphss",
+    "n_properties": 14,
+    "n_interpretations": 75
+  },
+  {
+    "sql_tables": "chstruct",
+    "n_properties": 13,
+    "n_interpretations": 17
+  },
+  {
+    "sql_tables": "chstructgrp",
+    "n_properties": 13,
+    "n_interpretations": 17
+  },
+  {
+    "sql_tables": "chconsistence",
+    "n_properties": 7,
+    "n_interpretations": 8
+  },
+  {
+    "sql_tables": "cosurfmorphhpp",
+    "n_properties": 7,
+    "n_interpretations": 33
+  },
+  {
+    "sql_tables": "cotaxfmmin",
+    "n_properties": 5,
+    "n_interpretations": 82
+  },
+  {
+    "sql_tables": "codiagfeatures",
+    "n_properties": 4,
+    "n_interpretations": 6
+  },
+  {
+    "sql_tables": "coeplants",
+    "n_properties": 3,
+    "n_interpretations": 5
+  },
+  {
+    "sql_tables": "cosurfmorphgc",
+    "n_properties": 3,
+    "n_interpretations": 4
+  },
+  {
+    "sql_tables": "cotxfmother",
+    "n_properties": 3,
+    "n_interpretations": 3
+  },
+  {
+    "sql_tables": "chdesgnsuffix",
+    "n_properties": 2,
+    "n_interpretations": 4
+  },
+  {
+    "sql_tables": "cointerp",
+    "n_properties": 2,
+    "n_interpretations": 10
+  },
+  {
+    "sql_tables": "coforprod",
+    "n_properties": 1,
+    "n_interpretations": 2
+  },
+  {
+    "sql_tables": "muaoverlap",
+    "n_properties": 1,
+    "n_interpretations": 1
+  }
+]

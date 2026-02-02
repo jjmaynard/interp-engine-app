@@ -1,0 +1,12 @@
+[
+  {
+    "interpiid": 34647,
+    "rulename": "MIL - Trafficability Vehicle; Type 3 dry season",
+    "error": "evaluation nested too deeply: infinite recursion / options(expressions=)?"
+  },
+  {
+    "interpiid": 37408,
+    "rulename": "MIL - Trafficability Vehicle Type 7 1-pass wet season",
+    "error": "evaluation nested too deeply: infinite recursion / options(expressions=)?"
+  }
+]

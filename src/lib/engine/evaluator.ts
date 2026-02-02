@@ -193,11 +193,20 @@ export function evaluateNode(
 
   // Handle nodes with children but no Type (container/rule nodes)
   if (node.children && node.children.length > 0) {
+    console.log(`[Evaluator] Container node with ${node.children.length} children, no Type`);
+    console.log(`[Evaluator] Node name:`, node.name);
+    console.log(`[Evaluator] Child types:`, node.children.map((c: any) => c.Type));
+    
     // Recursively evaluate all children
     const childResults = node.children.map((child: any) => evaluateNode(child, context));
+    const childRatings = childResults.map(r => r.rating);
+    
+    console.log(`[Evaluator] Child ratings:`, childRatings);
 
-    // For rule nodes, typically use the first (and often only) child's rating
+    // For rule nodes, typically use the first (and only) child's rating
     const rating = childResults[0].rating;
+    
+    console.log(`[Evaluator] Container node "${node.name}" using first child rating: ${rating}`);
 
     // Merge property values and evaluation results
     const propertyValues: Record<string, number | string | null> = {};

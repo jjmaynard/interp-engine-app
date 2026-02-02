@@ -23,7 +23,7 @@ export function loadEvaluations(): Evaluation[] {
     return evaluationsCache;
   }
   
-  const filePath = path.join(process.cwd(), 'data', 'evaluations.json');
+  const filePath = path.join(process.cwd(), 'src', 'data', 'evaluations.json');
   const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   evaluationsCache = data as Evaluation[];
   return evaluationsCache;
@@ -37,7 +37,7 @@ export function loadProperties(): Property[] {
     return propertiesCache;
   }
   
-  const filePath = path.join(process.cwd(), 'data', 'properties.json');
+  const filePath = path.join(process.cwd(), 'src', 'data', 'properties.json');
   const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   propertiesCache = data as Property[];
   return propertiesCache;
@@ -45,28 +45,49 @@ export function loadProperties(): Property[] {
 
 /**
  * Load all interpretation trees from static data
+ * Enriches properties array with propname and evaluation fields
  */
 export function loadInterpretationTrees(): InterpretationTree[] {
   if (interpretationsCache) {
     return interpretationsCache;
   }
   
-  const filePath = path.join(process.cwd(), 'data', 'primary_interpretation_trees.json');
+  const filePath = path.join(process.cwd(), 'src', 'data', 'primary_interpretation_trees.json');
   const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   
-  interpretationsCache = (data as any[]).map(interp => {
-    // primary_interpretation_trees.json structure: { name: string, tree: object, property_count?: number }
-    const treeName = typeof interp.name === 'string' ? interp.name : 
-                     Array.isArray(interp.name) ? interp.name[0] : 'Unknown';
-    
-    return {
-      name: [treeName],
-      tree: interp.tree || {},
-      properties: interp.properties || [],
-      property_count: interp.property_count || 0,
-      metadata: interp.metadata || {},
-    };
+  // Load properties and evaluations for enrichment
+  const allProperties = loadProperties();
+  const allEvaluations = loadEvaluations();
+  
+  // Create lookup maps
+  const propMap = new Map(allProperties.map(p => [String(p.propiid), p]));
+  const evalByPropId = new Map<string, Evaluation[]>();
+  allEvaluations.forEach(e => {
+    const propId = String(e.propiid);
+    if (!evalByPropId.has(propId)) {
+      evalByPropId.set(propId, []);
+    }
+    evalByPropId.get(propId)!.push(e);
   });
   
+  // Enrich each interpretation's properties array
+  const enriched = data.map((interp: any) => {
+    if (interp.properties && Array.isArray(interp.properties)) {
+      interp.properties = interp.properties.map((prop: any) => {
+        const propId = String(prop.propiid);
+        const propDef = propMap.get(propId);
+        const evals = evalByPropId.get(propId) || [];
+        
+        return {
+          propiid: propId,
+          propname: propDef?.propname || 'Unknown Property',
+          evaluation: evals.length > 0 ? evals[0].evalname : undefined
+        };
+      });
+    }
+    return interp;
+  });
+  
+  interpretationsCache = enriched as InterpretationTree[];
   return interpretationsCache;
 }

@@ -1,0 +1,610 @@
+{
+  "analysis_date": "2026-01-28 15:45:48",
+  "data_summary": {
+    "total_interpretations": 2113,
+    "successful_interpretations": 2111,
+    "failed_interpretations": 2,
+    "total_properties": 8096,
+    "properties_with_sql": 8050,
+    "properties_without_sql": 46
+  },
+  "optimization": {
+    "n_static_raster_candidates": 722,
+    "static_raster_coverage_pct": 78.1,
+    "static_raster_candidates": [28, 70, 23, 1005, 1213, 83, 13018, 15, 86, 1336, 109, 1059, 85, 12111, 13514, 11403, 11539, 52969, 13505, 19, 13014, 16418, 87, 12009, 13506, 13028, 24326, 1052, 111, 11404, 16407, 33, 16415, 1252, 13164, 24324, 12947, 11402, 13062, 11498, 12950, 13007, 13163, 17, 1166, 70379, 24327, 10244, 13075, 5, 13061, 23642, 13754, 66, 10097, 10099, 12958, 1031, 24334, 1027, 1093, 10237, 13544, 13545, 13546, 13547, 14968, 23638, 10203, 10283, 13563, 13893, 13359, 13627, 16, 1267, 11963, 30, 1192, 1228, 1255, 1046, 13971, 15500, 1047, 1111, 10243, 13532, 13636, 1030, 15057, 13528, 22, 1066, 13527, 10098, 13525, 79, 13569, 13570, 12896, 13554, 120, 1084, 10363, 12952, 16677, 1167, 13553, 14374, 14375, 71, 13172, 13531, 14372, 1392, 13656, 10345, 12035, 13976, 16926, 10240, 16925, 10288, 12049, 15170, 15576, 21, 14478, 15327, 37735, 20, 24, 1042, 1311, 13526, 14380, 14382, 14383, 14385, 61, 11479, 17047, 13503, 14378, 14379, 14381, 14384, 60, 1190, 12939, 14124, 10429, 13788, 14970, 10162, 10163, 13195, 13364, 13551, 13564, 13848, 14471, 75, 1043, 13230, 13550, 1175, 10173, 10206, 13776, 14147, 115, 1199, 10444, 13069, 13676, 15294, 23649, 72, 1189, 15014, 23813, 1057, 13783, 1053, 10166, 10169, 10400, 13847, 28685, 10168, 12830, 13849, 24333, 1115, 1243, 10210, 10294, 11300, 12106, 13231, 13845, 14517, 14819, 15251, 16271, 1037, 1212, 11490, 12119, 12642, 13533, 15216, 23371, 70378, 10083, 10096, 13769, 34255, 1041, 10109, 13032, 13193, 13941, 14850, 35985, 1214, 10192, 10307, 11491, 13063, 13658, 17126, 23791, 28688, 37, 1211, 12827, 12831, 13409, 13842, 14791, 23793, 1331, 1364, 10012, 10239, 13216, 14142, 22887, 23637, 1009, 1386, 10085, 10164, 10216, 10481, 12048, 13430, 14892, 15436, 1259, 1363, 10362, 12800, 13156, 50, 1150, 1233, 11500, 13065, 14851, 14969, 15126, 15127, 16645, 28686, 27, 38, 1051, 10193, 10242, 10472, 11381, 11494, 12957, 13033, 13192, 15032, 15121, 15122, 15123, 15225, 15239, 16181, 16190, 1062, 10231, 14186, 14593, 14935, 15372, 18, 116, 1262, 10100, 13844, 13876, 14965, 15009, 15124, 15300, 15301, 15302, 15492, 23810, 1054, 1350, 10171, 10172, 10325, 11283, 12898, 13850, 14377, 23792, 27319, 1183, 1381, 10170, 13846, 14477, 14964, 15248, 16471, 28687, 4, 13, 80, 1107, 10349, 14962, 16728, 35961, 35963, 37734, 1273, 1380, 10219, 10335, 10455, 12938, 13019, 13640, 14211, 14600, 15132, 16971, 16972, 17099, 17100, 26215, 27563, 49328, 1231, 1391, 10276, 11383, 11501, 11819, 13352, 13571, 13641, 13724, 13778, 14567, 14571, 15376, 15378, 15379, 52706, 1217, 1219, 1263, 1268, 1321, 10062, 10185, 10191, 10198, 10205, 10446, 10857, 11292, 13177, 13360, 13473, 13604, 13892, 14109, 15117, 16205, 16265, 16402, 16404, 16493, 28703, 30185, 1006, 1151, 1247, 1401, 10290, 12032, 14065, 14128, 14203, 15043, 15049, 15051, 15056, 15171, 22886, 37434, 42034, 64675, 1060, 1078, 1088, 1234, 10086, 10262, 10274, 10394, 10454, 11810, 13001, 13158, 13477, 14305, 14498, 14994, 15013, 15175, 15176, 16685, 22658, 30209, 34259, 52705, 55, 110, 1087, 1143, 1147, 1342, 1400, 10158, 10386, 11274, 12377, 13068, 13367, 14225, 14995, 15139, 15195, 15573, 16481, 16482, 16483, 16531, 16532, 16533, 23394, 30205, 52977, 106, 112, 1032, 1081, 1082, 1092, 1106, 1109, 1137, 1170, 1172, 1173, 1174, 1283, 1306, 1307, 1318, 1319, 10108, 10190, 10211, 10522, 11294, 11901, 13853, 13935, 13943, 14131, 14521, 14669, 14875, 14963, 15232, 15233, 16340, 30208, 45527, 46372, 49289, 8, 44, 1021, 1064, 1065, 1077, 1089, 1090, 1091, 1133, 1134, 1216, 1365, 1367, 10189, 10199, 10207, 10208, 10305, 10311, 10407, 10414, 10461, 11414, 11492, 12763, 13030, 13408, 13416, 13519, 14190, 14510, 15177, 15231, 15240, 16484, 16514, 16515, 16516, 16517, 16534, 16539, 16540, 16541, 16542, 16543, 16544, 16554, 16555, 16556, 16557, 16558, 16559, 16560, 16561, 16562, 16563, 16564, 16565, 16692, 24184, 27339, 27340, 27341, 27342, 27343, 30206, 57428, 1034, 1094, 1098, 1099, 1108, 1227, 1235, 1265, 1278, 1294, 10107, 10309, 10401, 10404, 10408, 10828, 12044, 12137, 12226, 12960, 12998, 13074, 13232, 13529, 13851, 14519, 14520, 14579, 14866, 14923, 14972, 15053, 15461, 26216, 27336, 28690, 41741, 45520, 59906, 59908, 14, 1085, 1097, 1100, 1104, 1105, 10232, 10235, 10300, 10951, 11288, 11882, 12037, 12900, 13011, 13012, 13034, 13410, 13412, 13413, 13479, 13705, 13710, 13868, 15252, 16724, 26200, 27310, 27311, 27312, 27313, 30187, 34077, 35984, 46345, 51486, 53002, 32, 1008, 1063, 1277, 1314, 1328, 1330, 10016, 10017, 10093, 10161, 10220, 10303, 10306, 10525, 10696, 10697, 10709, 10712, 10840, 11412, 11952, 12000, 12045, 12576, 13159, 13521, 13651, 13708, 13723, 13873, 13883, 13886, 14158, 14188, 14236, 14281, 14492, 14494, 14513, 14956, 15007, 15206, 15246, 15374, 16491, 16949, 23132, 23803, 24924, 27306, 27307, 27308, 27309, 28680, 34107, 34117, 34257, 34258, 35944],
+    "n_consolidation_groups": 275,
+    "n_consolidatable_properties": 7750,
+    "aggregation_types": {
+      "aggregate": 3647,
+      "array_func": 2881,
+      "component_weighted": 32,
+      "dominant": 5,
+      "dominant_condition": 11,
+      "group_by": 16,
+      "simple": 1491,
+      "weighted_avg": 13
+    },
+    "depth_range_summary": {
+      "n_with_depth_ranges": 1626,
+      "unique_depth_ranges": 143
+    }
+  },
+  "most_used_properties": [
+    {
+      "propiid": 28,
+      "propname": "FLOODING FREQUENCY (Maximum Frequency)",
+      "n_interpretations": 1385,
+      "avg_complexity": 5
+    },
+    {
+      "propiid": 70,
+      "propname": "SLOPE",
+      "n_interpretations": 771,
+      "avg_complexity": 0
+    },
+    {
+      "propiid": 23,
+      "propname": "HIGH WATER TABLE DEPTH MINIMUM",
+      "n_interpretations": 442,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 1005,
+      "propname": "PONDING DURATION",
+      "n_interpretations": 438,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 1213,
+      "propname": "SLOPE PERCENT",
+      "n_interpretations": 346,
+      "avg_complexity": 0
+    },
+    {
+      "propiid": 83,
+      "propname": "TAXONOMIC GREAT GROUP",
+      "n_interpretations": 304,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 13018,
+      "propname": "FLOODING FREQUENCY CLASS, Greatest (TX)",
+      "n_interpretations": 276,
+      "avg_complexity": 5
+    },
+    {
+      "propiid": 15,
+      "propname": "DEPTH TO BEDROCK",
+      "n_interpretations": 275,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 86,
+      "propname": "TAXONOMIC SUBGROUP",
+      "n_interpretations": 264,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 1336,
+      "propname": "DEPTH TO PERMAFROST",
+      "n_interpretations": 250,
+      "avg_complexity": 4
+    },
+    {
+      "propiid": 109,
+      "propname": "USDA TEXTURE (IN-LIEU-OF)",
+      "n_interpretations": 248,
+      "avg_complexity": 6
+    },
+    {
+      "propiid": 1059,
+      "propname": "USDA TEXTURE MODIFIER",
+      "n_interpretations": 248,
+      "avg_complexity": 5
+    },
+    {
+      "propiid": 85,
+      "propname": "TAXONOMIC ORDER",
+      "n_interpretations": 228,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 12111,
+      "propname": "RESTRICTIVE FEATURE HARDNESS",
+      "n_interpretations": 227,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 13514,
+      "propname": "UNIFIED THICKEST LAYER 0-39cm (TX)",
+      "n_interpretations": 218,
+      "avg_complexity": 11
+    },
+    {
+      "propiid": 11403,
+      "propname": "EPM-Unified 9 to 15\" (23-38cm)",
+      "n_interpretations": 214,
+      "avg_complexity": 15
+    },
+    {
+      "propiid": 11539,
+      "propname": "PONDING FREQUENCY",
+      "n_interpretations": 208,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 52969,
+      "propname": "DRAINAGE CLASS IS NOT SUBAQUEOUS",
+      "n_interpretations": 191,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 13505,
+      "propname": "UNIFIED THICKEST LAYER 0-23cm (TX)",
+      "n_interpretations": 188,
+      "avg_complexity": 11
+    },
+    {
+      "propiid": 19,
+      "propname": "DEPTH TO CEMENTED PAN",
+      "n_interpretations": 187,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 13014,
+      "propname": "DEPTH TO HIGH WATER TABLE MINIMUM (TX)",
+      "n_interpretations": 186,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 16418,
+      "propname": "UNIFIED THICKEST LAYER 0-39cm, REVISED",
+      "n_interpretations": 182,
+      "avg_complexity": 11
+    },
+    {
+      "propiid": 87,
+      "propname": "TAXONOMIC SUBORDER",
+      "n_interpretations": 162,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 12009,
+      "propname": "COMPONENT KIND (NULL)",
+      "n_interpretations": 155,
+      "avg_complexity": 4
+    },
+    {
+      "propiid": 13506,
+      "propname": "UNIFIED THICKEST LAYER 0-31cm (TX)",
+      "n_interpretations": 155,
+      "avg_complexity": 11
+    },
+    {
+      "propiid": 13028,
+      "propname": "SLOPE (TX)",
+      "n_interpretations": 152,
+      "avg_complexity": 0
+    },
+    {
+      "propiid": 24326,
+      "propname": "UNIFIED THICKEST LAYER 0-39cm",
+      "n_interpretations": 142,
+      "avg_complexity": 11
+    },
+    {
+      "propiid": 1052,
+      "propname": "TAXONOMIC MINERALOGY CLASS",
+      "n_interpretations": 140,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 111,
+      "propname": "USDA TEXTURE SURFACE LAYER NSSC",
+      "n_interpretations": 136,
+      "avg_complexity": 8
+    },
+    {
+      "propiid": 11404,
+      "propname": "EPM-Unified 6 to 12\" (15-30cm)",
+      "n_interpretations": 132,
+      "avg_complexity": 15
+    },
+    {
+      "propiid": 16407,
+      "propname": "UNIFIED THICKEST LAYER 0-23cm, REVISED",
+      "n_interpretations": 130,
+      "avg_complexity": 13
+    },
+    {
+      "propiid": 33,
+      "propname": "FRAGMENTS > 75MM WEIGHTED AVE. IN DEPTH 0-100CM",
+      "n_interpretations": 128,
+      "avg_complexity": 6
+    },
+    {
+      "propiid": 16415,
+      "propname": "UNIFIED THICKEST LAYER 0-31cm, REVISED",
+      "n_interpretations": 127,
+      "avg_complexity": 11
+    },
+    {
+      "propiid": 1252,
+      "propname": "HYDROLOGIC SOIL GROUP",
+      "n_interpretations": 126,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 13164,
+      "propname": "DEPTH TO FIRST RESTRICTIVE FEATURE (TX)",
+      "n_interpretations": 126,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 24324,
+      "propname": "UNIFIED THICKEST LAYER 0-31cm",
+      "n_interpretations": 113,
+      "avg_complexity": 11
+    },
+    {
+      "propiid": 12947,
+      "propname": "AVAILABLE WATER CAPACITY IN DEPTH 0-100cm (TX)",
+      "n_interpretations": 111,
+      "avg_complexity": 10
+    },
+    {
+      "propiid": 11402,
+      "propname": "EPM-Unified 3 to 9\" (8-23cm)",
+      "n_interpretations": 110,
+      "avg_complexity": 15
+    },
+    {
+      "propiid": 13062,
+      "propname": "PONDING DURATION (TX)",
+      "n_interpretations": 110,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 11498,
+      "propname": "DEPTH TO HIGH WATER TABLE MINIMUM",
+      "n_interpretations": 108,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 12950,
+      "propname": "FIRST RESTRICTIVE FEATURE HARDNESS (TX)",
+      "n_interpretations": 104,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 13007,
+      "propname": "DEPTH TO BEDROCK (TX)",
+      "n_interpretations": 104,
+      "avg_complexity": 1
+    },
+    {
+      "propiid": 13163,
+      "propname": "KIND OF FIRST RESTRICTION (TX)",
+      "n_interpretations": 104,
+      "avg_complexity": 2
+    },
+    {
+      "propiid": 17,
+      "propname": "DEPTH TO BEDROCK SOFT",
+      "n_interpretations": 102,
+      "avg_complexity": 7
+    },
+    {
+      "propiid": 1166,
+      "propname": "FRAGMENTS >=250MM ON THE SURFACE",
+      "n_interpretations": 102,
+      "avg_complexity": 5
+    },
+    {
+      "propiid": 70379,
+      "propname": "SLP - TWO DIMENSIONAL MORPHOMETRY HILLSLOPE PROFILE",
+      "n_interpretations": 102,
+      "avg_complexity": 7
+    },
+    {
+      "propiid": 24327,
+      "propname": "UNIFIED THICKEST LAYER 0-23cm",
+      "n_interpretations": 98,
+      "avg_complexity": 11
+    },
+    {
+      "propiid": 10244,
+      "propname": "AWC, 0-50CM OR FIRST RESTRICTIVE LAYER",
+      "n_interpretations": 97,
+      "avg_complexity": 12
+    },
+    {
+      "propiid": 13075,
+      "propname": "CLAY PERCENT SURFACE LAYER (TX)",
+      "n_interpretations": 97,
+      "avg_complexity": 4
+    },
+    {
+      "propiid": 5,
+      "propname": "AVAILABLE WATER CAPACITY IN DEPTH 0-100cm",
+      "n_interpretations": 96,
+      "avg_complexity": 10
+    }
+  ],
+  "most_complex_interpretations": [
+    {
+      "interpiid": 54955,
+      "rulename": "NCCPI - National Commodity Crop Productivity Index (Ver 3.0)",
+      "n_properties": 212,
+      "total_complexity": 2558
+    },
+    {
+      "interpiid": 25081,
+      "rulename": "NCCPI - Irrigated National Commodity Crop Productivity Index",
+      "n_properties": 204,
+      "total_complexity": 2547
+    },
+    {
+      "interpiid": 22202,
+      "rulename": "NCCPI - National Commodity Crop Productivity Index (Ver 1.0)",
+      "n_properties": 179,
+      "total_complexity": 2186
+    },
+    {
+      "interpiid": 34170,
+      "rulename": "NCCPI - National Commodity Crop Productivity Index (Ver 2.0)",
+      "n_properties": 170,
+      "total_complexity": 1996
+    },
+    {
+      "interpiid": 50909,
+      "rulename": "NCCPI - National Commodity Crop Productivity (2 C Warming)",
+      "n_properties": 167,
+      "total_complexity": 1739
+    },
+    {
+      "interpiid": 50910,
+      "rulename": "NCCPI - National Commodity Crop Productivity (4 C Warming)",
+      "n_properties": 167,
+      "total_complexity": 1739
+    },
+    {
+      "interpiid": 50911,
+      "rulename": "NCCPI - National Commodity Crop Productivity (2 C Cooling)",
+      "n_properties": 167,
+      "total_complexity": 1739
+    },
+    {
+      "interpiid": 1029,
+      "rulename": "FOR - Conservation Tree/Shrub Groups",
+      "n_properties": 95,
+      "total_complexity": 726
+    },
+    {
+      "interpiid": 42647,
+      "rulename": "MT - Conservation Tree/Shrub Groups (MT)",
+      "n_properties": 95,
+      "total_complexity": 726
+    },
+    {
+      "interpiid": 45382,
+      "rulename": "FOR - Conservation Tree/Shrub Groups (MT)",
+      "n_properties": 95,
+      "total_complexity": 726
+    },
+    {
+      "interpiid": 47558,
+      "rulename": "FOR - Conservation Tree and Shrub Groups (TX)",
+      "n_properties": 95,
+      "total_complexity": 726
+    },
+    {
+      "interpiid": 60098,
+      "rulename": "Copy of MT - Conservation Tree/Shrub Groups (MT)",
+      "n_properties": 95,
+      "total_complexity": 726
+    },
+    {
+      "interpiid": 54904,
+      "rulename": "TEST_CTSG",
+      "n_properties": 94,
+      "total_complexity": 724
+    },
+    {
+      "interpiid": 72237,
+      "rulename": "Similar Soil Grouping for APEX Modeling",
+      "n_properties": 81,
+      "total_complexity": 406
+    },
+    {
+      "interpiid": 37089,
+      "rulename": "NCCPI Kansas cotton submodel (KS)",
+      "n_properties": 74,
+      "total_complexity": 722
+    },
+    {
+      "interpiid": 37150,
+      "rulename": "NCCPI - NCCPI Cotton Submodel (II)",
+      "n_properties": 74,
+      "total_complexity": 722
+    },
+    {
+      "interpiid": 11997,
+      "rulename": "137 GRL - Forage Suitability Groups, TEST",
+      "n_properties": 72,
+      "total_complexity": 206
+    },
+    {
+      "interpiid": 49713,
+      "rulename": "NCCPI - NCCPI Cotton Submodel (2 C Warming)",
+      "n_properties": 72,
+      "total_complexity": 701
+    },
+    {
+      "interpiid": 50860,
+      "rulename": "NCCPI - NCCPI Cotton Submodel (4 C Warming)",
+      "n_properties": 72,
+      "total_complexity": 701
+    },
+    {
+      "interpiid": 50869,
+      "rulename": "NCCPI - NCCPI Cotton Submodel (2 C Cooling)",
+      "n_properties": 72,
+      "total_complexity": 701
+    }
+  ],
+  "table_usage": [
+    {
+      "sql_tables": "component",
+      "n_properties": 3573,
+      "n_interpretations": 2106
+    },
+    {
+      "sql_tables": "chorizon",
+      "n_properties": 2025,
+      "n_interpretations": 1894
+    },
+    {
+      "sql_tables": "comonth",
+      "n_properties": 482,
+      "n_interpretations": 1542
+    },
+    {
+      "sql_tables": "cosoilmoist",
+      "n_properties": 262,
+      "n_interpretations": 1456
+    },
+    {
+      "sql_tables": "corestrictions",
+      "n_properties": 241,
+      "n_interpretations": 1353
+    },
+    {
+      "sql_tables": "chtexturegrp",
+      "n_properties": 240,
+      "n_interpretations": 825
+    },
+    {
+      "sql_tables": "chtexture",
+      "n_properties": 165,
+      "n_interpretations": 701
+    },
+    {
+      "sql_tables": "mapunit",
+      "n_properties": 109,
+      "n_interpretations": 274
+    },
+    {
+      "sql_tables": "cogeomordesc",
+      "n_properties": 60,
+      "n_interpretations": 154
+    },
+    {
+      "sql_tables": "chfrags",
+      "n_properties": 45,
+      "n_interpretations": 103
+    },
+    {
+      "sql_tables": "cosurffrags",
+      "n_properties": 43,
+      "n_interpretations": 642
+    },
+    {
+      "sql_tables": "copmgrp",
+      "n_properties": 33,
+      "n_interpretations": 128
+    },
+    {
+      "sql_tables": "legend",
+      "n_properties": 31,
+      "n_interpretations": 72
+    },
+    {
+      "sql_tables": "copm",
+      "n_properties": 23,
+      "n_interpretations": 124
+    },
+    {
+      "sql_tables": "chtexturemod",
+      "n_properties": 20,
+      "n_interpretations": 388
+    },
+    {
+      "sql_tables": "cosurfmorphss",
+      "n_properties": 14,
+      "n_interpretations": 75
+    },
+    {
+      "sql_tables": "chstruct",
+      "n_properties": 13,
+      "n_interpretations": 17
+    },
+    {
+      "sql_tables": "chstructgrp",
+      "n_properties": 13,
+      "n_interpretations": 17
+    },
+    {
+      "sql_tables": "chconsistence",
+      "n_properties": 7,
+      "n_interpretations": 8
+    },
+    {
+      "sql_tables": "cosurfmorphhpp",
+      "n_properties": 7,
+      "n_interpretations": 33
+    },
+    {
+      "sql_tables": "cotaxfmmin",
+      "n_properties": 5,
+      "n_interpretations": 82
+    },
+    {
+      "sql_tables": "codiagfeatures",
+      "n_properties": 4,
+      "n_interpretations": 6
+    },
+    {
+      "sql_tables": "coeplants",
+      "n_properties": 3,
+      "n_interpretations": 5
+    },
+    {
+      "sql_tables": "cosurfmorphgc",
+      "n_properties": 3,
+      "n_interpretations": 4
+    },
+    {
+      "sql_tables": "cotxfmother",
+      "n_properties": 3,
+      "n_interpretations": 3
+    },
+    {
+      "sql_tables": "chdesgnsuffix",
+      "n_properties": 2,
+      "n_interpretations": 4
+    },
+    {
+      "sql_tables": "cointerp",
+      "n_properties": 2,
+      "n_interpretations": 10
+    },
+    {
+      "sql_tables": "coforprod",
+      "n_properties": 1,
+      "n_interpretations": 2
+    },
+    {
+      "sql_tables": "muaoverlap",
+      "n_properties": 1,
+      "n_interpretations": 1
+    }
+  ],
+  "statistics": {
+    "avg_properties_per_interp": 17.2,
+    "median_properties_per_interp": 14,
+    "max_properties_per_interp": 212,
+    "avg_uses_per_property": 10,
+    "max_uses_per_property": 1385
+  }
+}

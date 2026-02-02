@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo, useMemo } from 'react';
 import { BarChart3, GitMerge, Zap, Box, ChevronRight, ChevronDown, Network, List, GitBranch, ArrowRightLeft, CircleDot } from 'lucide-react';
 import type { RuleNode } from '@/types/interpretation';
 import { InteractiveTreeDiagram } from './InteractiveTreeDiagram';
@@ -18,6 +18,7 @@ interface RuleTreeVisualizationProps {
   tree: RuleNode[];
   interpretationName: string;
   evaluationResults?: Record<string, number>;
+  finalRating?: number;
 }
 
 interface TreeNodeData {
@@ -137,6 +138,8 @@ TreeNodeComponent.displayName = 'TreeNodeComponent';
 function enrichTreeWithRatings(node: any, evaluationResults: Record<string, number>): any {
   if (!node) return node;
   
+  console.log(`[TreeViz enriching] Node:`, node.name, `Type:`, node.Type, `RefId:`, node.RefId);
+  
   const enrichedNode = { ...node };
   
   // Add rating from evaluationResults if this is an evaluation node
@@ -144,6 +147,7 @@ function enrichTreeWithRatings(node: any, evaluationResults: Record<string, numb
     const refId = node.RefId || node.rule_refid;
     if (evaluationResults[refId] !== undefined) {
       enrichedNode.rating = evaluationResults[refId];
+      console.log(`[TreeViz enriching] Set rating from evaluationResults[${refId}]:`, enrichedNode.rating);
     }
   }
   
@@ -165,15 +169,19 @@ function enrichTreeWithRatings(node: any, evaluationResults: Record<string, numb
         .map((child: any) => child.rating)
         .filter((r: any) => r !== undefined && !isNaN(r));
       
+      console.log(`[TreeViz] Operator node: ${node.Type}, child ratings:`, childRatings);
+      
       // Apply operator to calculate this node's rating
       if (childRatings.length > 0) {
         enrichedNode.rating = applyOperator(node.Type, childRatings);
+        console.log(`[TreeViz] Applied ${node.Type} operator, result:`, enrichedNode.rating);
       }
     }
     
     // Check if this is a hedge node
     const hedgeTypes = ['not', 'very', 'slightly', 'somewhat', 'extremely', 
-                        'null_or', 'null_not_rated', 'multiply', 'mult', 'power', 'limit'];
+                        'null_or', 'null_not_rated', 'multiply', 'mult', 'power', 'limit',
+                        'divide', 'not_null_and'];
     
     if (node.Type && hedgeTypes.includes(node.Type.toLowerCase())) {
       // Hedges typically have one child
@@ -187,24 +195,12 @@ function enrichTreeWithRatings(node: any, evaluationResults: Record<string, numb
     }
     
     // Handle nodes with children but no explicit Type (container nodes)
-    // Use the first child's rating
+    // Use the first child's rating (this is standard for rule nodes)
     if (!node.Type && enrichedNode.children.length > 0 && !enrichedNode.rating) {
       const firstChildRating = enrichedNode.children[0].rating;
+      console.log(`[TreeViz] Container node (no Type), using first child rating:`, firstChildRating);
       if (firstChildRating !== undefined && !isNaN(firstChildRating)) {
         enrichedNode.rating = firstChildRating;
-      }
-    }
-    
-    // If this node still doesn't have a rating but has children with ratings,
-    // aggregate them (happens for root nodes or complex containers)
-    if (!enrichedNode.rating && enrichedNode.children.length > 0) {
-      const childRatings = enrichedNode.children
-        .map((child: any) => child.rating)
-        .filter((r: any) => r !== undefined && !isNaN(r));
-      
-      if (childRatings.length > 0) {
-        // Use AND (min) as default aggregation for safety
-        enrichedNode.rating = Math.min(...childRatings);
       }
     }
   }
@@ -216,20 +212,31 @@ export function RuleTreeVisualization({
   tree,
   interpretationName,
   evaluationResults = {},
+  finalRating,
 }: RuleTreeVisualizationProps) {
   const [isExpanded, setIsExpanded] = useState(true); // Start expanded since it's in its own dedicated tab
   const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'interactive' | 'sankey' | 'horizontal' | 'sunburst' | 'interactive-sankey'>('sankey');
   const [selectedNode, setSelectedNode] = useState<any | null>(null); // Enriched RuleNode
   const [selectedEvaluation, setSelectedEvaluation] = useState<any | null>(null);
-  const [enrichedTree, setEnrichedTree] = useState<any>(null);
 
-  // Enrich tree with ratings
-  useEffect(() => {
+  // Enrich tree with ratings using useMemo to avoid infinite loops
+  const enrichedTree = useMemo(() => {
     if (tree && tree.length > 0) {
-      setEnrichedTree(enrichTreeWithRatings(tree[0], evaluationResults));
+      const enriched = enrichTreeWithRatings(tree[0], evaluationResults);
+      
+      // Override root node rating with the actual final rating from the evaluator
+      if (finalRating !== undefined && enriched) {
+        enriched.rating = finalRating;
+        console.log('[TreeViz] Overriding root rating with finalRating:', finalRating);
+      }
+      
+      console.log('[TreeViz] Enriched tree root rating:', enriched?.rating);
+      console.log('[TreeViz] Evaluation results keys:', Object.keys(evaluationResults).length);
+      return enriched;
     }
-  }, [tree, evaluationResults]);
+    return null;
+  }, [tree, evaluationResults, finalRating]);
 
   // Convert flat tree to hierarchical structure
   useEffect(() => {

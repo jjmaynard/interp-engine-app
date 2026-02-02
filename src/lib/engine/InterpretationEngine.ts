@@ -208,7 +208,7 @@ export class InterpretationEngine {
     name: string
   ): Promise<InterpretationTree | null> {
     const trees = await dataCache.getInterpretationTrees();
-    return trees.find(t => Array.isArray(t.name) ? t.name[0] === name : t.name === name) || null;
+    return trees.find(t => t.rulename === name) || null;
   }
 
   /**

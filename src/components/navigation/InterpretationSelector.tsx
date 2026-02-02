@@ -4,8 +4,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { Filter } from 'lucide-react';
 
 interface Interpretation {
-  name: string;
+  name?: string;
+  rulename?: string;
   propertyCount: number;
+  property_count?: number;
 }
 
 interface InterpretationSelectorProps {
@@ -60,11 +62,14 @@ export function InterpretationSelector({
         const data = await response.json();
         
         if (data.success) {
+          console.log('First interpretation raw:', JSON.stringify(data.data[0]));
+          console.log('First 3 interpretations:', data.data.slice(0, 3));
           setInterpretations(data.data);
         } else {
           setError('Failed to load interpretations');
         }
       } catch (err) {
+        console.error('Error loading interpretations:', err);
         setError('Error loading interpretations');
       } finally {
         setLoading(false);
@@ -76,7 +81,7 @@ export function InterpretationSelector({
 
   const filteredInterpretations = useMemo(() => {
     return interpretations.filter(interp => {
-      const nameStr = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+      const nameStr = interp.name || interp.rulename || 'Unknown';
       
       // Filter by category
       if (selectedCategory !== 'all') {
@@ -100,7 +105,7 @@ export function InterpretationSelector({
     const counts: Record<string, number> = { all: interpretations.length };
     
     interpretations.forEach(interp => {
-      const nameStr = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+      const nameStr = interp.name || interp.rulename || 'Unknown';
       const category = getInterpretationCategory(nameStr);
       counts[category] = (counts[category] || 0) + 1;
     });
@@ -109,7 +114,7 @@ export function InterpretationSelector({
   }, [interpretations]);
 
   const selectedInterp = interpretations.find(i => {
-    const nameStr = Array.isArray(i.name) ? i.name[0] : i.name;
+    const nameStr = i.name || i.rulename || 'Unknown';
     return nameStr === value;
   });
 
@@ -170,13 +175,8 @@ export function InterpretationSelector({
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
-              {selectedInterp ? (Array.isArray(selectedInterp.name) ? selectedInterp.name[0] : selectedInterp.name) : 'Choose an interpretation...'}
+              {selectedInterp ? (selectedInterp.name || selectedInterp.rulename) : 'Choose an interpretation...'}
             </p>
-            {selectedInterp && (
-              <p className="text-xs text-gray-500 mt-1">
-                {selectedInterp.propertyCount} properties required
-              </p>
-            )}
           </div>
           <svg 
             className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -217,11 +217,11 @@ export function InterpretationSelector({
                 </div>
               ) : (
                 <div className="py-2">
-                  {filteredInterpretations.map((interp) => {
-                    const nameStr = Array.isArray(interp.name) ? interp.name[0] : interp.name;
+                  {filteredInterpretations.map((interp, index) => {
+                    const nameStr = interp.name || interp.rulename || 'Unknown';
                     return (
                       <button
-                        key={nameStr}
+                        key={`${nameStr}-${index}`}
                         type="button"
                         onClick={() => {
                           onChange(nameStr);
@@ -234,9 +234,6 @@ export function InterpretationSelector({
                       >
                         <div className="text-sm font-medium text-gray-900">
                           {nameStr}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          {interp.propertyCount} properties
                         </div>
                       </button>
                     );
