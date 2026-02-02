@@ -321,7 +321,7 @@ export function evaluateInterpretation(
 ): InterpretationResult {
   console.log('[Evaluator] Tree object:', {
     hasTreeProperty: !!tree.tree,
-    treeName: tree.name,
+    treeName: tree.rulename,
     treeType: typeof tree.tree,
     isArray: Array.isArray(tree.tree)
   });
