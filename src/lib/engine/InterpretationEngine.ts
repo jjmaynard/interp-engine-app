@@ -76,7 +76,7 @@ export class InterpretationEngine {
 
     for (const property of properties) {
       if (property.propiid) {
-        this.propertiesMap.set(property.propiid, property);
+        this.propertiesMap.set(String(property.propiid), property);
       }
       if (property.propname) {
         this.propertiesMap.set(property.propname, property);
