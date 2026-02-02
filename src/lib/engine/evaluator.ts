@@ -199,7 +199,7 @@ export function evaluateNode(
     
     // Recursively evaluate all children
     const childResults = node.children.map((child: any) => evaluateNode(child, context));
-    const childRatings = childResults.map(r => r.rating);
+    const childRatings = childResults.map((r: NodeEvaluationResult) => r.rating);
     
     console.log(`[Evaluator] Child ratings:`, childRatings);
 
