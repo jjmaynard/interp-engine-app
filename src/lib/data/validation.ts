@@ -231,7 +231,9 @@ export function checkDataIntegrity(
   const referencedProperties = new Set<string>();
   trees.forEach(tree => {
     tree.properties?.forEach(prop => {
-      referencedProperties.add(prop.propname);
+      if (prop.propname) {
+        referencedProperties.add(prop.propname);
+      }
     });
   });
 
