@@ -70,9 +70,16 @@ const RuleNodeSchema: z.ZodType<any> = z.lazy(() =>
  * Zod schema for InterpretationTree
  */
 const InterpretationTreeSchema = z.object({
-  name: z.array(z.string()),
-  tree: z.array(RuleNodeSchema),
-  properties: z.array(PropertySchema).optional()
+  interpiid: z.number(),
+  rulename: z.string(),
+  ruledesign: z.string(),
+  tree: z.any(),
+  properties: z.array(z.object({
+    propiid: z.number(),
+    propname: z.string().optional(),
+    evaluation: z.string().optional()
+  })).optional(),
+  property_count: z.number().optional()
 });
 
 /**
