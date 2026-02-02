@@ -34,7 +34,7 @@ export function loadEvaluations(): Evaluation[] {
  * Load all properties
  */
 export function loadProperties(): Property[] {
-  return propertiesData as Property[];
+  return propertiesData as unknown as Property[];
 }
 
 /**
@@ -104,7 +104,7 @@ export function getEvaluationsByProperty(propertyName: string): Evaluation[] {
  * @param propiid Property ID
  * @returns The property or null if not found
  */
-export function getPropertyById(propiid: string): Property | null {
+export function getPropertyById(propiid: number): Property | null {
   const properties = loadProperties();
   return properties.find(p => p.propiid === propiid) || null;
 }

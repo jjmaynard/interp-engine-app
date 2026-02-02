@@ -16,7 +16,7 @@ export interface EvaluationPoint {
  * Evaluation curve definition for converting property values to fuzzy ratings
  */
 export interface Evaluation {
-  propiid?: string;
+  propiid?: number;
   evaliid: number;
   evalname: string;
   evaldesc: string | null;
@@ -38,12 +38,13 @@ export interface Evaluation {
  * Soil property definition
  */
 export interface Property {
-  propiid: string;
+  propiid: number;
   propname: string;
   propuom?: string | null; // Unit of measure (null for categorical)
   propmin?: number | null;
   propmax?: number | null;
   propmod: string | null;
+  propdefval?: string | null;
   dataafuse: boolean | null;
   // Derived fields for UI
   choices?: string[]; // Valid choice values for categorical properties
@@ -86,7 +87,7 @@ export interface InterpretationTree {
   ruledesign: string;
   tree: any; // Tree structure from NASIS
   properties?: Array<{ 
-    propiid: string;
+    propiid: number;
     propname?: string;
     evaluation?: string;
   }>;

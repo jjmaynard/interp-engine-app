@@ -22,7 +22,7 @@ const EvaluationPointSchema = z.object({
  * Zod schema for Evaluation
  */
 const EvaluationSchema = z.object({
-  propiid: z.string().optional(),
+  propiid: z.number().optional(),
   evaliid: z.number(),
   evalname: z.string(),
   evaldesc: z.string(),
@@ -43,7 +43,7 @@ const EvaluationSchema = z.object({
  * Zod schema for Property
  */
 const PropertySchema = z.object({
-  propiid: z.string(),
+  propiid: z.number(),
   propname: z.string(),
   propuom: z.string().optional(),
   propmin: z.number().optional(),
