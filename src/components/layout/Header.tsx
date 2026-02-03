@@ -35,13 +35,6 @@ export function Header() {
             >
               API Docs
             </Link>
-            <Link 
-              href="https://github.com/jjmaynard/interp-engine-app" 
-              target="_blank"
-              className="hover:text-blue-200 transition-colors"
-            >
-              GitHub
-            </Link>
           </nav>
 
           <button className="md:hidden text-white">

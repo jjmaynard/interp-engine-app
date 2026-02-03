@@ -35,24 +35,13 @@ export function Footer() {
                   SSURGO Database
                 </a>
               </li>
-              <li>
-                <a 
-                  href="https://github.com/jjmaynard/interp-engine-app" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-blue-400 transition-colors"
-                >
-                  GitHub Repository
-                </a>
-              </li>
             </ul>
           </div>
           
           <div>
             <h3 className="text-white font-semibold mb-3">Contact</h3>
             <p className="text-sm text-gray-400">
-              For questions or feedback about this tool, please visit our 
-              GitHub repository or contact NRCS.
+              For questions or feedback about this tool, please contact NRCS.
             </p>
           </div>
         </div>
