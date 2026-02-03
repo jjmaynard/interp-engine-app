@@ -408,7 +408,7 @@ export function evaluateInterpretation(
 
   return {
     rating: result.rating,
-    ratingClass: lookupRatingClass(result.rating, tree.name?.[0] || ''),
+    ratingClass: lookupRatingClass(result.rating, tree.rulename || ''),
     propertyValues: allPropertyValues,
     evaluationResults: result.evaluationResults || {},
     timestamp: new Date(),
