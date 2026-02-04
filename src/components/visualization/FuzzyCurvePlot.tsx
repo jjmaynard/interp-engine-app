@@ -23,6 +23,30 @@ export function FuzzyCurvePlot({
   invert = false
 }: FuzzyCurvePlotProps) {
   
+  // Simple linear interpolation helper function
+  const interpolateValue = (x: number, points: { x: number; y: number }[], method: string, invert: boolean): number => {
+    if (points.length === 0) return 0;
+    if (x <= points[0].x) return invert ? 1 - points[0].y : points[0].y;
+    if (x >= points[points.length - 1].x) return invert ? 1 - points[points.length - 1].y : points[points.length - 1].y;
+    
+    // Find surrounding points
+    for (let i = 0; i < points.length - 1; i++) {
+      if (x >= points[i].x && x <= points[i + 1].x) {
+        const x1 = points[i].x;
+        const y1 = points[i].y;
+        const x2 = points[i + 1].x;
+        const y2 = points[i + 1].y;
+        
+        // Linear interpolation
+        const t = (x - x1) / (x2 - x1);
+        const y = y1 + t * (y2 - y1);
+        return invert ? 1 - y : y;
+      }
+    }
+    
+    return 0;
+  };
+  
   // Generate interpolated curve data
   const curveData = useMemo(() => {
     if (!points || points.length === 0) return [];
@@ -62,31 +86,6 @@ export function FuzzyCurvePlot({
     
     return curvePoints.sort((a, b) => a.x - b.x);
   }, [points, interpolation, inputValue, outputValue, invert]);
-  
-  // Simple linear interpolation
-  const interpolateValue = (x: number, points: { x: number; y: number }[], method: string, invert: boolean): number => {
-    if (points.length === 0) return 0;
-    if (x <= points[0].x) return invert ? 1 - points[0].y : points[0].y;
-    if (x >= points[points.length - 1].x) return invert ? 1 - points[points.length - 1].y : points[points.length - 1].y;
-    
-    // Find surrounding points
-    for (let i = 0; i < points.length - 1; i++) {
-      if (x >= points[i].x && x <= points[i + 1].x) {
-        const x1 = points[i].x;
-        const y1 = points[i].y;
-        const x2 = points[i + 1].x;
-        const y2 = points[i + 1].y;
-        
-        // Linear interpolation
-        const t = (x - x1) / (x2 - x1);
-        const y = y1 + t * (y2 - y1);
-        
-        return invert ? 1 - y : y;
-      }
-    }
-    
-    return 0;
-  };
   
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;

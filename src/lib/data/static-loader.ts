@@ -37,7 +37,7 @@ export function loadProperties(): Property[] {
     return propertiesCache;
   }
   
-  const filePath = path.join(process.cwd(), 'src', 'data', 'properties.json');
+  const filePath = path.join(process.cwd(), 'src', 'data', 'properties_enhanced.json');
   const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   propertiesCache = data as Property[];
   return propertiesCache;
