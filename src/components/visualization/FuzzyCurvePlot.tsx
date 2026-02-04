@@ -23,6 +23,17 @@ export function FuzzyCurvePlot({
   invert = false
 }: FuzzyCurvePlotProps) {
   
+  console.log('[FuzzyCurvePlot] Received props:', {
+    pointsCount: points?.length || 0,
+    points: points,
+    interpolation,
+    inputValue,
+    outputValue,
+    title,
+    propertyName,
+    invert
+  });
+  
   // Simple linear interpolation helper function
   const interpolateValue = (x: number, points: { x: number; y: number }[], method: string, invert: boolean): number => {
     if (points.length === 0) return 0;

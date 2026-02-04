@@ -559,36 +559,53 @@ export function PropertyInputForm({
       {/* Property Description Modal */}
       {selectedPropertyDesc && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black bg-opacity-20 flex items-center justify-center p-4 z-50"
           onClick={() => setSelectedPropertyDesc(null)}
         >
           <div 
-            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-auto"
+            className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-start justify-between">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5 flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <div className="flex items-center gap-2 mb-1">
+                  <Info className="w-5 h-5 text-white" />
+                  <h3 className="text-lg font-semibold text-white">
+                    Property Information
+                  </h3>
+                </div>
+                <p className="text-sm text-blue-100 font-medium">
                   {selectedPropertyDesc.name}
-                </h3>
+                </p>
               </div>
               <button
                 onClick={() => setSelectedPropertyDesc(null)}
-                className="text-gray-400 hover:text-gray-600 transition-colors ml-4"
+                className="text-white hover:text-blue-100 transition-colors ml-4"
                 aria-label="Close"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="px-6 py-4">
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                {selectedPropertyDesc.desc}
-              </p>
+            
+            {/* Content */}
+            <div className="px-6 py-6 overflow-auto max-h-[calc(85vh-180px)]">
+              <div className="bg-blue-50 border-l-4 border-blue-500 px-4 py-3 rounded-r-md">
+                <h4 className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+                  <Info className="w-4 h-4" />
+                  Description
+                </h4>
+                <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                  {selectedPropertyDesc.desc}
+                </p>
+              </div>
             </div>
-            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end">
+            
+            {/* Footer */}
+            <div className="bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end">
               <button
                 onClick={() => setSelectedPropertyDesc(null)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium shadow-sm"
               >
                 Close
               </button>

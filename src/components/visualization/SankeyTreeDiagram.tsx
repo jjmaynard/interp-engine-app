@@ -383,6 +383,8 @@ export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve, propertyValu
                       try {
                         const response = await fetch(`/api/evaluations/${refId}`);
                         const data = await response.json();
+                        console.log('[SankeyClick] API Response:', data);
+                        
                         if (data.success && data.data) {
                           // Get the property value from propertyValues using propname
                           const propname = data.data.propname;
@@ -392,6 +394,8 @@ export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve, propertyValu
                           const outputValue = node.value;
                           
                           console.log('[SankeyClick] Property:', propname, 'Input:', inputValue, 'Output:', outputValue);
+                          console.log('[SankeyClick] Points:', data.data.points);
+                          console.log('[SankeyClick] Interpolation:', data.data.interpolation);
                           
                           // Call onShowCurve with complete evaluation data
                           onShowCurve({
@@ -399,6 +403,8 @@ export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve, propertyValu
                             inputValue,
                             outputValue,
                           });
+                        } else {
+                          console.error('[SankeyClick] API returned error:', data);
                         }
                       } catch (error) {
                         console.error('Failed to load evaluation data:', error);
