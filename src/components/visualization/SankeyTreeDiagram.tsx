@@ -22,7 +22,7 @@ interface SankeyLink {
 
 interface SankeyTreeDiagramProps {
   tree: any;
-  onNodeClick?: (node: any) => void;
+  onNodeClick?: (node: any, evaluationData?: any) => void;
   onShowCurve?: (evaluation: any) => void;
   propertyValues?: Record<string, number | string | null>;
 }
@@ -378,8 +378,8 @@ export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve, propertyValu
                 onClick={async () => {
                   if (node.type === 'property' && node.treeNode) {
                     const refId = node.treeNode.RefId || node.treeNode.rule_refid;
-                    if (onShowCurve && refId) {
-                      // Fetch evaluation data from API
+                    if (refId) {
+                      // For evaluation nodes, fetch data and show branch analysis with fuzzy curve
                       try {
                         const response = await fetch(`/api/evaluations/${refId}`);
                         const data = await response.json();
@@ -393,24 +393,32 @@ export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve, propertyValu
                             : 0;
                           const outputValue = node.value;
                           
-                          console.log('[SankeyClick] Property:', propname, 'Input:', inputValue, 'Output:', outputValue);
-                          console.log('[SankeyClick] Points:', data.data.points);
-                          console.log('[SankeyClick] Interpolation:', data.data.interpolation);
-                          
-                          // Call onShowCurve with complete evaluation data
-                          onShowCurve({
+                          const evaluationData = {
                             ...data.data,
                             inputValue,
                             outputValue,
-                          });
+                          };
+                          
+                          // Show branch analysis with evaluation data
+                          if (onNodeClick) {
+                            onNodeClick(node.treeNode, evaluationData);
+                          }
                         } else {
                           console.error('[SankeyClick] API returned error:', data);
+                          // Still show branch analysis without evaluation data
+                          if (onNodeClick) {
+                            onNodeClick(node.treeNode);
+                          }
                         }
                       } catch (error) {
                         console.error('Failed to load evaluation data:', error);
+                        // Still show branch analysis without evaluation data
+                        if (onNodeClick) {
+                          onNodeClick(node.treeNode);
+                        }
                       }
                     } else if (onNodeClick) {
-                      // Otherwise show branch analysis
+                      // For non-evaluation nodes (operators), only show branch analysis
                       onNodeClick(node.treeNode);
                     }
                   }

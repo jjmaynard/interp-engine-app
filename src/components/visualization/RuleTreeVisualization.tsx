@@ -231,6 +231,7 @@ export function RuleTreeVisualization({
   const [viewMode, setViewMode] = useState<'list' | 'interactive' | 'sankey' | 'horizontal' | 'sunburst' | 'interactive-sankey'>('sankey');
   const [selectedNode, setSelectedNode] = useState<any | null>(null); // Enriched RuleNode
   const [selectedEvaluation, setSelectedEvaluation] = useState<any | null>(null);
+  const [selectedNodeEvaluationData, setSelectedNodeEvaluationData] = useState<any | null>(null);
 
   // Enrich tree with ratings using useMemo to avoid infinite loops
   const enrichedTree = useMemo(() => {
@@ -488,7 +489,10 @@ export function RuleTreeVisualization({
         <div className="p-4 bg-gray-50">
           <SankeyTreeDiagram 
             tree={enrichedTree} 
-            onNodeClick={(node: any) => setSelectedNode(node)}
+            onNodeClick={(node: any, evalData?: any) => {
+              setSelectedNode(node);
+              setSelectedNodeEvaluationData(evalData || null);
+            }}
             onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
             propertyValues={propertyValues}
           />
@@ -499,7 +503,10 @@ export function RuleTreeVisualization({
         <div className="p-4 bg-gray-50">
           <InteractiveSankeyDiagram
             tree={enrichedTree}
-            onNodeClick={(node: any) => setSelectedNode(node)}
+            onNodeClick={(node: any, evalData?: any) => {
+              setSelectedNode(node);
+              setSelectedNodeEvaluationData(evalData || null);
+            }}
             onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
           />
         </div>
@@ -577,7 +584,11 @@ export function RuleTreeVisualization({
           <BranchAnalysis
             selectedNode={selectedNode}
             rootNode={tree[0] as any}
-            onClose={() => setSelectedNode(null)}
+            onClose={() => {
+              setSelectedNode(null);
+              setSelectedNodeEvaluationData(null);
+            }}
+            evaluationData={selectedNodeEvaluationData}
           />
         </div>
       )}
@@ -604,6 +615,9 @@ export function RuleTreeVisualization({
               title={selectedEvaluation.Property || 'Evaluation'}
               propertyName={selectedEvaluation.Property}
               invert={selectedEvaluation.Invert || false}
+              propertyId={selectedEvaluation.propiid || selectedEvaluation.PropertyId}
+              evaluationId={selectedEvaluation.evaliid || selectedEvaluation.EvaluationId}
+              evaluationDesc={selectedEvaluation.evaldesc || selectedEvaluation.EvaluationDesc}
             />
             
             <div className="mt-4 flex justify-end">

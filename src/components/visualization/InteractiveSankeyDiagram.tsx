@@ -115,7 +115,15 @@ function SankeyNode({ data }: any) {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onShowCurve(node.Evaluation);
+              // Ensure we pass the full evaluation object with all metadata
+              const fullEvaluation = {
+                ...node.Evaluation,
+                // If Evaluation doesn't have these, try to get from node itself
+                propiid: node.Evaluation.propiid || node.propiid,
+                evaliid: node.Evaluation.evaliid || node.evaliid || node.RefId || node.rule_refid,
+                evaldesc: node.Evaluation.evaldesc || node.evaldesc
+              };
+              onShowCurve(fullEvaluation);
             }}
             className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
           >

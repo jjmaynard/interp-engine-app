@@ -3,12 +3,14 @@
 import { useMemo } from 'react';
 import { RuleNode } from '@/types/interpretation';
 import { ChevronRight, TrendingUp, AlertCircle } from 'lucide-react';
+import { FuzzyCurvePlot } from './FuzzyCurvePlot';
 
 // Note: nodes are enriched at runtime with additional properties
 interface BranchAnalysisProps {
   selectedNode: any; // Enriched RuleNode
   rootNode: any; // Enriched RuleNode
   onClose: () => void;
+  evaluationData?: any; // Optional evaluation data for fuzzy curve display
 }
 
 interface PathNode {
@@ -18,7 +20,7 @@ interface PathNode {
   contribution: number;
 }
 
-export function BranchAnalysis({ selectedNode, rootNode, onClose }: BranchAnalysisProps) {
+export function BranchAnalysis({ selectedNode, rootNode, onClose, evaluationData }: BranchAnalysisProps) {
   
   // Find path from selected node to root
   const pathToRoot = useMemo(() => {
@@ -113,8 +115,8 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose }: BranchAnalys
   };
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 10000000 }}>
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-auto">
+    <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 10000000 }}>
+      <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto border border-gray-200">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-start justify-between">
           <div>
@@ -261,6 +263,30 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose }: BranchAnalys
               )}
             </div>
           </div>
+          
+          {/* Fuzzy Membership Curve - only show if evaluation data is available */}
+          {evaluationData && evaluationData.Points && evaluationData.Points.length > 0 && (
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-purple-600" />
+                Fuzzy Membership Curve
+              </h3>
+              <div className="bg-white rounded-lg p-4">
+                <FuzzyCurvePlot
+                  points={evaluationData.Points || []}
+                  interpolation={evaluationData.Interpolation || 'linear'}
+                  inputValue={evaluationData.inputValue || 0}
+                  outputValue={evaluationData.outputValue || 0}
+                  title={evaluationData.Property || 'Evaluation'}
+                  propertyName={evaluationData.Property}
+                  invert={evaluationData.Invert || false}
+                  propertyId={evaluationData.propiid}
+                  evaluationId={evaluationData.evaliid}
+                  evaluationDesc={evaluationData.evaldesc}
+                />
+              </div>
+            </div>
+          )}
         </div>
         
         {/* Footer */}

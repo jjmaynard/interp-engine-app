@@ -1,0 +1,268 @@
+/* NRCS Soil Interpretation Engine - Color System */
+/* Based on Design Specifications Document v1.0 */
+
+:root {
+  /* ===== 1. EARTH TONES (Grounded, Professional) ===== */
+  --color-earth-50: #F7F4F0;
+  --color-earth-100: #EDE6DC;
+  --color-earth-200: #DDD0BD;
+  --color-earth-300: #C9B799;
+  --color-earth-400: #B29D7A;
+  --color-earth-500: #8B6F47;
+  --color-earth-600: #7A5F3D;
+  --color-earth-700: #684F33;
+  --color-earth-800: #563F29;
+  --color-earth-900: #442F1F;
+
+  /* ===== 2. OCEAN BLUE (Information, Trust) ===== */
+  --color-ocean-50: #F0F6F9;
+  --color-ocean-100: #DCE9F1;
+  --color-ocean-200: #BDD7E5;
+  --color-ocean-300: #99C0D6;
+  --color-ocean-400: #7AA8C4;
+  --color-ocean-500: #4A7C9E;
+  --color-ocean-600: #3F6A87;
+  --color-ocean-700: #345770;
+  --color-ocean-800: #294559;
+  --color-ocean-900: #1E3342;
+
+  /* ===== 3. SKY BLUE (Secondary, Calm) ===== */
+  --color-sky-50: #F2F7F9;
+  --color-sky-100: #E2ECF1;
+  --color-sky-200: #C7DBE5;
+  --color-sky-300: #A7C6D6;
+  --color-sky-400: #8CB0C4;
+  --color-sky-500: #7BA4B5;
+  --color-sky-600: #6A8F9E;
+  --color-sky-700: #597A87;
+  --color-sky-800: #486570;
+  --color-sky-900: #375059;
+
+  /* ===== 4. FOREST GREEN (Success, Growth) ===== */
+  --color-forest-50: #F2F6F2;
+  --color-forest-100: #E2EBE1;
+  --color-forest-200: #C7D9C6;
+  --color-forest-300: #A7C2A5;
+  --color-forest-400: #8CAB89;
+  --color-forest-500: #5C8D5A;
+  --color-forest-600: #4F7A4D;
+  --color-forest-700: #426740;
+  --color-forest-800: #355433;
+  --color-forest-900: #284126;
+
+  /* ===== 5. MOSS GREEN (Soil Health) ===== */
+  --color-moss-50: #F6F7F2;
+  --color-moss-100: #ECEEE1;
+  --color-moss-200: #D6DABF;
+  --color-moss-300: #BBC298;
+  --color-moss-400: #9BA56F;
+  --color-moss-500: #6B7F39;
+  --color-moss-600: #5C6F32;
+  --color-moss-700: #4D5E2B;
+  --color-moss-800: #3E4D24;
+  --color-moss-900: #2F3C1D;
+
+  /* ===== 6. SUNSET ORANGE (Warnings, Energy) ===== */
+  --color-sunset-50: #FAF6F2;
+  --color-sunset-100: #F3EAE2;
+  --color-sunset-200: #E9D7C7;
+  --color-sunset-300: #DBC0A7;
+  --color-sunset-400: #CAA98C;
+  --color-sunset-500: #B8794F;
+  --color-sunset-600: #A06843;
+  --color-sunset-700: #885737;
+  --color-sunset-800: #70462B;
+  --color-sunset-900: #58351F;
+
+  /* ===== 7. LAVENDER PURPLE (Creative, Suitability) ===== */
+  --color-lavender-50: #F8F7FB;
+  --color-lavender-100: #EFECF5;
+  --color-lavender-200: #DDD7EA;
+  --color-lavender-300: #C7BDDB;
+  --color-lavender-400: #ADA0C8;
+  --color-lavender-500: #8B7AA8;
+  --color-lavender-600: #7A6B92;
+  --color-lavender-700: #685C7C;
+  --color-lavender-800: #564D66;
+  --color-lavender-900: #443E50;
+
+  /* ===== 8. SAGE GREEN (Balanced, Environmental) ===== */
+  --color-sage-50: #F6F8F7;
+  --color-sage-100: #EBF0ED;
+  --color-sage-200: #D4E1DB;
+  --color-sage-300: #B8CFC5;
+  --color-sage-400: #9EBDAD;
+  --color-sage-500: #87A096;
+  --color-sage-600: #748B81;
+  --color-sage-700: #61756C;
+  --color-sage-800: #4E5F57;
+  --color-sage-900: #3B4942;
+
+  /* ===== 9. SLATE GRAY (UI Elements, Text) ===== */
+  --color-slate-50: #F7F8F8;
+  --color-slate-100: #EDEEEE;
+  --color-slate-200: #D8DBDB;
+  --color-slate-300: #BFC4C4;
+  --color-slate-400: #A1A9A9;
+  --color-slate-500: #6B7D7D;
+  --color-slate-600: #5C6C6C;
+  --color-slate-700: #4D5B5B;
+  --color-slate-800: #3E4A4A;
+  --color-slate-900: #2F3939;
+
+  /* ===== 10. CHARCOAL (Primary Text) ===== */
+  --color-charcoal-50: #F6F6F7;
+  --color-charcoal-100: #EBEBED;
+  --color-charcoal-200: #D2D2D7;
+  --color-charcoal-300: #B5B5BD;
+  --color-charcoal-400: #94949F;
+  --color-charcoal-500: #4A4A52;
+  --color-charcoal-600: #404047;
+  --color-charcoal-700: #36363C;
+  --color-charcoal-800: #2C2C31;
+  --color-charcoal-900: #222226;
+
+  /* ===== 11. CREAM (Warm Backgrounds) ===== */
+  --color-cream-50: #FEFDFB;
+  --color-cream-100: #FCFAF6;
+  --color-cream-200: #F8F4ED;
+  --color-cream-300: #F2EBE0;
+  --color-cream-400: #EADFD0;
+  --color-cream-500: #F5F1E8;
+  --color-cream-600: #DDD3C5;
+  --color-cream-700: #C5B5A2;
+  --color-cream-800: #AD977F;
+  --color-cream-900: #95795C;
+
+  /* ===== 12. CLAY RED (Errors) ===== */
+  --color-clay-50: #FDF7F6;
+  --color-clay-100: #F9EDEC;
+  --color-clay-200: #F1D7D5;
+  --color-clay-300: #E6BCB9;
+  --color-clay-400: #D69E99;
+  --color-clay-500: #A0453D;
+  --color-clay-600: #8B3C35;
+  --color-clay-700: #75332D;
+  --color-clay-800: #5F2A25;
+  --color-clay-900: #49211D;
+
+  /* ===== 13. AMBER (Caution) ===== */
+  --color-amber-50: #FDFCF7;
+  --color-amber-100: #F9F5E8;
+  --color-amber-200: #F2EAD3;
+  --color-amber-300: #E8DBB8;
+  --color-amber-400: #DBC898;
+  --color-amber-500: #D4A853;
+  --color-amber-600: #BE9548;
+  --color-amber-700: #A07F3C;
+  --color-amber-800: #826930;
+  --color-amber-900: #645324;
+
+  /* ===== SEMANTIC COLOR ASSIGNMENTS ===== */
+  
+  /* Primary Actions & Links */
+  --color-primary: var(--color-ocean-500);
+  --color-primary-hover: var(--color-ocean-600);
+  --color-primary-light: var(--color-ocean-100);
+  --color-primary-dark: var(--color-ocean-800);
+
+  /* Secondary Actions */
+  --color-secondary: var(--color-sky-500);
+  --color-secondary-hover: var(--color-sky-600);
+  --color-secondary-light: var(--color-sky-100);
+
+  /* Success States */
+  --color-success: var(--color-forest-500);
+  --color-success-hover: var(--color-forest-600);
+  --color-success-light: var(--color-forest-100);
+
+  /* Information */
+  --color-info: var(--color-ocean-500);
+  --color-info-light: var(--color-ocean-100);
+
+  /* Warnings */
+  --color-warning: var(--color-sunset-500);
+  --color-warning-light: var(--color-sunset-100);
+
+  /* Errors */
+  --color-error: var(--color-clay-500);
+  --color-error-light: var(--color-clay-100);
+
+  /* Conservation/Environmental Themes */
+  --color-conservation: var(--color-forest-500);
+  --color-soil-health: var(--color-moss-500);
+  --color-environmental: var(--color-sage-500);
+  --color-assessment: var(--color-slate-600);
+  --color-mapping: var(--color-ocean-700);
+
+  /* Background Colors */
+  --color-background: #F8F4ED;
+  --color-card-background: #FFFFFF;
+  --color-card-background-alt: #FEFDFB;
+  --color-accent-background: #F9FAFB;
+
+  /* Text Colors */
+  --color-text-primary: var(--color-charcoal-800);
+  --color-text-heading: var(--color-charcoal-900);
+  --color-text-secondary: var(--color-slate-600);
+  --color-text-muted: var(--color-slate-400);
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+.alert-info {
+  background-color: var(--color-info-light);
+  border-left: 4px solid var(--color-info);
+}
+
+.alert-success {
+  background-color: var(--color-success-light);
+  border-left: 4px solid var(--color-success);
+}
+
+.alert-warning {
+  background-color: var(--color-warning-light);
+  border-left: 4px solid var(--color-warning);
+}
+
+.alert-error {
+  background-color: var(--color-error-light);
+  border-left: 4px solid var(--color-error);
+}
+
+.text-info {
+  color: var(--color-info);
+}
+
+.text-info-dark {
+  color: var(--color-ocean-800);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-error {
+  color: var(--color-error);
+}
+
+/* Gradients */
+.gradient-ocean {
+  background: linear-gradient(135deg, var(--color-ocean-500) 0%, var(--color-ocean-700) 100%);
+}
+
+.gradient-forest {
+  background: linear-gradient(135deg, var(--color-forest-500) 0%, var(--color-forest-700) 100%);
+}
+
+.gradient-lavender {
+  background: linear-gradient(135deg, var(--color-lavender-500) 0%, var(--color-lavender-700) 100%);
+}
+
+.gradient-hero {
+  background: linear-gradient(135deg, #1a4d2e, #2d6a4f, #1b4965);
+}

@@ -133,11 +133,14 @@ export function InterpretationResultDisplay({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="rounded-lg shadow-lg overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-white">
+      <div 
+        className="px-6 py-4 text-white"
+        style={{ background: 'linear-gradient(to right, var(--color-lavender-500), var(--color-lavender-600))' }}
+      >
         <h2 className="text-2xl font-bold">{interpretationName}</h2>
-        <p className="text-sm text-blue-100 mt-1">
+        <p className="text-sm mt-1" style={{ color: 'var(--color-lavender-100)' }}>
           Evaluated on {new Date(result.timestamp).toLocaleString()}
         </p>
       </div>
@@ -145,10 +148,10 @@ export function InterpretationResultDisplay({
       <div className="p-6 space-y-6">
         {/* Overall Rating */}
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-gray-900">Overall Rating</h3>
+          <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-charcoal-900)' }}>Overall Rating</h3>
           <div className="space-y-3">
             {/* Progress bar */}
-            <div className="w-full bg-gray-200 rounded-full h-12 overflow-hidden shadow-inner">
+            <div className="w-full rounded-full h-12 overflow-hidden shadow-inner" style={{ backgroundColor: 'var(--color-slate-200)' }}>
               <div
                 className={`h-12 rounded-full ${getRatingColor(result.rating)} flex items-center justify-end pr-4 transition-all duration-700 ease-out`}
                 style={{ width: `${Math.max(result.rating * 100, 3)}%` }}
@@ -170,30 +173,30 @@ export function InterpretationResultDisplay({
 
         {/* Input Values */}
         <div>
-          <h3 className="text-lg font-semibold mb-3 text-gray-900">Input Values</h3>
-          <div className="overflow-x-auto border border-gray-200 rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-charcoal-900)' }}>Input Values</h3>
+          <div className="overflow-x-auto rounded-lg" style={{ border: '1px solid var(--color-slate-200)' }}>
+            <table className="min-w-full" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+              <thead style={{ backgroundColor: 'var(--color-slate-50)' }}>
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-slate-600)', borderBottom: '1px solid var(--color-slate-200)' }}>
                     Property
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-slate-600)', borderBottom: '1px solid var(--color-slate-200)' }}>
                     Value
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody style={{ backgroundColor: '#FFFFFF' }}>
                 {Object.entries(result.propertyValues).map(([key, value]) => (
-                  <tr key={key} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+                  <tr key={key} className="transition-colors" style={{ borderBottom: '1px solid var(--color-slate-200)' }}>
+                    <td className="px-4 py-3 text-sm font-medium" style={{ color: 'var(--color-charcoal-800)' }}>
                       {key}
                     </td>
                     <td className="px-4 py-3 text-sm text-right font-mono">
                       {value !== null ? (
-                        <span className="text-gray-900">{value}</span>
+                        <span style={{ color: 'var(--color-charcoal-900)' }}>{value}</span>
                       ) : (
-                        <span className="text-gray-400">N/A</span>
+                        <span style={{ color: 'var(--color-slate-400)' }}>N/A</span>
                       )}
                     </td>
                   </tr>
@@ -206,19 +209,19 @@ export function InterpretationResultDisplay({
         {/* Evaluation Breakdown */}
         {result.evaluationResults && Object.keys(result.evaluationResults).length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold mb-3 text-gray-900">Evaluation Breakdown</h3>
+            <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-charcoal-900)' }}>Evaluation Breakdown</h3>
             <div className="space-y-3">
               {Object.entries(result.evaluationResults)
                 .filter(([key]) => isNaN(Number(key))) // Filter out numeric keys (evaliid)
                 .map(([key, value]) => (
                 <div key={key} className="space-y-1">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-700 font-medium">{key}</span>
-                    <span className="text-gray-900 font-semibold">
+                    <span className="font-medium" style={{ color: 'var(--color-slate-700)' }}>{key}</span>
+                    <span className="font-semibold" style={{ color: 'var(--color-charcoal-900)' }}>
                       {(value * 100).toFixed(1)}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div className="w-full rounded-full h-2 overflow-hidden" style={{ backgroundColor: 'var(--color-slate-200)' }}>
                     <div
                       className={`h-2 rounded-full ${getRatingColor(value)} transition-all duration-500`}
                       style={{ width: `${value * 100}%` }}
@@ -268,7 +271,7 @@ export function InterpretationResultDisplay({
       <style jsx>{`
         @media print {
           .bg-gradient-to-r {
-            background: #2563eb !important;
+            background: var(--color-lavender-600) !important;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }

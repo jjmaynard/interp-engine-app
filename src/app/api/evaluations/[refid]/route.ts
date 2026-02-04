@@ -51,6 +51,8 @@ export async function GET(
         evaliid: evaluation.evaliid,
         evalname: evaluation.evalname,
         propname: evaluation.propname,
+        propiid: evaluation.propiid,
+        evaldesc: evaluation.evaldesc,
         evaluationtype: evaluation.evaluationtype,
         invertevaluationresults: evaluation.invertevaluationresults,
         points: evaluation.points || [],

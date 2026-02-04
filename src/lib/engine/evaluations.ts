@@ -261,24 +261,44 @@ export function categoricalEvaluation(
 }
 
 /**
- * Sigmoid curve evaluation
+ * CVIR S-curve evaluation (piecewise quadratic sigmoid)
+ * Based on NASIS CVIR ComputeSCurve function
  * 
  * @param x - Input property value
- * @param center - Center point of sigmoid
- * @param width - Width of transition zone
- * @param invert - Invert the result
+ * @param min - Minimum x value where curve starts
+ * @param max - Maximum x value where curve reaches 1.0
+ * @param invert - Invert the result (descending vs ascending)
  * @returns Fuzzy membership value [0, 1]
  */
 export function sigmoidEvaluation(
   x: number,
-  center: number,
-  width: number,
+  min: number,
+  max: number,
   invert: boolean = false
 ): number {
-  // Sigmoid: 1 / (1 + exp(-k * (x - center)))
-  // k is determined by width
-  const k = 4 / width; // Transition occurs over width interval
-  const result = 1 / (1 + Math.exp(-k * (x - center)));
+  // CVIR S-curve uses piecewise quadratic functions
+  // Below min: 0
+  // Above max: 1
+  // Between min and max: piecewise quadratic
+  let result: number;
+  
+  if (x < min) {
+    result = 0;
+  } else if (x > max) {
+    result = 1;
+  } else {
+    const midpoint = (max + min) / 2;
+    if (x < midpoint) {
+      // First half: 2 * ((x - min) / (max - min))^2
+      const normalized = (x - min) / (max - min);
+      result = 2 * normalized * normalized;
+    } else {
+      // Second half: 1 - 2 * ((x - max) / (max - min))^2
+      const normalized = (x - max) / (max - min);
+      result = 1 - 2 * normalized * normalized;
+    }
+  }
+  
   return invert ? 1 - result : result;
 }
 
@@ -347,9 +367,11 @@ export function evaluateProperty(
       
       case 'sigmoid':
         if (points.length >= 2) {
-          const center = (points[0].x + points[1].x) / 2;
-          const width = Math.abs(points[1].x - points[0].x);
-          result = sigmoidEvaluation(x, center, width, invert);
+          // Use first and last points as min/max for S-curve
+          const sortedPoints = [...points].sort((a, b) => a.x - b.x);
+          const min = sortedPoints[0].x;
+          const max = sortedPoints[sortedPoints.length - 1].x;
+          result = sigmoidEvaluation(x, min, max, invert);
         } else {
           result = linearInterpolation(x, points, invert);
         }

@@ -410,21 +410,34 @@ export function PropertyInputForm({
             <div className="flex items-start justify-between gap-2">
               <label 
                 htmlFor={`prop-${property.propname}`}
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium"
+                style={{ color: 'var(--color-charcoal-800)' }}
               >
                 {property.propname}
                 {property.propuom && (
-                  <span className="text-gray-500 ml-1 font-normal">
+                  <span className="ml-1 font-normal" style={{ color: 'var(--color-slate-500)' }}>
                     ({property.propuom})
                   </span>
                 )}
-                <span className="text-red-500 ml-1">*</span>
+                <span className="ml-1" style={{ color: 'var(--color-clay-500)' }}>*</span>
               </label>
               {property.propdesc && (
                 <button
                   type="button"
                   onClick={() => setSelectedPropertyDesc({ name: property.propname, desc: property.propdesc! })}
-                  className="text-blue-600 hover:text-blue-800 transition-colors flex-shrink-0"
+                  className="transition-all flex-shrink-0 rounded-lg p-1.5 backdrop-blur-sm"
+                  style={{ 
+                    backgroundColor: 'var(--color-lavender-100)',
+                    color: 'var(--color-lavender-700)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-lavender-200)';
+                    e.currentTarget.style.color = 'var(--color-lavender-900)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--color-lavender-100)';
+                    e.currentTarget.style.color = 'var(--color-lavender-700)';
+                  }}
                   title="View property description"
                 >
                   <Info className="w-4 h-4" />
@@ -507,11 +520,17 @@ export function PropertyInputForm({
       </div>
 
       {/* Form actions */}
-      <div className="flex gap-3 pt-4 border-t border-gray-200">
+      <div className="flex gap-3 pt-4" style={{ borderTop: '1px solid var(--color-slate-200)' }}>
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="flex-1 text-white py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors font-medium disabled:cursor-not-allowed"
+          style={{
+            background: loading ? 'var(--color-slate-400)' : 'linear-gradient(to right, var(--color-ocean-500), var(--color-ocean-600))',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }}
+          onMouseEnter={(e) => !loading && (e.currentTarget.style.background = 'linear-gradient(to right, var(--color-ocean-600), var(--color-ocean-700))')}
+          onMouseLeave={(e) => !loading && (e.currentTarget.style.background = 'linear-gradient(to right, var(--color-ocean-500), var(--color-ocean-600))')}
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -530,8 +549,14 @@ export function PropertyInputForm({
           type="button"
           onClick={handleAutoFill}
           disabled={loading}
-          className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed font-medium"
+          className="px-4 py-3 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:cursor-not-allowed font-medium"
           title="Auto-fill with sample data"
+          style={{
+            background: loading ? 'var(--color-slate-200)' : 'linear-gradient(to right, var(--color-forest-500), var(--color-forest-600))',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+          }}
+          onMouseEnter={(e) => !loading && (e.currentTarget.style.background = 'linear-gradient(to right, var(--color-forest-600), var(--color-forest-700))')}
+          onMouseLeave={(e) => !loading && (e.currentTarget.style.background = 'linear-gradient(to right, var(--color-forest-500), var(--color-forest-600))')}
         >
           <span className="flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -545,29 +570,41 @@ export function PropertyInputForm({
           type="button"
           onClick={handleReset}
           disabled={loading}
-          className="px-4 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className="px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:cursor-not-allowed"
+          style={{
+            border: '2px solid var(--color-slate-300)',
+            color: 'var(--color-slate-700)',
+            backgroundColor: loading ? 'var(--color-slate-100)' : 'transparent'
+          }}
+          onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = 'var(--color-slate-50)')}
+          onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = 'transparent')}
         >
           Reset
         </button>
       </div>
 
       {/* Help text */}
-      <div className="text-xs text-gray-500 text-center">
-        <p>All fields marked with <span className="text-red-500">*</span> are required</p>
+      <div className="text-xs text-center" style={{ color: 'var(--color-slate-500)' }}>
+        <p>All fields marked with <span style={{ color: 'var(--color-clay-500)' }}>*</span> are required</p>
       </div>
 
       {/* Property Description Modal */}
       {selectedPropertyDesc && (
         <div 
           className="fixed inset-0 flex items-center justify-center p-4 z-50"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
           onClick={() => setSelectedPropertyDesc(null)}
         >
           <div 
-            className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden"
+            className="rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden"
+            style={{ backgroundColor: '#FFFFFF' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5 flex items-start justify-between">
+            <div 
+              className="px-6 py-5 flex items-start justify-between"
+              style={{ background: 'linear-gradient(to right, var(--color-lavender-500), var(--color-lavender-600))' }}
+            >
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <Info className="w-5 h-5 text-white" />
@@ -575,13 +612,16 @@ export function PropertyInputForm({
                     Property Information
                   </h3>
                 </div>
-                <p className="text-sm text-blue-100 font-medium">
+                <p className="text-sm font-medium" style={{ color: 'var(--color-lavender-100)' }}>
                   {selectedPropertyDesc.name}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedPropertyDesc(null)}
-                className="text-white hover:text-blue-100 transition-colors ml-4"
+                className="text-white transition-all ml-4 rounded-lg p-2 backdrop-blur-sm"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
                 aria-label="Close"
               >
                 <X className="w-6 h-6" />
@@ -590,22 +630,37 @@ export function PropertyInputForm({
             
             {/* Content */}
             <div className="px-6 py-6 overflow-auto max-h-[calc(85vh-180px)]">
-              <div className="bg-blue-50 border-l-4 border-blue-500 px-4 py-3 rounded-r-md">
-                <h4 className="text-sm font-semibold text-blue-900 mb-2 flex items-center gap-2">
+              <div 
+                className="px-4 py-3 rounded-r-md"
+                style={{ 
+                  backgroundColor: 'var(--color-lavender-50)', 
+                  borderLeft: '4px solid var(--color-lavender-500)' 
+                }}
+              >
+                <h4 
+                  className="text-sm font-semibold mb-2 flex items-center gap-2"
+                  style={{ color: 'var(--color-lavender-900)' }}
+                >
                   <Info className="w-4 h-4" />
                   Description
                 </h4>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                <p 
+                  className="text-sm whitespace-pre-wrap leading-relaxed"
+                  style={{ color: 'var(--color-slate-700)' }}
+                >
                   {selectedPropertyDesc.desc}
                 </p>
               </div>
             </div>
             
             {/* Footer */}
-            <div className="bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end">
+            <div className="px-6 py-4 flex justify-end" style={{ backgroundColor: 'var(--color-slate-50)', borderTop: '1px solid var(--color-slate-200)' }}>
               <button
                 onClick={() => setSelectedPropertyDesc(null)}
-                className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium shadow-sm"
+                className="px-6 py-2.5 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all font-medium shadow-sm"
+                style={{ background: 'linear-gradient(to right, var(--color-lavender-500), var(--color-lavender-600))' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(to right, var(--color-lavender-600), var(--color-lavender-700))'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(to right, var(--color-lavender-500), var(--color-lavender-600))'}
               >
                 Close
               </button>

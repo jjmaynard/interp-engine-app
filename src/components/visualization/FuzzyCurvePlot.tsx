@@ -11,6 +11,9 @@ interface FuzzyCurvePlotProps {
   title: string;
   propertyName?: string;
   invert?: boolean;
+  propertyId?: string;
+  evaluationId?: string | number;
+  evaluationDesc?: string;
 }
 
 export function FuzzyCurvePlot({
@@ -20,7 +23,10 @@ export function FuzzyCurvePlot({
   outputValue,
   title,
   propertyName,
-  invert = false
+  invert = false,
+  propertyId,
+  evaluationId,
+  evaluationDesc
 }: FuzzyCurvePlotProps) {
   
   console.log('[FuzzyCurvePlot] Received props:', {
@@ -34,48 +40,153 @@ export function FuzzyCurvePlot({
     invert
   });
   
-  // Simple linear interpolation helper function
-  const interpolateValue = (x: number, points: { x: number; y: number }[], method: string, invert: boolean): number => {
-    if (points.length === 0) return 0;
-    if (x <= points[0].x) return invert ? 1 - points[0].y : points[0].y;
-    if (x >= points[points.length - 1].x) return invert ? 1 - points[points.length - 1].y : points[points.length - 1].y;
+  // Interpolation helper functions
+  // CVIR S-curve (piecewise quadratic sigmoid) - matches NASIS implementation
+  const sigmoid = (x: number, points: { x: number; y: number }[]): number => {
+    if (points.length < 2) return points[0]?.y || 0;
     
-    // Find surrounding points
+    const min = points[0].x;
+    const max = points[points.length - 1].x;
+    
+    if (min === max) return points[0].y;
+    
+    // Values outside the range
+    if (x < min) return 0;
+    if (x > max) return 1;
+    
+    // Piecewise quadratic S-curve (CVIR ComputeSCurve algorithm)
+    const midpoint = (max + min) / 2;
+    if (x < midpoint) {
+      // First half: 2 * ((x - min) / (max - min))^2
+      const normalized = (x - min) / (max - min);
+      return 2 * normalized * normalized;
+    } else {
+      // Second half: 1 - 2 * ((x - max) / (max - min))^2
+      const normalized = (x - max) / (max - min);
+      return 1 - 2 * normalized * normalized;
+    }
+  };
+
+  const spline = (x: number, points: { x: number; y: number }[]): number => {
+    // Catmull-Rom spline interpolation for smooth curves
+    if (points.length < 2) return points[0]?.y || 0;
+    
+    // Find the segment
+    let idx = 0;
     for (let i = 0; i < points.length - 1; i++) {
       if (x >= points[i].x && x <= points[i + 1].x) {
-        const x1 = points[i].x;
-        const y1 = points[i].y;
-        const x2 = points[i + 1].x;
-        const y2 = points[i + 1].y;
-        
-        // Linear interpolation
-        const t = (x - x1) / (x2 - x1);
-        const y = y1 + t * (y2 - y1);
-        return invert ? 1 - y : y;
+        idx = i;
+        break;
       }
     }
     
-    return 0;
+    const p0 = points[Math.max(0, idx - 1)];
+    const p1 = points[idx];
+    const p2 = points[Math.min(points.length - 1, idx + 1)];
+    const p3 = points[Math.min(points.length - 1, idx + 2)];
+    
+    const t = (x - p1.x) / (p2.x - p1.x);
+    const t2 = t * t;
+    const t3 = t2 * t;
+    
+    // Catmull-Rom basis
+    const v0 = (p2.y - p0.y) / 2;
+    const v1 = (p3.y - p1.y) / 2;
+    
+    return (2 * p1.y - 2 * p2.y + v0 + v1) * t3 +
+           (-3 * p1.y + 3 * p2.y - 2 * v0 - v1) * t2 +
+           v0 * t + p1.y;
+  };
+  
+  const interpolateValue = (x: number, points: { x: number; y: number }[], method: string, invert: boolean): number => {
+    if (points.length === 0) return 0;
+    
+    let y: number;
+    
+    // Apply appropriate interpolation method
+    if (method.toLowerCase() === 'sigmoid') {
+      y = sigmoid(x, points);
+    } else if (method.toLowerCase() === 'spline') {
+      // For spline, handle bounds first
+      if (x <= points[0].x) {
+        y = points[0].y;
+      } else if (x >= points[points.length - 1].x) {
+        y = points[points.length - 1].y;
+      } else {
+        y = spline(x, points);
+      }
+    } else {
+      // Linear interpolation (default)
+      if (x <= points[0].x) {
+        y = points[0].y;
+      } else if (x >= points[points.length - 1].x) {
+        y = points[points.length - 1].y;
+      } else {
+        // Find surrounding points for linear interpolation
+        for (let i = 0; i < points.length - 1; i++) {
+          if (x >= points[i].x && x <= points[i + 1].x) {
+            const x1 = points[i].x;
+            const y1 = points[i].y;
+            const x2 = points[i + 1].x;
+            const y2 = points[i + 1].y;
+            
+            const t = (x - x1) / (x2 - x1);
+            y = y1 + t * (y2 - y1);
+            break;
+          }
+        }
+        if (y === undefined) y = 0;
+      }
+    }
+    
+    return invert ? 1 - y : y;
   };
   
   // Generate interpolated curve data
   const curveData = useMemo(() => {
-    if (!points || points.length === 0) return [];
+    if (!points || points.length === 0) {
+      // If no control points, just show the input/output point
+      return [{
+        x: inputValue,
+        y: outputValue,
+        isOriginal: false,
+        isInput: true
+      }];
+    }
     
     // Sort points by x value
     const sortedPoints = [...points].sort((a, b) => a.x - b.x);
+    
+    // Handle single point case
+    if (sortedPoints.length === 1) {
+      return [
+        {
+          x: sortedPoints[0].x,
+          y: invert ? 1 - sortedPoints[0].y : sortedPoints[0].y,
+          isOriginal: true
+        },
+        {
+          x: inputValue,
+          y: outputValue,
+          isOriginal: false,
+          isInput: true
+        }
+      ];
+    }
     
     // Generate dense curve for smooth visualization
     const minX = sortedPoints[0].x;
     const maxX = sortedPoints[sortedPoints.length - 1].x;
     const range = maxX - minX;
-    const step = range / 100; // 100 points for smooth curve
+    const step = range > 0 ? range / 100 : 1; // 100 points for smooth curve, avoid division by zero
     
     const curvePoints = [];
     
-    for (let x = minX; x <= maxX; x += step) {
-      const y = interpolateValue(x, sortedPoints, interpolation, invert);
-      curvePoints.push({ x, y, isOriginal: false });
+    if (range > 0) {
+      for (let x = minX; x <= maxX; x += step) {
+        const y = interpolateValue(x, sortedPoints, interpolation, invert);
+        curvePoints.push({ x, y, isOriginal: false });
+      }
     }
     
     // Add original points
@@ -167,12 +278,16 @@ export function FuzzyCurvePlot({
             dataKey="x" 
             label={{ value: propertyName || 'Property Value', position: 'insideBottom', offset: -5 }}
             stroke="#6b7280"
+            type="number"
+            domain={['auto', 'auto']}
+            allowDataOverflow={false}
           />
           <YAxis 
             domain={[0, 1]}
             label={{ value: 'Fuzzy Rating (0-1)', angle: -90, position: 'insideLeft' }}
             stroke="#6b7280"
             tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
+            type="number"
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
@@ -219,6 +334,33 @@ export function FuzzyCurvePlot({
           <span>Fuzzy Membership Curve</span>
         </div>
       </div>
+      
+      {/* Evaluation Details */}
+      {(propertyId || evaluationId || evaluationDesc) && (
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">Evaluation Details</h4>
+          <div className="space-y-2 text-sm">
+            {propertyId && (
+              <div className="flex">
+                <span className="font-medium text-gray-600 w-32">Property ID:</span>
+                <span className="text-gray-900 font-mono">{propertyId}</span>
+              </div>
+            )}
+            {evaluationId && (
+              <div className="flex">
+                <span className="font-medium text-gray-600 w-32">Evaluation ID:</span>
+                <span className="text-gray-900 font-mono">{evaluationId}</span>
+              </div>
+            )}
+            {evaluationDesc && (
+              <div className="flex flex-col">
+                <span className="font-medium text-gray-600 mb-1">Description:</span>
+                <span className="text-gray-700 leading-relaxed">{evaluationDesc}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
