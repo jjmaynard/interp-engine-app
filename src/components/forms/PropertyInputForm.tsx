@@ -559,7 +559,7 @@ export function PropertyInputForm({
       {/* Property Description Modal */}
       {selectedPropertyDesc && (
         <div 
-          className="fixed inset-0 bg-gray-900 bg-opacity-10 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 flex items-center justify-center p-4 z-50"
           onClick={() => setSelectedPropertyDesc(null)}
         >
           <div 
