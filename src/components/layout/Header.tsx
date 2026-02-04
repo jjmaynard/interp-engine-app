@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function Header() {
   return (
@@ -6,12 +7,17 @@ export function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-              <span className="text-blue-900 font-bold text-xl">SI</span>
+            <div className="w-10 h-10 flex items-center justify-center">
+              <Image 
+                src="/usda-logo-white.png" 
+                alt="USDA Logo" 
+                width={40} 
+                height={40}
+                className="object-contain"
+              />
             </div>
             <div>
               <h1 className="text-xl font-bold">NRCS Soil Interpretation Engine</h1>
-              <p className="text-blue-200 text-sm">Natural Resources Conservation Service</p>
             </div>
           </div>
           

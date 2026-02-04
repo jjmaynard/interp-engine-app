@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sprout, FileText, GitBranch, CheckCircle2, Sparkles, Info } from 'lucide-react';
+import { Settings, FileText, GitBranch, CheckCircle2, Sparkles, Info } from 'lucide-react';
 import type { InterpretationResult, Property, RuleNode } from '@/types/interpretation';
 import { InterpretationSelector } from '@/components/navigation/InterpretationSelector';
 import { PropertyFormSkeleton } from '@/components/layout/LoadingSkeleton';
@@ -111,11 +111,11 @@ export default function InterpretPage() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Modern Header with Gradient */}
         <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-green-500 mb-4 shadow-lg">
-            <Sprout className="w-8 h-8 text-white" strokeWidth={2.5} />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gray-600 mb-4 shadow-lg">
+            <Settings className="w-8 h-8 text-white" strokeWidth={2.5} />
           </div>
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-3">
-            NRCS Soil Interpretation Engine
+            Soil Interpretation Engine
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Evaluate soil interpretations using property data and fuzzy logic
@@ -270,9 +270,6 @@ export default function InterpretPage() {
       {!selectedInterp && (
         <div className="p-12 bg-white rounded-2xl shadow-xl border border-gray-100 text-center">
           <div className="max-w-md mx-auto">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-green-500 mb-6 shadow-lg">
-              <Sprout className="w-10 h-10 text-white" strokeWidth={2.5} />
-            </div>
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-3">
               Get Started
             </h2>

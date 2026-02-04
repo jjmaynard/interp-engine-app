@@ -42,6 +42,28 @@ export function multiplyHedge(
 }
 
 /**
+ * DIVIDE hedge
+ * 
+ * Divides the input by a constant
+ * 
+ * @param x - Input value or array of values
+ * @param divisor - Division factor
+ * @returns Divided value(s)
+ */
+export function divideHedge(
+  x: number | number[],
+  divisor: number
+): number | number[] {
+  if (divisor === 0) {
+    return Array.isArray(x) ? x.map(() => NaN) : NaN;
+  }
+  if (Array.isArray(x)) {
+    return x.map(v => (isNaN(v) ? NaN : v / divisor));
+  }
+  return isNaN(x) ? NaN : x / divisor;
+}
+
+/**
  * POWER hedge
  * 
  * Raises the input to a power
@@ -163,6 +185,14 @@ export function applyHedge(
         throw new Error('MULTIPLY hedge requires a parameter');
       }
       return multiplyHedge(x, parameter);
+    
+    case 'DIVIDE':
+    case 'DIV':
+      if (x === null || x === undefined) return NaN;
+      if (parameter === undefined) {
+        throw new Error('DIVIDE hedge requires a parameter');
+      }
+      return divideHedge(x, parameter);
     
     case 'POWER':
       if (x === null || x === undefined) return NaN;

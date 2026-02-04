@@ -80,7 +80,7 @@ export function InterpretationSelector({
   }, []);
 
   const filteredInterpretations = useMemo(() => {
-    return interpretations.filter(interp => {
+    const filtered = interpretations.filter(interp => {
       const nameStr = interp.name || interp.rulename || 'Unknown';
       
       // Filter by category
@@ -97,6 +97,13 @@ export function InterpretationSelector({
       }
       
       return true;
+    });
+    
+    // Sort alphabetically by name
+    return filtered.sort((a, b) => {
+      const nameA = (a.name || a.rulename || 'Unknown').toLowerCase();
+      const nameB = (b.name || b.rulename || 'Unknown').toLowerCase();
+      return nameA.localeCompare(nameB);
     });
   }, [interpretations, selectedCategory, searchTerm]);
 

@@ -65,6 +65,10 @@ export function evaluateNode(
   const hasChildren = node.children && Array.isArray(node.children) && node.children.length > 0;
   const isEvaluationNode = (node.RefId || node.rule_refid) && !isOperatorType(node.Type) && !isHedgeType(node.Type) && !hasChildren;
   
+  if ((node.RefId || node.rule_refid) && hasChildren && !isOperatorType(node.Type) && !isHedgeType(node.Type)) {
+    console.log(`[Evaluator] Node with RefId ${node.RefId || node.rule_refid} has children - treating as container, not evaluation`);
+  }
+  
   if (isEvaluationNode || node.Type === 'Evaluation') {
     const refId = node.RefId || node.rule_refid;
     const evaluation = evaluations.get(String(refId));
@@ -122,11 +126,13 @@ export function evaluateNode(
   }
 
   // Handle operator nodes (and, or, product, sum, etc.)
+  // NOTE: multiply, power, and limit can be BOTH operators and hedges
+  // If they have a Value parameter, they're hedges; otherwise they're operators
   const operatorTypes = ['and', 'or', 'product', 'sum', 'times', 'add', 'multiply', 'divide', 
-                         'subtract', 'minus', 'plus', 'average', 'limit', 'power', 'weight',
+                         'subtract', 'minus', 'plus', 'average', 'power', 'limit', 'weight',
                          'not_null_and', 'alpha'];
   
-  if (node.Type && operatorTypes.includes(node.Type.toLowerCase())) {
+  if (node.Type && operatorTypes.includes(node.Type.toLowerCase()) && !node.Value) {
     if (!node.children || node.children.length === 0) {
       console.warn(`[Evaluator] Operator node has no children: ${node.Type}`);
       return { rating: NaN };
@@ -162,10 +168,12 @@ export function evaluateNode(
   }
 
   // Handle hedge nodes (not, very, slightly, somewhat, extremely, null_or, null_not_rated, etc.)
+  // Also handle multiply/power/limit when they have a Value parameter
   const hedgeTypes = ['not', 'very', 'slightly', 'somewhat', 'extremely', 
-                      'null_or', 'null_not_rated'];
+                      'null_or', 'null_not_rated', 'multiply', 'mult', 'divide', 'div', 
+                      'power', 'limit', 'not_null_and'];
   
-  if (node.Type && hedgeTypes.includes(node.Type.toLowerCase())) {
+  if (node.Type && (hedgeTypes.includes(node.Type.toLowerCase()) || node.Value)) {
     if (!node.children || node.children.length === 0) {
       if (debug) {
         console.warn(`Hedge node has no children: ${node.Type}`);
@@ -239,7 +247,7 @@ export function evaluateNode(
 function isOperatorType(type: string | undefined): boolean {
   if (!type) return false;
   const operatorTypes = ['and', 'or', 'product', 'sum', 'times', 'add', 'multiply', 'divide', 
-                         'subtract', 'minus', 'plus', 'average', 'limit', 'power', 'weight',
+                         'subtract', 'minus', 'plus', 'average', 'power', 'limit', 'weight',
                          'not_null_and', 'alpha', 'Operator'];
   return operatorTypes.includes(type.toLowerCase()) || type === 'Operator';
 }
@@ -247,7 +255,8 @@ function isOperatorType(type: string | undefined): boolean {
 function isHedgeType(type: string | undefined): boolean {
   if (!type) return false;
   const hedgeTypes = ['not', 'very', 'slightly', 'somewhat', 'extremely', 
-                      'null_or', 'null_not_rated', 'Hedge'];
+                      'null_or', 'null_not_rated', 'multiply', 'mult', 'divide', 'div',
+                      'power', 'limit', 'not_null_and', 'Hedge'];
   return hedgeTypes.includes(type.toLowerCase()) || type === 'Hedge';
 }
 

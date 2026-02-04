@@ -15,6 +15,7 @@ import ReactFlow, {
   ConnectionMode,
   ReactFlowProvider,
   Panel,
+  Handle,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Maximize2, Minimize2, Eye, TrendingUp } from 'lucide-react';
@@ -47,32 +48,38 @@ function SankeyNode({ data }: any) {
   // Operator nodes are smaller badges
   if (isOperator) {
     return (
-      <div 
-        className="px-4 py-2 rounded-md bg-amber-100 border-2 border-amber-500 shadow-md"
-        style={{ minWidth: '80px' }}
-      >
-        <div className="text-sm font-bold text-amber-900 text-center">
-          {node.Type}
+      <>
+        <Handle type="target" position={Position.Left} />
+        <div 
+          className="px-4 py-2 rounded-md bg-amber-100 border-2 border-amber-500 shadow-md"
+          style={{ minWidth: '80px' }}
+        >
+          <div className="text-sm font-bold text-amber-900 text-center">
+            {node.Type}
+          </div>
         </div>
-      </div>
+        <Handle type="source" position={Position.Right} />
+      </>
     );
   }
   
   // Evaluation nodes are full Sankey-style boxes
   return (
-    <div 
-      className="rounded-lg shadow-xl min-w-[200px] max-w-[280px] overflow-hidden"
-      style={{ 
-        borderLeft: `6px solid ${nodeColor}`,
-      }}
-    >
-      {/* Header */}
+    <>
+      <Handle type="target" position={Position.Left} />
       <div 
-        className="px-4 py-2 text-white font-bold text-sm"
-        style={{ backgroundColor: nodeColor }}
+        className="rounded-lg shadow-xl min-w-[200px] max-w-[280px] overflow-hidden"
+        style={{ 
+          borderLeft: `6px solid ${nodeColor}`,
+        }}
       >
-        {node.levelName || node.name || 'Unknown'}
-      </div>
+        {/* Header */}
+        <div 
+          className="px-4 py-2 text-white font-bold text-sm"
+          style={{ backgroundColor: nodeColor }}
+        >
+          {node.levelName || node.name || 'Unknown'}
+        </div>
       
       {/* Content */}
       <div className="bg-white px-4 py-3">
@@ -118,6 +125,8 @@ function SankeyNode({ data }: any) {
         )}
       </div>
     </div>
+    <Handle type="source" position={Position.Right} />
+    </>
   );
 }
 
@@ -134,9 +143,20 @@ function InteractiveSankeyFlow({ tree, onNodeClick, onShowCurve }: InteractiveSa
     const edges: Edge[] = [];
     let nodeIdCounter = 0;
     const levelCounts = new Map<number, number>();
+    let maxLevel = 0;
     
     const LEVEL_SPACING_X = 350;
     const NODE_SPACING_Y = 120;
+    
+    // First pass: find max level
+    function findMaxLevel(treeNode: any, level: number): void {
+      maxLevel = Math.max(maxLevel, level);
+      if (treeNode.children && treeNode.children.length > 0) {
+        treeNode.children.forEach((child: any) => findMaxLevel(child, level + 1));
+      }
+    }
+    
+    findMaxLevel(tree, 0);
     
     function processNode(
       treeNode: any, 
@@ -153,8 +173,8 @@ function InteractiveSankeyFlow({ tree, onNodeClick, onShowCurve }: InteractiveSa
       
       const isOperator = treeNode.Type && !treeNode.RefId && !treeNode.rule_refid;
       
-      // Position calculation
-      const x = level * LEVEL_SPACING_X;
+      // Position calculation - reversed: children on left, parent on right
+      const x = (maxLevel - level) * LEVEL_SPACING_X;
       const y = countAtLevel * NODE_SPACING_Y + 50;
       
       // Get branch color
@@ -189,14 +209,14 @@ function InteractiveSankeyFlow({ tree, onNodeClick, onShowCurve }: InteractiveSa
             treeNode.children.length > 1 ? childIndex : branchIndex
           );
           
-          // Create edge with Sankey-style appearance
+          // Create edge with Sankey-style appearance - reversed direction
           const edgeRating = child.rating || 0;
           const edgeColor = isOperator ? '#f59e0b' : branchColor;
           
           edges.push({
             id: `edge-${nodeId}-${childId}`,
-            source: nodeId,
-            target: childId,
+            source: childId,
+            target: nodeId,
             type: 'smoothstep',
             animated: false,
             style: {
@@ -231,6 +251,10 @@ function InteractiveSankeyFlow({ tree, onNodeClick, onShowCurve }: InteractiveSa
     }
     
     processNode(tree, 0, null, 0);
+    
+    console.log('[Interactive Sankey] Nodes created:', nodes.length);
+    console.log('[Interactive Sankey] Edges created:', edges.length);
+    console.log('[Interactive Sankey] Sample edge:', edges[0]);
     
     return { initialNodes: nodes, initialEdges: edges };
   }, [tree, onShowCurve]);

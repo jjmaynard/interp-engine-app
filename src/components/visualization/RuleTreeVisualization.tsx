@@ -142,13 +142,22 @@ function enrichTreeWithRatings(node: any, evaluationResults: Record<string, numb
   
   const enrichedNode = { ...node };
   
-  // Add rating from evaluationResults if this is an evaluation node
-  if (node.RefId || node.rule_refid) {
+  // Check if node has children - important for determining if it's a leaf evaluation node
+  const hasChildren = node.children && Array.isArray(node.children) && node.children.length > 0;
+  
+  // Add rating from evaluationResults if this is a LEAF evaluation node
+  // A node with RefId AND children is a container node, not a leaf evaluation
+  if ((node.RefId || node.rule_refid) && !hasChildren) {
     const refId = node.RefId || node.rule_refid;
     if (evaluationResults[refId] !== undefined) {
       enrichedNode.rating = evaluationResults[refId];
       console.log(`[TreeViz enriching] Set rating from evaluationResults[${refId}]:`, enrichedNode.rating);
+    } else {
+      console.warn(`[TreeViz enriching] RefId ${refId} not found in evaluationResults for node:`, node.name);
     }
+  } else if ((node.RefId || node.rule_refid) && hasChildren) {
+    const refId = node.RefId || node.rule_refid;
+    console.log(`[TreeViz enriching] Node has RefId ${refId} AND children - treating as container, not evaluation node`);
   }
   
   // Recursively enrich children first (bottom-up calculation)
@@ -158,12 +167,13 @@ function enrichTreeWithRatings(node: any, evaluationResults: Record<string, numb
     );
     
     // After enriching children, calculate intermediate node ratings
-    // Check if this is an operator node
+    // Check if this is an operator node (without a Value parameter)
+    // NOTE: multiply, power, limit can be operators OR hedges - check for Value to differentiate
     const operatorTypes = ['and', 'or', 'product', 'prod', 'multiply', 'sum', 'times', 
                            'average', 'avg', 'mean', 'plus', 'add', 'addition', 
-                           'minus', 'subtract', 'subtraction', 'min', 'max'];
+                           'minus', 'subtract', 'subtraction', 'divide', 'division', 'power', 'limit', 'min', 'max'];
     
-    if (node.Type && operatorTypes.includes(node.Type.toLowerCase())) {
+    if (node.Type && operatorTypes.includes(node.Type.toLowerCase()) && !node.Value) {
       // Extract child ratings
       const childRatings = enrichedNode.children
         .map((child: any) => child.rating)
@@ -178,12 +188,12 @@ function enrichTreeWithRatings(node: any, evaluationResults: Record<string, numb
       }
     }
     
-    // Check if this is a hedge node
+    // Check if this is a hedge node (or has a Value parameter making it a hedge)
     const hedgeTypes = ['not', 'very', 'slightly', 'somewhat', 'extremely', 
-                        'null_or', 'null_not_rated', 'multiply', 'mult', 'power', 'limit',
-                        'divide', 'not_null_and'];
+                        'null_or', 'null_not_rated', 'multiply', 'mult', 'divide', 'div',
+                        'power', 'limit', 'not_null_and'];
     
-    if (node.Type && hedgeTypes.includes(node.Type.toLowerCase())) {
+    if (node.Type && (hedgeTypes.includes(node.Type.toLowerCase()) || node.Value)) {
       // Hedges typically have one child
       if (enrichedNode.children.length > 0) {
         const childRating = enrichedNode.children[0].rating;
@@ -223,16 +233,13 @@ export function RuleTreeVisualization({
   // Enrich tree with ratings using useMemo to avoid infinite loops
   const enrichedTree = useMemo(() => {
     if (tree && tree.length > 0) {
+      console.log('[TreeViz] Starting tree enrichment with evaluationResults:', Object.keys(evaluationResults).slice(0, 10));
+      console.log('[TreeViz] Total evaluation results:', Object.keys(evaluationResults).length);
+      
       const enriched = enrichTreeWithRatings(tree[0], evaluationResults);
       
-      // Override root node rating with the actual final rating from the evaluator
-      if (finalRating !== undefined && enriched) {
-        enriched.rating = finalRating;
-        console.log('[TreeViz] Overriding root rating with finalRating:', finalRating);
-      }
-      
-      console.log('[TreeViz] Enriched tree root rating:', enriched?.rating);
-      console.log('[TreeViz] Evaluation results keys:', Object.keys(evaluationResults).length);
+      console.log('[TreeViz] Tree calculated rating:', enriched?.rating);
+      console.log('[TreeViz] Evaluator finalRating:', finalRating);
       return enriched;
     }
     return null;
@@ -383,7 +390,8 @@ export function RuleTreeVisualization({
     console.log('[TreeViz] First root node has', nodes[0]?.children.length, 'children');
 
     setTreeData(nodes);
-  }, [tree, evaluationResults]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tree, JSON.stringify(evaluationResults)]);
 
   if (!tree || tree.length === 0) {
     return (
@@ -476,7 +484,11 @@ export function RuleTreeVisualization({
       {/* Visualization */}
       {isExpanded && viewMode === 'sankey' && enrichedTree && (
         <div className="p-4 bg-gray-50">
-          <SankeyTreeDiagram tree={enrichedTree} />
+          <SankeyTreeDiagram 
+            tree={enrichedTree} 
+            onNodeClick={(node: any) => setSelectedNode(node)}
+            onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
+          />
         </div>
       )}
       

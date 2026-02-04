@@ -83,7 +83,7 @@ Database schema and migration files exist in the codebase but are **not actively
 - Simpler deployment (no database dependencies)
 - Faster development iteration
 - Avoids database quota/connection limits
-- All 3 interpretations + 167K evaluations fit in JSON
+- All 2111 interpretations + 167K evaluations fit in JSON
 
 **Available but unused:**
 - Database schema definitions (`src/lib/db/schema.ts`)
@@ -215,7 +215,7 @@ The application loads all data from static JSON files:
 
 ```bash
 src/data/
-├── interpretation_trees.json  # 3 interpretations
+├── primary_interpretation_trees.json  # 2,111+ complete NASIS interpretations
 ├── evaluations.json           # 167,000+ evaluation curves
 └── properties.json            # 67,000+ property definitions
 ```

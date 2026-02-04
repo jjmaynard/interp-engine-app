@@ -10,6 +10,7 @@ interface SankeyNode {
   value: number;
   type: 'property' | 'operator' | 'result';
   level: number;
+  treeNode?: any; // Reference to original tree node for evaluation details
 }
 
 interface SankeyLink {
@@ -21,9 +22,11 @@ interface SankeyLink {
 
 interface SankeyTreeDiagramProps {
   tree: any;
+  onNodeClick?: (node: any) => void;
+  onShowCurve?: (evaluation: any) => void;
 }
 
-export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
+export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve }: SankeyTreeDiagramProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -53,7 +56,8 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
           name: treeNode.levelName || treeNode.name || treeNode.Type || 'Unknown',
           value: rating,
           type: level === 0 ? 'result' : 'property',
-          level
+          level,
+          treeNode: treeNode // Store reference to original tree node
         };
         
         nodes.push(node);
@@ -96,7 +100,7 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
     const nodeWidth = 180;
     const nodeHeight = 50;
     const nodePadding = 30;
-    const levelPadding = 250;
+    const levelPadding = 350; // Increased spacing between levels for operator labels
     
     // Group nodes by level
     const levelGroups = new Map<number, SankeyNode[]>();
@@ -107,14 +111,14 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
       levelGroups.get(node.level)!.push(node);
     });
     
-    // Calculate positions (left to right)
+    // Calculate positions (right to left - root on right, children on left)
     const positions = new Map<string, { x: number; y: number; height: number }>();
     
     levelGroups.forEach((levelNodes, level) => {
       const totalHeight = levelNodes.length * (nodeHeight + nodePadding);
       
       levelNodes.forEach((node, index) => {
-        const x = level * levelPadding + 50; // Left to right
+        const x = (maxLevel - level) * levelPadding + 50; // Right to left - reverse level order
         const y = index * (nodeHeight + nodePadding) + 50;
         const nodeDisplayHeight = Math.max(nodeHeight, node.value * 80); // Scale by rating
         
@@ -126,6 +130,8 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
     const width = (maxLevel + 1) * levelPadding + nodeWidth + 100;
     const maxY = Math.max(...Array.from(positions.values()).map(p => p.y + p.height));
     const height = maxY + 50;
+    
+    console.log('[SankeyDiagram] Layout calculated:', { width, height, maxLevel, levelPadding, nodeCount: nodes.length });
     
     return { positions, width, height, nodeHeight, nodeWidth };
   }, [nodes, maxLevel]);
@@ -258,16 +264,14 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
           style={{ 
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
             transformOrigin: '0 0',
-            transition: isPanning ? 'none' : 'transform 0.1s ease',
-            minWidth: '100%',
-            minHeight: '100%'
+            transition: isPanning ? 'none' : 'transform 0.1s ease'
           }}
         >
           <svg 
             ref={svgRef}
             width={layout.width} 
             height={layout.height}
-            style={{ display: 'block' }}
+            style={{ display: 'block', width: layout.width, height: layout.height }}
           >
         <defs>
           {/* Gradient for links */}
@@ -299,7 +303,7 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
           const targetNode = nodes.find(n => n.id === link.target);
           if (!sourceNode || !targetNode) return null;
           
-          // For left-to-right flow: source connects from right edge, target from left edge
+          // For right-to-left flow: source connects from right edge, target from left edge
           const sourceX = sourcePos.x + layout.nodeWidth; // Right edge of source node
           const sourceY = sourcePos.y + sourcePos.height / 2;
           const targetX = targetPos.x; // Left edge of target node
@@ -369,6 +373,18 @@ export function SankeyTreeDiagram({ tree }: SankeyTreeDiagramProps) {
                 strokeWidth={isResult ? 3 : 1}
                 rx={6}
                 opacity={0.9}
+                style={{ cursor: node.type === 'property' && (onNodeClick || onShowCurve) ? 'pointer' : 'default' }}
+                onClick={() => {
+                  if (node.type === 'property' && node.treeNode) {
+                    if (onShowCurve && node.treeNode.RefId) {
+                      // If it's an evaluation node, show the fuzzy curve
+                      onShowCurve(node.treeNode);
+                    } else if (onNodeClick) {
+                      // Otherwise show branch analysis
+                      onNodeClick(node.treeNode);
+                    }
+                  }
+                }}
               />
               <text
                 x={pos.x + layout.nodeWidth / 2}
