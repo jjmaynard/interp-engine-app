@@ -407,11 +407,16 @@ export function RuleTreeVisualization({
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-earth-700 to-earth-800 px-6 py-4 text-white">
+      <div 
+        className="px-6 py-4 text-white"
+        style={{
+          background: 'linear-gradient(to right, var(--color-earth-700), var(--color-earth-800))'
+        }}
+      >
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-bold">Rule Tree Visualization</h3>
-            <p className="text-sm text-earth-100 mt-1">
+            <p className="text-sm mt-1" style={{ color: 'var(--color-earth-100)' }}>
               {interpretationName}
             </p>
           </div>
@@ -422,9 +427,10 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('sankey')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'sankey' 
-                    ? 'bg-white text-earth-700 shadow-sm' 
+                    ? 'bg-white shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
+                style={viewMode === 'sankey' ? { color: 'var(--color-earth-700)' } : {}}
               >
                 <GitBranch className="w-3.5 h-3.5" />
                 Flow
@@ -433,9 +439,10 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('interactive-sankey')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'interactive-sankey' 
-                    ? 'bg-white text-earth-700 shadow-sm' 
+                    ? 'bg-white shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
+                style={viewMode === 'interactive-sankey' ? { color: 'var(--color-earth-700)' } : {}}
               >
                 <Network className="w-3.5 h-3.5" />
                 Interactive
@@ -444,9 +451,10 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('horizontal')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'horizontal' 
-                    ? 'bg-white text-earth-700 shadow-sm' 
+                    ? 'bg-white shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
+                style={viewMode === 'horizontal' ? { color: 'var(--color-earth-700)' } : {}}
               >
                 <ArrowRightLeft className="w-3.5 h-3.5" />
                 Horizontal
@@ -455,9 +463,10 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('sunburst')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'sunburst' 
-                    ? 'bg-white text-earth-700 shadow-sm' 
+                    ? 'bg-white shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
+                style={viewMode === 'sunburst' ? { color: 'var(--color-earth-700)' } : {}}
               >
                 <CircleDot className="w-3.5 h-3.5" />
                 Radial
@@ -466,9 +475,10 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('list')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'list' 
-                    ? 'bg-white text-earth-700 shadow-sm' 
+                    ? 'bg-white shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
+                style={viewMode === 'list' ? { color: 'var(--color-earth-700)' } : {}}
               >
                 <List className="w-3.5 h-3.5" />
                 List

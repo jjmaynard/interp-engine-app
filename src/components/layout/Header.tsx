@@ -15,33 +15,22 @@ export function Header() {
       <div className="container mx-auto px-4 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 flex items-center justify-center bg-white/15 rounded-xl backdrop-blur-sm border border-white/20 shadow-lg">
-              <Image 
-                src="/usda-logo-white.png" 
-                alt="USDA Logo" 
-                width={42} 
-                height={42}
-                className="object-contain"
-              />
+            <div className="bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/20">
+              <div className="flex items-center gap-2">
+                <Image 
+                  src="/nrcs.png" 
+                  alt="USDA-NRCS" 
+                  width={24} 
+                  height={24}
+                  className="object-contain"
+                />
+                <span className="text-sm font-bold tracking-wider" style={{ color: 'var(--color-ocean-50)' }}>
+                  USDA-NRCS
+                </span>
+              </div>
             </div>
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="bg-white/10 backdrop-blur-sm rounded-full px-2.5 py-0.5 border border-white/20">
-                  <div className="flex items-center gap-1.5">
-                    <Image 
-                      src="/nrcs.png" 
-                      alt="NRCS" 
-                      width={14} 
-                      height={14}
-                      className="object-contain"
-                    />
-                    <span className="text-xs font-bold tracking-wider" style={{ color: 'var(--color-ocean-50)' }}>
-                      NRCS
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <h1 className="text-xl md:text-2xl font-bold tracking-tight" style={{ letterSpacing: '-0.01em' }}>
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight" style={{ letterSpacing: '-0.01em' }}>
                 Soil Interpretation Engine
               </h1>
             </div>
@@ -61,7 +50,7 @@ export function Header() {
                 e.currentTarget.style.color = 'var(--color-ocean-100)';
               }}
             >
-              Home
+              About
             </Link>
             <Link 
               href="/interpret" 

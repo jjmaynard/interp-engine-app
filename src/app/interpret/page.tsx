@@ -175,8 +175,11 @@ export default function InterpretPage() {
               className="rounded-2xl shadow-lg overflow-hidden"
               style={{ backgroundColor: '#FFFFFF', border: '1px solid var(--color-slate-200)' }}
             >
-              <div style={{ borderBottom: '1px solid var(--color-slate-200)' }}>
-                <nav className="flex -mb-px p-1" style={{ backgroundColor: 'var(--color-slate-50)' }}>
+              <div style={{ 
+                borderBottom: '1px solid var(--color-slate-200)',
+                background: 'linear-gradient(to bottom, var(--color-ocean-50), var(--color-sky-50))'
+              }}>
+                <nav className="flex -mb-px p-1">
                   <button
                     onClick={() => setActiveTab('properties')}
                     className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all ${
