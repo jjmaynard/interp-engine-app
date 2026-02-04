@@ -101,7 +101,7 @@ export function FuzzyCurvePlot({
   const interpolateValue = (x: number, points: { x: number; y: number }[], method: string, invert: boolean): number => {
     if (points.length === 0) return 0;
     
-    let y: number;
+    let y: number = 0; // Initialize to 0 to avoid TypeScript error
     
     // Apply appropriate interpolation method
     if (method.toLowerCase() === 'sigmoid') {
@@ -135,7 +135,6 @@ export function FuzzyCurvePlot({
             break;
           }
         }
-        if (y === undefined) y = 0;
       }
     }
     
