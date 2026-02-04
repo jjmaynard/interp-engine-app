@@ -222,6 +222,7 @@ export default function InterpretPage() {
                         interpretationName={selectedInterp}
                         evaluationResults={result?.evaluationResults}
                         finalRating={result?.rating}
+                        propertyValues={propertyValues}
                       />
                     ) : (
                       <div className="p-8 text-center text-gray-500">

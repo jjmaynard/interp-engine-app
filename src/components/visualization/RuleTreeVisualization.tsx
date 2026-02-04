@@ -19,6 +19,7 @@ interface RuleTreeVisualizationProps {
   interpretationName: string;
   evaluationResults?: Record<string, number>;
   finalRating?: number;
+  propertyValues?: Record<string, number | string | null>;
 }
 
 interface TreeNodeData {
@@ -223,6 +224,7 @@ export function RuleTreeVisualization({
   interpretationName,
   evaluationResults = {},
   finalRating,
+  propertyValues = {},
 }: RuleTreeVisualizationProps) {
   const [isExpanded, setIsExpanded] = useState(true); // Start expanded since it's in its own dedicated tab
   const [treeData, setTreeData] = useState<TreeNodeData[]>([]);
@@ -488,6 +490,7 @@ export function RuleTreeVisualization({
             tree={enrichedTree} 
             onNodeClick={(node: any) => setSelectedNode(node)}
             onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
+            propertyValues={propertyValues}
           />
         </div>
       )}

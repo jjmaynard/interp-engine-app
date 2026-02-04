@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Info, X } from 'lucide-react';
 import type { Property } from '@/types/interpretation';
 
 interface PropertyInputFormProps {
@@ -21,6 +22,7 @@ export function PropertyInputForm({
   const [internalValues, setInternalValues] = useState<Record<string, number | string | null>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [selectedPropertyDesc, setSelectedPropertyDesc] = useState<{ name: string; desc: string } | null>(null);
 
   // Use controlled values if provided, otherwise use internal state
   const values = externalValues || internalValues;
@@ -405,18 +407,30 @@ export function PropertyInputForm({
       <div className="space-y-4">
         {properties.map((property, index) => (
           <div key={property.propiid || index} className="space-y-2">
-            <label 
-              htmlFor={`prop-${property.propname}`}
-              className="block text-sm font-medium text-gray-700"
-            >
-              {property.propname}
-              {property.propuom && (
-                <span className="text-gray-500 ml-1 font-normal">
-                  ({property.propuom})
-                </span>
+            <div className="flex items-start justify-between gap-2">
+              <label 
+                htmlFor={`prop-${property.propname}`}
+                className="block text-sm font-medium text-gray-700"
+              >
+                {property.propname}
+                {property.propuom && (
+                  <span className="text-gray-500 ml-1 font-normal">
+                    ({property.propuom})
+                  </span>
+                )}
+                <span className="text-red-500 ml-1">*</span>
+              </label>
+              {property.propdesc && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedPropertyDesc({ name: property.propname, desc: property.propdesc! })}
+                  className="text-blue-600 hover:text-blue-800 transition-colors flex-shrink-0"
+                  title="View property description"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
               )}
-              <span className="text-red-500 ml-1">*</span>
-            </label>
+            </div>
 
             {/* Categorical property - dropdown */}
             {property.isCategorical && property.choices && property.choices.length > 0 ? (
@@ -541,6 +555,47 @@ export function PropertyInputForm({
       <div className="text-xs text-gray-500 text-center">
         <p>All fields marked with <span className="text-red-500">*</span> are required</p>
       </div>
+
+      {/* Property Description Modal */}
+      {selectedPropertyDesc && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          onClick={() => setSelectedPropertyDesc(null)}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {selectedPropertyDesc.name}
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedPropertyDesc(null)}
+                className="text-gray-400 hover:text-gray-600 transition-colors ml-4"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                {selectedPropertyDesc.desc}
+              </p>
+            </div>
+            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end">
+              <button
+                onClick={() => setSelectedPropertyDesc(null)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

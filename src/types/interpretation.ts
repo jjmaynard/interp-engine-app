@@ -46,6 +46,7 @@ export interface Property {
   propmod: string | null;
   propdefval?: string | null;
   dataafuse: boolean | null;
+  propdesc?: string | null; // Property description
   // Derived fields for UI
   choices?: string[]; // Valid choice values for categorical properties
   isCategorical?: boolean; // True if property has no unit (categorical/choice)

@@ -24,9 +24,10 @@ interface SankeyTreeDiagramProps {
   tree: any;
   onNodeClick?: (node: any) => void;
   onShowCurve?: (evaluation: any) => void;
+  propertyValues?: Record<string, number | string | null>;
 }
 
-export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve }: SankeyTreeDiagramProps) {
+export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve, propertyValues = {} }: SankeyTreeDiagramProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -374,11 +375,34 @@ export function SankeyTreeDiagram({ tree, onNodeClick, onShowCurve }: SankeyTree
                 rx={6}
                 opacity={0.9}
                 style={{ cursor: node.type === 'property' && (onNodeClick || onShowCurve) ? 'pointer' : 'default' }}
-                onClick={() => {
+                onClick={async () => {
                   if (node.type === 'property' && node.treeNode) {
-                    if (onShowCurve && node.treeNode.RefId) {
-                      // If it's an evaluation node, show the fuzzy curve
-                      onShowCurve(node.treeNode);
+                    const refId = node.treeNode.RefId || node.treeNode.rule_refid;
+                    if (onShowCurve && refId) {
+                      // Fetch evaluation data from API
+                      try {
+                        const response = await fetch(`/api/evaluations/${refId}`);
+                        const data = await response.json();
+                        if (data.success && data.data) {
+                          // Get the property value from propertyValues using propname
+                          const propname = data.data.propname;
+                          const inputValue = propertyValues[propname] !== undefined && propertyValues[propname] !== null 
+                            ? Number(propertyValues[propname]) 
+                            : 0;
+                          const outputValue = node.value;
+                          
+                          console.log('[SankeyClick] Property:', propname, 'Input:', inputValue, 'Output:', outputValue);
+                          
+                          // Call onShowCurve with complete evaluation data
+                          onShowCurve({
+                            ...data.data,
+                            inputValue,
+                            outputValue,
+                          });
+                        }
+                      } catch (error) {
+                        console.error('Failed to load evaluation data:', error);
+                      }
                     } else if (onNodeClick) {
                       // Otherwise show branch analysis
                       onNodeClick(node.treeNode);
