@@ -158,6 +158,30 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose, evaluationData
             </div>
           </div>
           
+          {/* Fuzzy Membership Curve - only show if evaluation data is available */}
+          {evaluationData && evaluationData.Points && evaluationData.Points.length > 0 && (
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-purple-600" />
+                Fuzzy Membership Curve
+              </h3>
+              <div className="bg-white rounded-lg p-4">
+                <FuzzyCurvePlot
+                  points={evaluationData.Points || []}
+                  interpolation={evaluationData.Interpolation || 'linear'}
+                  inputValue={evaluationData.inputValue || 0}
+                  outputValue={evaluationData.outputValue || 0}
+                  title={evaluationData.Property || 'Evaluation'}
+                  propertyName={evaluationData.Property}
+                  invert={evaluationData.Invert || false}
+                  propertyId={evaluationData.propiid}
+                  evaluationId={evaluationData.evaliid}
+                  evaluationDesc={evaluationData.evaldesc}
+                />
+              </div>
+            </div>
+          )}
+          
           {/* Path to Root */}
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -263,30 +287,6 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose, evaluationData
               )}
             </div>
           </div>
-          
-          {/* Fuzzy Membership Curve - only show if evaluation data is available */}
-          {evaluationData && evaluationData.Points && evaluationData.Points.length > 0 && (
-            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
-                Fuzzy Membership Curve
-              </h3>
-              <div className="bg-white rounded-lg p-4">
-                <FuzzyCurvePlot
-                  points={evaluationData.Points || []}
-                  interpolation={evaluationData.Interpolation || 'linear'}
-                  inputValue={evaluationData.inputValue || 0}
-                  outputValue={evaluationData.outputValue || 0}
-                  title={evaluationData.Property || 'Evaluation'}
-                  propertyName={evaluationData.Property}
-                  invert={evaluationData.Invert || false}
-                  propertyId={evaluationData.propiid}
-                  evaluationId={evaluationData.evaliid}
-                  evaluationDesc={evaluationData.evaldesc}
-                />
-              </div>
-            </div>
-          )}
         </div>
         
         {/* Footer */}
