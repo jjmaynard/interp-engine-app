@@ -22,8 +22,9 @@ import { Maximize2, Minimize2, Eye, TrendingUp } from 'lucide-react';
 
 interface InteractiveSankeyDiagramProps {
   tree: any;
-  onNodeClick?: (node: any) => void;
+  onNodeClick?: (node: any, evaluationData?: any) => void;
   onShowCurve?: (evaluation: any) => void;
+  propertyValues?: Record<string, number | string | null>;
 }
 
 // Custom node component with Sankey-style appearance
@@ -142,7 +143,7 @@ const nodeTypes: NodeTypes = {
   sankeyNode: SankeyNode,
 };
 
-function InteractiveSankeyFlow({ tree, onNodeClick, onShowCurve }: InteractiveSankeyDiagramProps) {
+function InteractiveSankeyFlow({ tree, onNodeClick, onShowCurve, propertyValues = {} }: InteractiveSankeyDiagramProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   
   // Convert tree to React Flow nodes and edges
@@ -270,11 +271,43 @@ function InteractiveSankeyFlow({ tree, onNodeClick, onShowCurve }: InteractiveSa
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   
-  const onNodeClickHandler = useCallback((event: React.MouseEvent, node: Node) => {
+  const onNodeClickHandler = useCallback(async (event: React.MouseEvent, node: Node) => {
     if (onNodeClick) {
-      onNodeClick(node.data.node);
+      const treeNode = node.data.node;
+      const refId = treeNode.RefId || treeNode.rule_refid;
+      
+      if (refId) {
+        // For evaluation nodes, fetch evaluation data
+        try {
+          const response = await fetch(`/api/evaluations/${refId}`);
+          const data = await response.json();
+          
+          if (data.success && data.data) {
+            const propname = data.data.propname;
+            const inputValue = propertyValues[propname] !== undefined && propertyValues[propname] !== null 
+              ? Number(propertyValues[propname]) 
+              : 0;
+            const outputValue = node.data.rating || 0;
+            
+            const evaluationData = {
+              ...data.data,
+              inputValue,
+              outputValue,
+            };
+            
+            onNodeClick(treeNode, evaluationData);
+          } else {
+            onNodeClick(treeNode);
+          }
+        } catch (error) {
+          console.error('Failed to load evaluation data:', error);
+          onNodeClick(treeNode);
+        }
+      } else {
+        onNodeClick(treeNode);
+      }
     }
-  }, [onNodeClick]);
+  }, [onNodeClick, propertyValues]);
   
   const renderContent = () => (
     <div className={`${

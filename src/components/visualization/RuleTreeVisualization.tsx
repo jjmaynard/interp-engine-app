@@ -407,11 +407,11 @@ export function RuleTreeVisualization({
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4 text-white">
+      <div className="bg-gradient-to-r from-earth-700 to-earth-800 px-6 py-4 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-bold">Rule Tree Visualization</h3>
-            <p className="text-sm text-purple-100 mt-1">
+            <p className="text-sm text-earth-100 mt-1">
               {interpretationName}
             </p>
           </div>
@@ -422,7 +422,7 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('sankey')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'sankey' 
-                    ? 'bg-white text-purple-700 shadow-sm' 
+                    ? 'bg-white text-earth-700 shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
               >
@@ -433,7 +433,7 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('interactive-sankey')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'interactive-sankey' 
-                    ? 'bg-white text-purple-700 shadow-sm' 
+                    ? 'bg-white text-earth-700 shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
               >
@@ -444,7 +444,7 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('horizontal')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'horizontal' 
-                    ? 'bg-white text-purple-700 shadow-sm' 
+                    ? 'bg-white text-earth-700 shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
               >
@@ -455,7 +455,7 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('sunburst')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'sunburst' 
-                    ? 'bg-white text-purple-700 shadow-sm' 
+                    ? 'bg-white text-earth-700 shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
               >
@@ -466,7 +466,7 @@ export function RuleTreeVisualization({
                 onClick={() => setViewMode('list')}
                 className={`px-2 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 ${
                   viewMode === 'list' 
-                    ? 'bg-white text-purple-700 shadow-sm' 
+                    ? 'bg-white text-earth-700 shadow-sm' 
                     : 'text-white hover:bg-white/20'
                 }`}
               >
