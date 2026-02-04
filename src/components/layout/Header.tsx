@@ -6,18 +6,18 @@ export function Header() {
     <header className="bg-blue-900 text-white shadow-lg">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 flex items-center justify-center">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 flex items-center justify-center">
               <Image 
                 src="/usda-logo-white.png" 
                 alt="USDA Logo" 
-                width={40} 
-                height={40}
+                width={64} 
+                height={64}
                 className="object-contain"
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold">NRCS Soil Interpretation Engine</h1>
+              <h1 className="text-2xl font-bold">NRCS Soil Interpretation Engine</h1>
             </div>
           </div>
           
