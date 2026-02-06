@@ -169,8 +169,8 @@ export function BranchAnalysis({ selectedNode, rootNode, onClose, evaluationData
                 <FuzzyCurvePlot
                   points={evaluationData.Points || []}
                   interpolation={evaluationData.Interpolation || 'linear'}
-                  inputValue={evaluationData.inputValue || 0}
-                  outputValue={evaluationData.outputValue || 0}
+                  inputValue={evaluationData.inputValue ?? NaN}
+                  outputValue={evaluationData.outputValue ?? 0}
                   title={evaluationData.Property || 'Evaluation'}
                   propertyName={evaluationData.Property}
                   invert={evaluationData.Invert || false}

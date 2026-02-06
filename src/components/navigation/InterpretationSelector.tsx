@@ -59,6 +59,9 @@ export function InterpretationSelector({
     async function loadInterpretations() {
       try {
         const response = await fetch('/api/interpret');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         
         if (data.success) {

@@ -39,6 +39,9 @@ export default function InterpretPage() {
       
       try {
         const response = await fetch(`/api/interpret/${encodeURIComponent(selectedInterp)}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         
         if (data.success && data.data.properties) {
@@ -76,7 +79,7 @@ export default function InterpretPage() {
     
     try {
       const response = await fetch(
-        `/api/interpret/${encodeURIComponent(selectedInterp)}/evaluate`,
+        `/api/interpret/${encodeURIComponent(selectedInterp)}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -85,6 +88,10 @@ export default function InterpretPage() {
       );
       
       console.log('[Client] Response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
       const data = await response.json();
       

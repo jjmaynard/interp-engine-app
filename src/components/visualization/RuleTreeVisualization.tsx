@@ -518,6 +518,7 @@ export function RuleTreeVisualization({
               setSelectedNodeEvaluationData(evalData || null);
             }}
             onShowCurve={(evaluation: any) => setSelectedEvaluation(evaluation)}
+            propertyValues={propertyValues}
           />
         </div>
       )}
@@ -620,8 +621,8 @@ export function RuleTreeVisualization({
             <FuzzyCurvePlot
               points={selectedEvaluation.Points || []}
               interpolation={selectedEvaluation.Interpolation || 'linear'}
-              inputValue={selectedEvaluation.inputValue || 0}
-              outputValue={selectedEvaluation.outputValue || 0}
+              inputValue={selectedEvaluation.inputValue ?? NaN}
+              outputValue={selectedEvaluation.outputValue ?? 0}
               title={selectedEvaluation.Property || 'Evaluation'}
               propertyName={selectedEvaluation.Property}
               invert={selectedEvaluation.Invert || false}

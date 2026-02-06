@@ -280,19 +280,45 @@ function InteractiveSankeyFlow({ tree, onNodeClick, onShowCurve, propertyValues 
         // For evaluation nodes, fetch evaluation data
         try {
           const response = await fetch(`/api/evaluations/${refId}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
           const data = await response.json();
           
           if (data.success && data.data) {
             const propname = data.data.propname;
-            const inputValue = propertyValues[propname] !== undefined && propertyValues[propname] !== null 
-              ? Number(propertyValues[propname]) 
-              : 0;
+            
+            // Try exact match first, then case-insensitive match
+            let propertyValue = propertyValues[propname];
+            if (propertyValue === undefined || propertyValue === null) {
+              // Try finding by case-insensitive match
+              const propKey = Object.keys(propertyValues).find(
+                key => key.toLowerCase() === propname.toLowerCase()
+              );
+              if (propKey) {
+                propertyValue = propertyValues[propKey];
+              }
+            }
+            
+            console.log('[InteractiveSankey] Property lookup:', {
+              propname,
+              propertyValue,
+              allPropertyKeys: Object.keys(propertyValues),
+              nodeRating: node.data.rating
+            });
+            
+            // Only show fuzzy curve if we have a valid input value
+            // Don't default to 0 - that creates misleading visualizations
+            const hasValidInput = propertyValue !== undefined && propertyValue !== null && propertyValue !== '';
+            const inputValue = hasValidInput ? Number(propertyValue) : NaN;
             const outputValue = node.data.rating || 0;
             
             const evaluationData = {
               ...data.data,
               inputValue,
               outputValue,
+              propertyValue,
+              hasValidInput,
             };
             
             onNodeClick(treeNode, evaluationData);
