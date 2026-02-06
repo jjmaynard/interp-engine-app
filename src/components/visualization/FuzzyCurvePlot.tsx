@@ -37,8 +37,18 @@ export function FuzzyCurvePlot({
     outputValue,
     title,
     propertyName,
-    invert
+    invert,
+    isValidInput: !isNaN(inputValue),
+    inputValueType: typeof inputValue,
+    inputValueActual: inputValue
   });
+  
+  // Check if input value is missing/invalid
+  const hasInvalidInput = isNaN(inputValue);
+  
+  if (hasInvalidInput) {
+    console.warn('[FuzzyCurvePlot] Missing input value for property:', propertyName);
+  }
   
   // Interpolation helper functions
   // CVIR S-curve (piecewise quadratic sigmoid) - matches NASIS implementation
@@ -197,16 +207,18 @@ export function FuzzyCurvePlot({
       });
     });
     
-    // Add input point
-    curvePoints.push({
-      x: inputValue,
-      y: outputValue,
-      isOriginal: false,
-      isInput: true
-    });
+    // Add input point only if it's valid (not NaN/missing)
+    if (!hasInvalidInput) {
+      curvePoints.push({
+        x: inputValue,
+        y: outputValue,
+        isOriginal: false,
+        isInput: true
+      });
+    }
     
     return curvePoints.sort((a, b) => a.x - b.x);
-  }, [points, interpolation, inputValue, outputValue, invert]);
+  }, [points, interpolation, inputValue, outputValue, invert, hasInvalidInput]);
   
   const CustomDot = (props: any) => {
     const { cx, cy, payload } = props;
@@ -247,6 +259,20 @@ export function FuzzyCurvePlot({
   
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
+      {hasInvalidInput && (
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center gap-2 text-yellow-800">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <p className="font-semibold">Missing Property Value</p>
+              <p className="text-sm mt-1">The property value for <span className="font-mono">{propertyName}</span> was not provided. The output rating shown ({(outputValue * 100).toFixed(1)}%) may be a default value or based on other factors.</p>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
@@ -256,7 +282,9 @@ export function FuzzyCurvePlot({
           </div>
           <div className="flex items-center gap-2">
             <span>Input:</span>
-            <span className="font-mono bg-blue-50 px-2 py-1 rounded text-blue-700">{inputValue.toFixed(2)}</span>
+            <span className={`font-mono px-2 py-1 rounded ${hasInvalidInput ? 'bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700'}`}>
+              {hasInvalidInput ? 'N/A (missing)' : inputValue.toFixed(2)}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <span>Output:</span>
