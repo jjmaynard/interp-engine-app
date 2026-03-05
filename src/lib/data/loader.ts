@@ -11,8 +11,8 @@ import {
 } from '@/types/interpretation';
 
 // Import JSON data files
-// Using primary_interpretation_trees.json with complete NASIS database (2,111+ interpretations)
-import interpretationTreesData from '@/data/primary_interpretation_trees.json';
+// Using interpretation_trees.json with complete NASIS database (2,111+ interpretations)
+import interpretationTreesData from '@/data/interpretation_trees.json';
 import evaluationsData from '@/data/evaluations.json';
 import propertiesData from '@/data/properties_enhanced.json';
 

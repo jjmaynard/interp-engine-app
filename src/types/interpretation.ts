@@ -101,7 +101,7 @@ export interface InterpretationTree {
 export interface InterpretationResult {
   rating: number; // 0-1 fuzzy value
   ratingClass: 'not rated' | 'slight' | 'moderate' | 'severe' | 'very severe';
-  propertyValues: Record<string, number | string | null>;
+  propertyValues: Record<string, number | string | null | PropertyValue>;
   evaluationResults: Record<string, number>;
   timestamp: Date;
 }
@@ -131,6 +131,28 @@ export type FuzzyHedge = 'not' | 'limit' | 'multiply' | 'null_or' | 'not_null_an
 export type InterpolationType = 'linear' | 'spline' | 'step';
 
 /**
- * Property value type (can be numeric, text, or null)
+ * Property value status - semantic clarity for null values
  */
-export type PropertyValue = number | string | null;
+export type PropertyStatus = 'present' | 'not_applicable' | 'missing';
+
+/**
+ * Property value confidence level
+ */
+export type PropertyConfidence = 'high' | 'medium' | 'low';
+
+/**
+ * Enhanced property value with semantic status
+ * Distinguishes between "not applicable" and "missing data"
+ */
+export interface PropertyValue {
+  value: number | string | null;
+  status: PropertyStatus;
+  confidence?: PropertyConfidence;
+  source?: string;
+  metadata?: Record<string, any>;
+}
+
+/**
+ * Simple property value type (backward compatibility)
+ */
+export type SimplePropertyValue = number | string | null;

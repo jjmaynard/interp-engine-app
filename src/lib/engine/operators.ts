@@ -7,20 +7,57 @@
  * All operators work with fuzzy membership values [0, 1]
  */
 
+import type { PropertyValue } from '@/types/interpretation';
+
+/**
+ * Process a value that may be a number or PropertyValue object
+ * Returns a numeric fuzzy rating based on status:
+ * - present: use the value
+ * - not_applicable: return 1.0 (neutral, don't penalize)
+ * - missing: return NaN (exclude from calculation)
+ */
+function processValue(v: number | PropertyValue): number {
+  if (typeof v === 'number') return v;
+  
+  if (!v || typeof v !== 'object') return NaN;
+  
+  // Handle PropertyValue objects
+  if (v.status === 'not_applicable') {
+    // Property doesn't apply - return neutral value (1.0)
+    // This prevents unfair penalization in interpretations
+    return 1.0;
+  }
+  
+  if (v.status === 'missing') {
+    // Data is missing - exclude from calculation
+    return NaN;
+  }
+  
+  if (v.status === 'present' && v.value !== null && v.value !== undefined) {
+    // Property has a valid value - use it
+    return typeof v.value === 'number' ? v.value : NaN;
+  }
+  
+  return NaN;
+}
+
 /**
  * Fuzzy AND (minimum operator)
  * 
  * Returns the minimum value from all inputs
  * Represents the intersection of fuzzy sets
  * 
- * @param values - Array of fuzzy membership values
+ * @param values - Array of fuzzy membership values or PropertyValue objects
  * @returns Minimum value [0, 1]
  */
-export function fuzzyAnd(values: number[]): number {
+export function fuzzyAnd(values: Array<number | PropertyValue>): number {
   if (values.length === 0) return 0;
   
+  // Process values (handles PropertyValue objects with status)
+  const processedValues = values.map(processValue);
+  
   // Filter out NaN values
-  const validValues = values.filter(v => !isNaN(v));
+  const validValues = processedValues.filter(v => !isNaN(v));
   if (validValues.length === 0) return NaN;
   
   return Math.min(...validValues);
@@ -32,14 +69,17 @@ export function fuzzyAnd(values: number[]): number {
  * Returns the maximum value from all inputs
  * Represents the union of fuzzy sets
  * 
- * @param values - Array of fuzzy membership values
+ * @param values - Array of fuzzy membership values or PropertyValue objects
  * @returns Maximum value [0, 1]
  */
-export function fuzzyOr(values: number[]): number {
+export function fuzzyOr(values: Array<number | PropertyValue>): number {
   if (values.length === 0) return 0;
   
+  // Process values (handles PropertyValue objects with status)
+  const processedValues = values.map(processValue);
+  
   // Filter out NaN values
-  const validValues = values.filter(v => !isNaN(v));
+  const validValues = processedValues.filter(v => !isNaN(v));
   if (validValues.length === 0) return NaN;
   
   return Math.max(...validValues);
@@ -51,14 +91,17 @@ export function fuzzyOr(values: number[]): number {
  * Returns the product of all input values
  * More sensitive to low values than fuzzy AND
  * 
- * @param values - Array of fuzzy membership values
+ * @param values - Array of fuzzy membership values or PropertyValue objects
  * @returns Product [0, 1]
  */
-export function fuzzyProduct(values: number[]): number {
+export function fuzzyProduct(values: Array<number | PropertyValue>): number {
   if (values.length === 0) return 0;
   
+  // Process values (handles PropertyValue objects with status)
+  const processedValues = values.map(processValue);
+  
   // Filter out NaN values
-  const validValues = values.filter(v => !isNaN(v));
+  const validValues = processedValues.filter(v => !isNaN(v));
   if (validValues.length === 0) return NaN;
   
   return validValues.reduce((product, value) => product * value, 1);
@@ -70,14 +113,17 @@ export function fuzzyProduct(values: number[]): number {
  * Returns the algebraic sum: 1 - product(1 - x_i)
  * More sensitive to high values than fuzzy OR
  * 
- * @param values - Array of fuzzy membership values
+ * @param values - Array of fuzzy membership values or PropertyValue objects
  * @returns Sum [0, 1]
  */
-export function fuzzySum(values: number[]): number {
+export function fuzzySum(values: Array<number | PropertyValue>): number {
   if (values.length === 0) return 0;
   
+  // Process values (handles PropertyValue objects with status)
+  const processedValues = values.map(processValue);
+  
   // Filter out NaN values
-  const validValues = values.filter(v => !isNaN(v));
+  const validValues = processedValues.filter(v => !isNaN(v));
   if (validValues.length === 0) return NaN;
   
   // 1 - product(1 - x_i)
@@ -91,14 +137,17 @@ export function fuzzySum(values: number[]): number {
  * Returns max(0, sum(x_i) - (n-1))
  * where n is the number of values
  * 
- * @param values - Array of fuzzy membership values
+ * @param values - Array of fuzzy membership values or PropertyValue objects
  * @returns Bounded product [0, 1]
  */
-export function fuzzyTimes(values: number[]): number {
+export function fuzzyTimes(values: Array<number | PropertyValue>): number {
   if (values.length === 0) return 0;
   
+  // Process values (handles PropertyValue objects with status)
+  const processedValues = values.map(processValue);
+  
   // Filter out NaN values
-  const validValues = values.filter(v => !isNaN(v));
+  const validValues = processedValues.filter(v => !isNaN(v));
   if (validValues.length === 0) return NaN;
   
   const sum = validValues.reduce((acc, value) => acc + value, 0);
@@ -114,12 +163,13 @@ export function fuzzyTimes(values: number[]): number {
  */
 export function applyOperator(
   operator: string,
-  values: number[]
+  values: Array<number | PropertyValue>
 ): number {
   const op = operator.toUpperCase();
   
-  // Filter NaN values for most operators
-  const validValues = values.filter(v => !isNaN(v));
+  // Process and filter NaN values for most operators
+  const processedValues = values.map(processValue);
+  const validValues = processedValues.filter(v => !isNaN(v));
   
   switch (op) {
     case 'AND':

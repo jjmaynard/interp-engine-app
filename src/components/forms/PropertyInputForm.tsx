@@ -2,35 +2,120 @@
 
 import { useState, useEffect } from 'react';
 import { Info, X } from 'lucide-react';
-import type { Property } from '@/types/interpretation';
+import type { Property, PropertyValue } from '@/types/interpretation';
 
 interface PropertyInputFormProps {
   properties: Property[];
-  onSubmit: (values: Record<string, number | string | null>) => void;
+  onSubmit: (values: Record<string, number | string | null | PropertyValue>) => void;
   loading?: boolean;
-  values?: Record<string, number | string | null>;
-  onValuesChange?: (values: Record<string, number | string | null>) => void;
+  values?: Record<string, number | string | null | PropertyValue>;
+  onValuesChange?: (values: Record<string, number | string | null | PropertyValue>) => void;
+  allowNullValues?: boolean; // Allow null values (e.g., from SSURGO data)
 }
 
-export function PropertyInputForm({ 
-  properties, 
+export function PropertyInputForm({
+  properties,
   onSubmit,
   loading = false,
   values: externalValues,
-  onValuesChange
+  onValuesChange,
+  allowNullValues = false
 }: PropertyInputFormProps) {
-  const [internalValues, setInternalValues] = useState<Record<string, number | string | null>>({});
+  const [internalValues, setInternalValues] = useState<Record<string, number | string | null | PropertyValue>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [selectedPropertyDesc, setSelectedPropertyDesc] = useState<{ name: string; desc: string } | null>(null);
+  const [selectedPropertyDesc, setSelectedPropertyDesc] = useState<{ name: string; desc: string; id?: number } | null>(null);
+
+  // Log allowNullValues for debugging
+  console.log(`[PropertyInputForm] Rendered with allowNullValues=${allowNullValues}`);
 
   // Use controlled values if provided, otherwise use internal state
   const values = externalValues || internalValues;
 
+  // Helper to extract display value from PropertyValue object or simple value
+  const getDisplayValue = (value: number | string | null | PropertyValue): number | string | null => {
+    if (value && typeof value === 'object' && 'value' in value) {
+      return value.value;
+    }
+    return value as number | string | null;
+  };
+
+  const normalizeChoiceText = (input: string): string => {
+    return input
+      .toLowerCase()
+      .replace(/[“”]/g, '"')
+      .replace(/[’]/g, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  const wildcardChoiceMatches = (choice: string, actual: string): boolean => {
+    if (!choice.includes('*')) return false;
+
+    const escaped = choice
+      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/\\\*/g, '.*');
+
+    const regex = new RegExp(`^${escaped}$`);
+    return regex.test(actual);
+  };
+
+  const resolveCategoricalDisplayValue = (
+    property: Property,
+    value: number | string | null | PropertyValue
+  ): string => {
+    const actual = getDisplayValue(value);
+    if (typeof actual !== 'string' || !property.choices || property.choices.length === 0) {
+      return (actual as string) ?? '';
+    }
+
+    if (actual === '__NOT_APPLICABLE__' || actual === '__MISSING__') {
+      return actual;
+    }
+
+    const normalizedActual = normalizeChoiceText(actual);
+
+    // First check if the value matches a real dropdown choice (exact or normalized).
+    // If it does, return that choice directly — never remap a valid option to __NOT_APPLICABLE__.
+    const exact = property.choices.find(choice => choice === actual);
+    if (exact) return exact;
+
+    const normalizedMatch = property.choices.find(
+      choice => normalizeChoiceText(choice) === normalizedActual
+    );
+
+    if (normalizedMatch) return normalizedMatch;
+
+    const wildcardMatch = property.choices.find(choice =>
+      wildcardChoiceMatches(normalizeChoiceText(choice), normalizedActual)
+    );
+
+    if (wildcardMatch) return wildcardMatch;
+
+    // Only remap to __NOT_APPLICABLE__ when no dropdown choice matched AND the value
+    // semantically means "not applicable / not present / none".
+    if (
+      allowNullValues &&
+      ['none', 'not applicable', 'not_applicable', 'not present', 'n/a', 'na'].includes(normalizedActual)
+    ) {
+      return '__NOT_APPLICABLE__';
+    }
+
+    return actual;
+  };
+
+  // Helper to get status from value
+  const getValueStatus = (value: number | string | null | PropertyValue): string | null => {
+    if (value && typeof value === 'object' && 'status' in value) {
+      return value.status;
+    }
+    return null;
+  };
+
   // Initialize values only if using internal state
   useEffect(() => {
     if (!externalValues) {
-      const initialValues: Record<string, number | string | null> = {};
+      const initialValues: Record<string, number | string | null | PropertyValue> = {};
       properties.forEach(prop => {
         initialValues[prop.propname] = null;
       });
@@ -40,15 +125,41 @@ export function PropertyInputForm({
     setTouched({});
   }, [properties, externalValues]);
 
-  const validateField = (propname: string, value: number | string | null, property: Property): string => {
-    if (value === null || value === undefined || value === '') {
+  const validateField = (propname: string, value: number | string | null | PropertyValue, property: Property): string => {
+    // Extract actual value from PropertyValue object if needed
+    const actualValue = getDisplayValue(value);
+    
+    // Allow null values if explicitly permitted (e.g., from SSURGO data)
+    if ((actualValue === null || actualValue === undefined || actualValue === '') && allowNullValues) {
+      return ''; // Null is valid when allowNullValues is true
+    }
+
+    if (actualValue === null || actualValue === undefined || actualValue === '') {
       return 'This field is required';
     }
 
+    // Detect categorical properties (even if not explicitly marked)
+    const uom = property.propuom?.toLowerCase().trim();
+    const isCategorical = property.isCategorical ||
+                          !uom ||
+                          uom === '' ||
+                          uom === 'null' ||
+                          uom === 'code' ||
+                          uom === 'choice' ||
+                          uom === 'class';
+
     // Categorical property validation
-    if (property.isCategorical) {
+    if (isCategorical) {
+      // In SSURGO mode (allowNullValues=true), trust SSURGO categorical values
+      // even if they're not in our choices list (e.g., "pf", "none")
+      if (allowNullValues) {
+        console.log(`[PropertyInputForm] Skipping choice validation for ${propname} (allowNullValues=true, value="${actualValue}")`);
+        return ''; // Trust SSURGO values in auto-fetch mode
+      }
+
       if (property.choices && property.choices.length > 0) {
-        if (typeof value === 'string' && !property.choices.includes(value)) {
+        if (typeof actualValue === 'string' && !property.choices.includes(actualValue)) {
+          console.log(`[PropertyInputForm] Invalid choice for ${propname}: "${actualValue}" not in [${property.choices.join(', ')}]`);
           return `Invalid choice`;
         }
       }
@@ -56,8 +167,8 @@ export function PropertyInputForm({
     }
 
     // Numeric property validation
-    const numValue = typeof value === 'number' ? value : parseFloat(String(value));
-    
+    const numValue = typeof actualValue === 'number' ? actualValue : parseFloat(String(actualValue));
+
     if (isNaN(numValue)) {
       return 'Please enter a valid number';
     }
@@ -424,7 +535,7 @@ export function PropertyInputForm({
               {property.propdesc && (
                 <button
                   type="button"
-                  onClick={() => setSelectedPropertyDesc({ name: property.propname, desc: property.propdesc! })}
+                  onClick={() => setSelectedPropertyDesc({ name: property.propname, desc: property.propdesc!, id: property.propiid })}
                   className="transition-all flex-shrink-0 rounded-lg p-1.5 backdrop-blur-sm"
                   style={{ 
                     backgroundColor: 'var(--color-lavender-100)',
@@ -447,47 +558,89 @@ export function PropertyInputForm({
 
             {/* Categorical property - dropdown */}
             {property.isCategorical && property.choices && property.choices.length > 0 ? (
-              <select
-                id={`prop-${property.propname}`}
-                value={values[property.propname] ?? ''}
-                onChange={(e) => handleChange(property.propname, e.target.value, property)}
-                onBlur={() => handleBlur(property.propname, property)}
-                disabled={loading}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 transition-colors ${
-                  errors[property.propname] && touched[property.propname]
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                } ${loading ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
-              >
-                <option value="">Select {property.propname}</option>
-                {property.choices.map(choice => (
-                  <option key={choice} value={choice}>
-                    {choice}
+              <>
+                <select
+                  id={`prop-${property.propname}`}
+                  value={resolveCategoricalDisplayValue(property, values[property.propname])}
+                  onChange={(e) => handleChange(property.propname, e.target.value, property)}
+                  onBlur={() => handleBlur(property.propname, property)}
+                  disabled={loading}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 transition-colors ${
+                    errors[property.propname] && touched[property.propname]
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                  } ${loading ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                >
+                  <option value="">
+                    {allowNullValues ? 'Select a value...' : `Select ${property.propname}`}
                   </option>
-                ))}
-              </select>
+                  {allowNullValues && (
+                    <>
+                      <option value="__NOT_APPLICABLE__" style={{ color: 'var(--color-slate-600)' }}>
+                        ⊘ Not Applicable / Not Present
+                      </option>
+                      <option value="__MISSING__" style={{ color: 'var(--color-slate-600)' }}>
+                        ? Data Missing / Unknown
+                      </option>
+                    </>
+                  )}
+                  {property.choices.map(choice => (
+                    <option key={choice} value={choice}>
+                      {choice}
+                    </option>
+                  ))}
+                </select>
+                {getValueStatus(values[property.propname]) && (
+                  <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+                    getValueStatus(values[property.propname]) === 'present' 
+                      ? 'bg-green-100 text-green-700'
+                      : getValueStatus(values[property.propname]) === 'not_applicable'
+                      ? 'bg-slate-100 text-slate-600'
+                      : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {getValueStatus(values[property.propname]) === 'present' && '✓ Present'}
+                    {getValueStatus(values[property.propname]) === 'not_applicable' && '⊘ N/A'}
+                    {getValueStatus(values[property.propname]) === 'missing' && '? Missing'}
+                  </span>
+                )}
+              </>
             ) : (
               /* Numeric property - number input */
-              <input
-                id={`prop-${property.propname}`}
-                type="number"
-                step="any"
-                value={values[property.propname] ?? ''}
-                onChange={(e) => handleChange(property.propname, e.target.value, property)}
-                onBlur={() => handleBlur(property.propname, property)}
-                disabled={loading}
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 transition-colors ${
-                  errors[property.propname] && touched[property.propname]
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                } ${loading ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
-                placeholder={
-                  property.propmin !== null && property.propmin !== undefined && 
-                  property.propmax !== null && property.propmax !== undefined
-                    ? `${property.propmin} - ${property.propmax}`
-                    : 'Enter value'
-                }
-              />
+              <>
+                <input
+                  id={`prop-${property.propname}`}
+                  type="number"
+                  step="any"
+                  value={getDisplayValue(values[property.propname]) ?? ''}
+                  onChange={(e) => handleChange(property.propname, e.target.value, property)}
+                  onBlur={() => handleBlur(property.propname, property)}
+                  disabled={loading}
+                  className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 transition-colors ${
+                    errors[property.propname] && touched[property.propname]
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                  } ${loading ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                  placeholder={
+                    property.propmin !== null && property.propmin !== undefined && 
+                    property.propmax !== null && property.propmax !== undefined
+                      ? `${property.propmin} - ${property.propmax}`
+                      : 'Enter value'
+                  }
+                />
+                {getValueStatus(values[property.propname]) && (
+                  <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+                    getValueStatus(values[property.propname]) === 'present' 
+                      ? 'bg-green-100 text-green-700'
+                      : getValueStatus(values[property.propname]) === 'not_applicable'
+                      ? 'bg-slate-100 text-slate-600'
+                      : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {getValueStatus(values[property.propname]) === 'present' && '✓ Present'}
+                    {getValueStatus(values[property.propname]) === 'not_applicable' && '⊘ N/A'}
+                    {getValueStatus(values[property.propname]) === 'missing' && '? Missing'}
+                  </span>
+                )}
+              </>
             )}
 
             {/* Hints and validation messages */}
@@ -615,6 +768,11 @@ export function PropertyInputForm({
                 <p className="text-sm font-medium" style={{ color: 'var(--color-lavender-100)' }}>
                   {selectedPropertyDesc.name}
                 </p>
+                {selectedPropertyDesc.id && (
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-lavender-200)' }}>
+                    Property ID: {selectedPropertyDesc.id}
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => setSelectedPropertyDesc(null)}

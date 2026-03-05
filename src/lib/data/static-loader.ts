@@ -52,7 +52,7 @@ export function loadInterpretationTrees(): InterpretationTree[] {
     return interpretationsCache;
   }
   
-  const filePath = path.join(process.cwd(), 'src', 'data', 'primary_interpretation_trees.json');
+  const filePath = path.join(process.cwd(), 'src', 'data', 'interpretation_trees.json');
   const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   
   // Load properties and evaluations for enrichment

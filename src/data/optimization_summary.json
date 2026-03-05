@@ -1,5 +1,5 @@
 {
-  "analysis_date": "2026-01-28 15:45:48",
+  "analysis_date": "2026-02-09 16:54:22",
   "data_summary": {
     "total_interpretations": 2113,
     "successful_interpretations": 2111,
@@ -7,6 +7,73 @@
     "total_properties": 8096,
     "properties_with_sql": 8050,
     "properties_without_sql": 46
+  },
+  "dependencies": {
+    "properties_with_dependencies": 2729,
+    "total_dependency_relationships": 5083,
+    "max_dependency_depth": 6,
+    "properties_with_unresolved_deps": 32,
+    "dependency_depth_distribution": {
+      "0": 5367,
+      "1": 1108,
+      "2": 297,
+      "3": 846,
+      "4": 221,
+      "5": 242,
+      "6": 15
+    },
+    "most_depended_upon": [
+      {
+        "propiid": 10346,
+        "propname": "THICKNESS OF SURFACE ORGANIC HORIZON",
+        "used_by_count": 744
+      },
+      {
+        "propiid": 13834,
+        "propname": "DEPTH TO FIRST STR/VSTR CEMENTED BELOW ORGANIC LAYER",
+        "used_by_count": 590
+      },
+      {
+        "propiid": 13835,
+        "propname": "LAYER THICKNESS IN RANGE; ABOVE VSTR RESTRICT BELOW O",
+        "used_by_count": 511
+      },
+      {
+        "propiid": 116,
+        "propname": "DEPTH TO FIRST RESTRICTIVE LAYER",
+        "used_by_count": 284
+      },
+      {
+        "propiid": 11866,
+        "propname": "SURFACE ORGANIC HORIZON THICKNESS",
+        "used_by_count": 276
+      },
+      {
+        "propiid": 10181,
+        "propname": "LAYER THICKNESS IN RANGE; ABOVE A RESTRICTIVE LAYER",
+        "used_by_count": 219
+      },
+      {
+        "propiid": 1190,
+        "propname": "DEPTH TO FIRST RESTRICTION BELOW ORGANIC LAYER",
+        "used_by_count": 160
+      },
+      {
+        "propiid": 13558,
+        "propname": "SURFACE ORGANIC HORIZON THICKNESS, NOT HISTOSOL",
+        "used_by_count": 84
+      },
+      {
+        "propiid": 17007,
+        "propname": "SURFACE ORGANIC DUFF HORIZON THICKNESS",
+        "used_by_count": 75
+      },
+      {
+        "propiid": 15,
+        "propname": "DEPTH TO BEDROCK",
+        "used_by_count": 59
+      }
+    ]
   },
   "optimization": {
     "n_static_raster_candidates": 722,

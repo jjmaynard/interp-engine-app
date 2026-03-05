@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const dataDir = path.join(__dirname, '../data');
+const dataDir = path.join(__dirname, '../src/data');
 
 /**
  * Parse XML evaluation data and extract DomainPoints, RangePoints, and CrispExpression
@@ -44,13 +44,12 @@ function parseEvaluationXML(
       const rangeValues = Array.from(rangeContent.matchAll(/<double>(.*?)<\/double>/g))
         .map(m => parseFloat(m[1]));
 
-      // Special handling for Sigmoid curves with empty RangePoints
-      // Sigmoid curves implicitly go from 0 to 1
-      if (domainValues.length > 0 && rangeValues.length === 0 && 
-          evaluationType?.toLowerCase() === 'sigmoid') {
+      // Handle empty RangePoints - generate evenly distributed values from 0 to 1
+      // This applies to Linear, Sigmoid, and other curve types when only DomainPoints exist
+      if (domainValues.length > 0 && rangeValues.length === 0) {
         const points = domainValues.map((x, i) => ({
           x: x,
-          y: i / (domainValues.length - 1) // Distribute evenly from 0 to 1
+          y: domainValues.length > 1 ? i / (domainValues.length - 1) : 0.5 // Distribute evenly from 0 to 1
         }));
         return { points, crispExpression };
       }

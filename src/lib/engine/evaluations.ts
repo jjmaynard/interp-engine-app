@@ -7,7 +7,7 @@
  * Each evaluation type converts a property value to a fuzzy membership value [0, 1]
  */
 
-import type { Evaluation, EvaluationPoint } from '@/types/interpretation';
+import type { Evaluation, EvaluationPoint, PropertyValue } from '@/types/interpretation';
 
 /**
  * Linear interpolation between evaluation points
@@ -325,11 +325,35 @@ export function crispEvaluation(
  * @returns Fuzzy membership value [0, 1]
  */
 export function evaluateProperty(
-  x: number | string | null | undefined,
+  x: number | string | null | undefined | PropertyValue,
   evaluation: Evaluation
 ): number {
+  // Handle PropertyValue objects - extract the actual value
+  let actualValue: number | string | null | undefined;
+  if (x && typeof x === 'object' && 'value' in x) {
+    actualValue = x.value;
+    // If status is not_applicable, return 1.0 (neutral)
+    if (x.status === 'not_applicable') {
+      return 1.0;
+    }
+    // If status is missing, return NaN
+    if (x.status === 'missing') {
+      return NaN;
+    }
+  } else {
+    actualValue = x as number | string | null | undefined;
+  }
+  
+  // Handle special marker strings from form dropdowns
+  if (actualValue === '__NOT_APPLICABLE__') {
+    return 1.0; // Neutral - don't penalize
+  }
+  if (actualValue === '__MISSING__') {
+    return NaN; // Exclude from calculation
+  }
+
   // Handle null/undefined values
-  if (x === null || x === undefined) {
+  if (actualValue === null || actualValue === undefined) {
     console.warn('[evaluateProperty] Property value is null/undefined for:', evaluation.evalname);
     return NaN;
   }
@@ -339,7 +363,7 @@ export function evaluateProperty(
 
   console.log('[evaluateProperty] Evaluating:', {
     evalname: evaluation.evalname,
-    propertyValue: x,
+    propertyValue: actualValue,
     interpolation,
     pointsCount: points?.length || 0,
     invert,
@@ -347,22 +371,22 @@ export function evaluateProperty(
   });
 
   // Handle numeric evaluations
-  if (typeof x === 'number' && points && points.length > 0) {
+  if (typeof actualValue === 'number' && points && points.length > 0) {
     let result: number;
     switch (interpolation?.toLowerCase()) {
       case 'linear':
       case 'arbitrarylinear':
-        result = linearInterpolation(x, points, invert);
+        result = linearInterpolation(actualValue, points, invert);
         break;
       
       case 'step':
       case 'crisp':
-        result = stepFunction(x, points, invert);
+        result = stepFunction(actualValue, points, invert);
         break;
       
       case 'spline':
       case 'arbitrarycurve':
-        result = splineInterpolation(x, points, invert);
+        result = splineInterpolation(actualValue, points, invert);
         break;
       
       case 'sigmoid':
@@ -371,15 +395,15 @@ export function evaluateProperty(
           const sortedPoints = [...points].sort((a, b) => a.x - b.x);
           const min = sortedPoints[0].x;
           const max = sortedPoints[sortedPoints.length - 1].x;
-          result = sigmoidEvaluation(x, min, max, invert);
+          result = sigmoidEvaluation(actualValue, min, max, invert);
         } else {
-          result = linearInterpolation(x, points, invert);
+          result = linearInterpolation(actualValue, points, invert);
         }
         break;
       
       default:
         // Default to linear interpolation
-        result = linearInterpolation(x, points, invert);
+        result = linearInterpolation(actualValue, points, invert);
         break;
     }
     
@@ -392,14 +416,14 @@ export function evaluateProperty(
     const expr = evaluation.crispExpression.trim();
     
     // Handle string categorical crisp expressions
-    if (typeof x === 'string') {
+    if (typeof actualValue === 'string') {
       // Handle simple equality: ="value"
       const simpleMatch = expr.match(/^=\s*"([^"]+)"$/);
       if (simpleMatch) {
-        const result = x === simpleMatch[1] ? 1 : 0;
+        const result = actualValue === simpleMatch[1] ? 1 : 0;
         console.log('[evaluateProperty] Crisp result:', {
           expression: expr,
-          inputValue: x,
+          inputValue: actualValue,
           targetValue: simpleMatch[1],
           result
         });
@@ -411,10 +435,10 @@ export function evaluateProperty(
       if (orPattern.test(expr)) {
         // Extract all quoted values
         const values = Array.from(expr.matchAll(/"([^"]+)"/g)).map(m => m[1]);
-        const result = values.includes(x) ? 1 : 0;
+        const result = values.includes(actualValue) ? 1 : 0;
         console.log('[evaluateProperty] Crisp OR result:', {
           expression: expr,
-          inputValue: x,
+          inputValue: actualValue,
           possibleValues: values,
           matches: result === 1
         });
@@ -426,10 +450,10 @@ export function evaluateProperty(
       if (matchesPattern.test(expr)) {
         // Extract all quoted values
         const values = Array.from(expr.matchAll(/"([^"]+)"/g)).map(m => m[1]);
-        const result = values.includes(x) ? 1 : 0;
+        const result = values.includes(actualValue) ? 1 : 0;
         console.log('[evaluateProperty] Matches pattern result:', {
           expression: expr,
-          inputValue: x,
+          inputValue: actualValue,
           possibleValues: values,
           matches: result === 1
         });
@@ -458,19 +482,19 @@ export function evaluateProperty(
         
         switch (operator) {
           case '<':
-            result = x < value ? 1 : 0;
+            result = actualValue < value ? 1 : 0;
             break;
           case '<=':
-            result = x <= value ? 1 : 0;
+            result = actualValue <= value ? 1 : 0;
             break;
           case '>':
-            result = x > value ? 1 : 0;
+            result = actualValue > value ? 1 : 0;
             break;
           case '>=':
-            result = x >= value ? 1 : 0;
+            result = actualValue >= value ? 1 : 0;
             break;
           case '=':
-            result = x === value ? 1 : 0;
+            result = actualValue === value ? 1 : 0;
             break;
           default:
             console.warn('[evaluateProperty] Unknown operator:', operator);
@@ -479,7 +503,7 @@ export function evaluateProperty(
         
         console.log('[evaluateProperty] Numeric crisp result:', {
           expression: cleanExpr,
-          inputValue: x,
+          inputValue: actualValue,
           operator,
           compareValue: value,
           result
@@ -499,25 +523,25 @@ export function evaluateProperty(
         let cond2 = false;
         
         switch (op1) {
-          case '<': cond1 = x < val1; break;
-          case '<=': cond1 = x <= val1; break;
-          case '>': cond1 = x > val1; break;
-          case '>=': cond1 = x >= val1; break;
-          case '=': cond1 = x === val1; break;
+          case '<': cond1 = actualValue < val1; break;
+          case '<=': cond1 = actualValue <= val1; break;
+          case '>': cond1 = actualValue > val1; break;
+          case '>=': cond1 = actualValue >= val1; break;
+          case '=': cond1 = actualValue === val1; break;
         }
         
         switch (op2) {
-          case '<': cond2 = x < val2; break;
-          case '<=': cond2 = x <= val2; break;
-          case '>': cond2 = x > val2; break;
-          case '>=': cond2 = x >= val2; break;
-          case '=': cond2 = x === val2; break;
+          case '<': cond2 = actualValue < val2; break;
+          case '<=': cond2 = actualValue <= val2; break;
+          case '>': cond2 = actualValue > val2; break;
+          case '>=': cond2 = actualValue >= val2; break;
+          case '=': cond2 = actualValue === val2; break;
         }
         
         const result = (cond1 && cond2) ? 1 : 0;
         console.log('[evaluateProperty] Numeric range crisp result:', {
           expression: cleanExpr,
-          inputValue: x,
+          inputValue: actualValue,
           result
         });
         return result;
@@ -528,12 +552,12 @@ export function evaluateProperty(
     }
   }
   
-  if (typeof x === 'string' && evaluation.evalname) {
+  if (typeof actualValue === 'string' && evaluation.evalname) {
     console.warn('[evaluateProperty] Categorical evaluation without crispExpression:', evaluation.evalname);
     // For now, return 0 for categorical - will need category mapping
     return 0;
   }
 
-  console.warn('[evaluateProperty] No points or invalid input type for:', evaluation.evalname, 'x:', x, 'type:', typeof x);
+  console.warn('[evaluateProperty] No points or invalid input type for:', evaluation.evalname, 'actualValue:', actualValue, 'type:', typeof actualValue);
   return 0;
 }

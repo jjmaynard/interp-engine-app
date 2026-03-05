@@ -11,6 +11,7 @@ import type {
   InterpretationResult,
   Evaluation,
   Property,
+  PropertyValue,
 } from '@/types/interpretation';
 import { evaluateProperty } from './evaluations';
 import { applyOperator } from './operators';
@@ -18,9 +19,9 @@ import { applyHedge } from './hedges';
 
 /**
  * Property data input for evaluation
- * Keys are property names, values are the property values
+ * Keys are property names, values can be simple values or PropertyValue objects with status
  */
-export type PropertyData = Record<string, number | string | null | undefined>;
+export type PropertyData = Record<string, number | string | null | undefined | PropertyValue>;
 
 /**
  * Evaluation context for tracking state during recursive evaluation

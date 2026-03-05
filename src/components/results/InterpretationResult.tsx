@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import type { InterpretationResult } from '@/types/interpretation';
+import type { InterpretationResult, PropertyValue } from '@/types/interpretation';
 
 interface InterpretationResultDisplayProps {
   result: InterpretationResult;
@@ -187,20 +187,69 @@ export function InterpretationResultDisplay({
                 </tr>
               </thead>
               <tbody style={{ backgroundColor: '#FFFFFF' }}>
-                {Object.entries(result.propertyValues).map(([key, value]) => (
-                  <tr key={key} className="transition-colors" style={{ borderBottom: '1px solid var(--color-slate-200)' }}>
-                    <td className="px-4 py-3 text-sm font-medium" style={{ color: 'var(--color-charcoal-800)' }}>
-                      {key}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-right font-mono">
-                      {value !== null ? (
-                        <span style={{ color: 'var(--color-charcoal-900)' }}>{value}</span>
-                      ) : (
-                        <span style={{ color: 'var(--color-slate-400)' }}>N/A</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {Object.entries(result.propertyValues).map(([key, value]) => {
+                  // Check if value is PropertyValue object
+                  const isPropertyValue = value && typeof value === 'object' && 'status' in value;
+                  
+                  // Handle special marker strings from form dropdowns
+                  let displayValue: any;
+                  let status: string | null = null;
+                  
+                  if (isPropertyValue) {
+                    displayValue = (value as PropertyValue).value;
+                    status = (value as PropertyValue).status;
+                  } else if (value === '__NOT_APPLICABLE__') {
+                    displayValue = null;
+                    status = 'not_applicable';
+                  } else if (value === '__MISSING__') {
+                    displayValue = null;
+                    status = 'missing';
+                  } else {
+                    displayValue = value;
+                  }
+                  
+                  return (
+                    <tr key={key} className="transition-colors" style={{ borderBottom: '1px solid var(--color-slate-200)' }}>
+                      <td className="px-4 py-3 text-sm font-medium" style={{ color: 'var(--color-charcoal-800)' }}>
+                        {key}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-right font-mono">
+                        {displayValue !== null && displayValue !== '' ? (
+                          <span className="flex items-center justify-end gap-2">
+                            <span style={{ color: 'var(--color-charcoal-900)' }}>{displayValue}</span>
+                            {status && (
+                              <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
+                                status === 'present' 
+                                  ? 'bg-green-100 text-green-700'
+                                  : status === 'not_applicable'
+                                  ? 'bg-slate-100 text-slate-600'
+                                  : 'bg-amber-100 text-amber-700'
+                              }`}>
+                                {status === 'present' && '✓'}
+                                {status === 'not_applicable' && '⊘'}
+                                {status === 'missing' && '?'}
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-end gap-2">
+                            <span style={{ color: 'var(--color-slate-400)' }}>N/A</span>
+                            {status && (
+                              <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
+                                status === 'not_applicable'
+                                  ? 'bg-slate-100 text-slate-600'
+                                  : 'bg-amber-100 text-amber-700'
+                              }`}>
+                                {status === 'not_applicable' && '⊘'}
+                                {status === 'missing' && '?'}
+                              </span>
+                            )}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

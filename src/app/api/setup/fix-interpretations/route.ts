@@ -9,7 +9,7 @@ import { interpretations } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 // Import source data
-import sourceData from '@/data/primary_interpretation_trees.json';
+import sourceData from '@/data/interpretation_trees.json';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

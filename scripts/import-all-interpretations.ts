@@ -54,10 +54,10 @@ async function importAllInterpretations() {
 
   // Load the exported interpretation trees
   const interpData: InterpretationTree[] = JSON.parse(
-    readFileSync('../data/primary_interpretation_trees.json', 'utf-8')
+    readFileSync('../data/interpretation_trees.json', 'utf-8')
   );
 
-  console.log(`📦 Loaded ${interpData.length} PRIMARY interpretations from NASIS export\n`);
+  console.log(`📦 Loaded ${interpData.length} interpretations from NASIS export\n`);
 
   // Create all necessary categories first
   console.log('📁 Creating interpretation categories...\n');
