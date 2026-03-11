@@ -7,40 +7,24 @@ import 'server-only';
  */
 
 import { Evaluation, Property, InterpretationTree } from '@/types/interpretation';
-import fs from 'fs';
-import path from 'path';
-
-// Cache loaded data in memory
-let evaluationsCache: Evaluation[] | null = null;
-let propertiesCache: Property[] | null = null;
-let interpretationsCache: InterpretationTree[] | null = null;
+import {
+  loadEvaluationsServer,
+  loadInterpretationTreesServer,
+  loadPropertiesServer,
+} from '@/lib/data/server-loader';
 
 /**
  * Load all evaluations from static data
  */
 export function loadEvaluations(): Evaluation[] {
-  if (evaluationsCache) {
-    return evaluationsCache;
-  }
-  
-  const filePath = path.join(process.cwd(), 'src', 'data', 'evaluations.json');
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  evaluationsCache = data as Evaluation[];
-  return evaluationsCache;
+  return loadEvaluationsServer();
 }
 
 /**
  * Load all properties from static data
  */
 export function loadProperties(): Property[] {
-  if (propertiesCache) {
-    return propertiesCache;
-  }
-  
-  const filePath = path.join(process.cwd(), 'src', 'data', 'properties_enhanced.json');
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  propertiesCache = data as Property[];
-  return propertiesCache;
+  return loadPropertiesServer();
 }
 
 /**
@@ -48,12 +32,7 @@ export function loadProperties(): Property[] {
  * Enriches properties array with propname and evaluation fields
  */
 export function loadInterpretationTrees(): InterpretationTree[] {
-  if (interpretationsCache) {
-    return interpretationsCache;
-  }
-  
-  const filePath = path.join(process.cwd(), 'src', 'data', 'interpretation_trees.json');
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  const data = loadInterpretationTreesServer();
   
   // Load properties and evaluations for enrichment
   const allProperties = loadProperties();
@@ -88,6 +67,5 @@ export function loadInterpretationTrees(): InterpretationTree[] {
     return interp;
   });
   
-  interpretationsCache = enriched as InterpretationTree[];
-  return interpretationsCache;
+  return enriched as InterpretationTree[];
 }

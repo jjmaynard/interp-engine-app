@@ -3,38 +3,39 @@
  * Loads interpretation trees, evaluations, and properties from JSON files
  */
 
+import 'server-only';
+
 import {
   InterpretationTree,
   Evaluation,
   Property,
   InterpretationSummary
 } from '@/types/interpretation';
-
-// Import JSON data files
-// Using interpretation_trees.json with complete NASIS database (2,111+ interpretations)
-import interpretationTreesData from '@/data/interpretation_trees.json';
-import evaluationsData from '@/data/evaluations.json';
-import propertiesData from '@/data/properties_enhanced.json';
+import {
+  loadEvaluationsServer,
+  loadInterpretationTreesServer,
+  loadPropertiesServer,
+} from '@/lib/data/server-loader';
 
 /**
  * Load all interpretation trees
  */
 export function loadInterpretationTrees(): InterpretationTree[] {
-  return interpretationTreesData as unknown as InterpretationTree[];
+  return loadInterpretationTreesServer();
 }
 
 /**
  * Load all evaluations
  */
 export function loadEvaluations(): Evaluation[] {
-  return evaluationsData as Evaluation[];
+  return loadEvaluationsServer();
 }
 
 /**
  * Load all properties
  */
 export function loadProperties(): Property[] {
-  return propertiesData as unknown as Property[];
+  return loadPropertiesServer();
 }
 
 /**

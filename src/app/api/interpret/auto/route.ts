@@ -12,6 +12,7 @@ import { PropertyServiceError } from '@/lib/errors/PropertyServiceError';
 import { getInterpretationByName } from '@/lib/data/loader';
 import { InterpretationEngine } from '@/lib/engine/InterpretationEngine';
 import { loadEvaluations } from '@/lib/data/loader';
+import { loadPropertiesForInterpretation } from '@/lib/data/property-loader';
 
 /**
  * Request validation schema
@@ -77,15 +78,15 @@ export async function POST(request: NextRequest) {
     // that don't appear in the interpretation's static `properties` list.
     const engine = new InterpretationEngine({ evaluations: loadEvaluations() });
     await engine.initialize();
-    const engineProperties = await engine.getRequiredProperties(validated.interpretationName);
+    const scopedProperties = loadPropertiesForInterpretation(validated.interpretationName);
 
     // Combine: static list (from interpretation_trees.json) + engine-discovered (deeper traversal)
     const staticIds = new Set((interpretation.properties || []).map(p => Number(p.propiid)).filter(n => !isNaN(n)));
-    engineProperties.forEach(p => { if (p.propiid) staticIds.add(Number(p.propiid)); });
+    scopedProperties.forEach(p => { if (p.propiid) staticIds.add(Number(p.propiid)); });
     const propertyIds = Array.from(staticIds);
 
     console.log('[Auto Interpret] Property IDs:', propertyIds.length, 'properties',
-      '(static:', (interpretation.properties?.length || 0), '+ engine-discovered:', engineProperties.length, ')');
+      '(static:', (interpretation.properties?.length || 0), '+ scoped-discovered:', scopedProperties.length, ')');
     
     if (propertyIds.length === 0) {
       return NextResponse.json(
@@ -150,9 +151,9 @@ export async function POST(request: NextRequest) {
         propertyIdToName.set(pid, (ev as any).propname);
       }
     }
-    // Layer 2: engine-discovered properties (covers propiids that have no evaluation entry,
+    // Layer 2: scoped properties (covers propiids that have no evaluation entry,
     // e.g., when properties_enhanced.json has a newer propiid for a duplicate propname)
-    for (const prop of engineProperties) {
+    for (const prop of scopedProperties) {
       const pid = Number(prop.propiid);
       if (!Number.isNaN(pid) && prop.propname && !propertyIdToName.has(pid)) {
         propertyIdToName.set(pid, prop.propname);
@@ -177,12 +178,20 @@ export async function POST(request: NextRequest) {
           confidence: 'high',
           source: 'ssurgo'
         };
-      } else if (propValue && typeof propValue === 'object' && 'value' in propValue) {
+      } else if (
+        propValue &&
+        typeof propValue === 'object' &&
+        !Array.isArray(propValue) &&
+        'value' in propValue
+      ) {
         // Wrapped format without status - add default status
+        const wrapped = propValue as Record<string, any>;
         normalizedValue = {
-          ...propValue,
-          status: (propValue as any).status || 'present',
-          source: (propValue as any).source || 'ssurgo'
+          value: wrapped.value,
+          status: wrapped.status || 'present',
+          confidence: wrapped.confidence,
+          source: wrapped.source || 'ssurgo',
+          metadata: wrapped.metadata,
         };
       } else {
         // Null or undefined
