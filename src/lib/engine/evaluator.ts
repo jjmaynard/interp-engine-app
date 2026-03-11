@@ -422,7 +422,7 @@ export function evaluateInterpretation(
   const allPropertyValues: Record<string, number | string | null> = {};
   for (const [key, value] of Object.entries(mergedValues)) {
     if (value !== undefined) {
-      allPropertyValues[key] = value;
+      allPropertyValues[key] = toPrimitivePropertyValue(value);
     }
   }
 
