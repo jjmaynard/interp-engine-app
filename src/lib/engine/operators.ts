@@ -224,7 +224,7 @@ export function applyOperator(
     case 'NOT_NULL_AND':
     case 'NOTNULLAND':
       // AND operator that treats non-null values as 1.0 if null
-      const nonNullValues = values.map(v => isNaN(v) || v === null ? 1.0 : v);
+      const nonNullValues = processedValues.map(v => isNaN(v) ? 1.0 : v);
       return fuzzyAnd(nonNullValues);
     
     case 'ALPHA':
