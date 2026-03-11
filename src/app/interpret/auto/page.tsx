@@ -6,10 +6,17 @@ import { MapPin, Calendar, Loader2, CheckCircle2, XCircle, AlertCircle, Search }
 import { getMapUnitsFromGeometry } from '@/lib/spatial/mukey-query'
 import { PropertyInputForm } from '@/components/forms/PropertyInputForm'
 import { InterpretationResultDisplay } from '@/components/results/InterpretationResult'
-import type { Property, InterpretationResult as InterpResult } from '@/types/interpretation'
+import type { Property, PropertyValue, InterpretationResult as InterpResult } from '@/types/interpretation'
 
 const makePropertyDisplayKey = (property: Property): string =>
   `${property.propname} [ID:${property.propiid}]`
+
+const toPrimitiveValue = (value: number | string | null | PropertyValue): number | string | null => {
+  if (value && typeof value === 'object' && 'value' in value) {
+    return value.value
+  }
+  return value
+}
 
 interface FieldData {
   name: string
@@ -223,7 +230,7 @@ export default function AutoInterpretPage() {
     }
   }
 
-  const handleRecalculate = async (values: Record<string, number | string | null>) => {
+  const handleRecalculate = async (values: Record<string, number | string | null | PropertyValue>) => {
     if (!selectedInterpretation) return
 
     setIsRecalculating(true)
@@ -235,7 +242,7 @@ export default function AutoInterpretPage() {
       enhancedProperties.forEach((prop) => {
         const displayKey = prop.propname
         const canonicalName = displayKey.replace(/\s*\[ID:\d+\]$/, '')
-        const value = values[displayKey]
+        const value = toPrimitiveValue(values[displayKey])
         if (value !== undefined) {
           normalizedValues[canonicalName] = value
           normalizedValues[String(prop.propiid)] = value
@@ -258,7 +265,7 @@ export default function AutoInterpretPage() {
 
       // Check if modified from SSURGO
       const hasChanges = Object.keys(ssurgoValues).some(
-        key => ssurgoValues[key] !== values[key]
+        key => ssurgoValues[key] !== toPrimitiveValue(values[key])
       )
       setIsModified(hasChanges)
 
@@ -276,6 +283,14 @@ export default function AutoInterpretPage() {
     setPropertyValues({...ssurgoValues})
     setIsModified(false)
     console.log('[Auto Interpret] Reset to SSURGO values')
+  }
+
+  const handlePropertyValuesChange = (values: Record<string, number | string | null | PropertyValue>) => {
+    const normalizedValues: Record<string, number | string | null> = {}
+    Object.entries(values).forEach(([key, value]) => {
+      normalizedValues[key] = toPrimitiveValue(value)
+    })
+    setPropertyValues(normalizedValues)
   }
 
   const filteredInterpretations = AVAILABLE_INTERPRETATIONS.filter(interp =>
@@ -500,7 +515,7 @@ export default function AutoInterpretPage() {
                       onSubmit={handleRecalculate}
                       loading={isRecalculating}
                       values={propertyValues}
-                      onValuesChange={setPropertyValues}
+                      onValuesChange={handlePropertyValuesChange}
                       allowNullValues={true}
                     />
                   </div>
