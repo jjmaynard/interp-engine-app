@@ -126,6 +126,15 @@ export default function InterpretPage() {
     }
   };
 
+  const handleValuesChange = (values: Record<string, number | string | null | PropertyValue>) => {
+    const normalizedValues: Record<string, number | string | null> = {};
+    Object.entries(values).forEach(([key, value]) => {
+      normalizedValues[key] = toPrimitiveValue(value);
+    });
+
+    setPropertyValues(normalizedValues);
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F8F4ED' }}>
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -249,7 +258,7 @@ export default function InterpretPage() {
                         onSubmit={handleEvaluate}
                         loading={loading}
                         values={propertyValues}
-                        onValuesChange={setPropertyValues}
+                        onValuesChange={handleValuesChange}
                       />
                     ) : (
                       <div className="p-8 text-center" style={{ color: 'var(--color-slate-500)' }}>
