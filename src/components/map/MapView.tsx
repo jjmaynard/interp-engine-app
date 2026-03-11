@@ -88,7 +88,7 @@ export function MapView({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         
-        <LocationMarker onLocationClick={onLocationClick} />
+        <LocationMarker />
         
         {markers.map((marker, idx) => (
           <Marker 
