@@ -42,6 +42,16 @@ interface NodeEvaluationResult {
   evaluationResults?: Record<string, number>;
 }
 
+function toPrimitivePropertyValue(
+  value: number | string | null | undefined | PropertyValue
+): number | string | null {
+  if (value && typeof value === 'object' && 'value' in value) {
+    return value.value;
+  }
+
+  return value ?? null;
+}
+
 /**
  * Evaluate a rule tree node recursively
  * 
@@ -121,7 +131,7 @@ export function evaluateNode(
 
     return {
       rating,
-      propertyValues: { [propertyName]: propertyValue ?? null },
+      propertyValues: { [propertyName]: toPrimitivePropertyValue(propertyValue) },
       evaluationResults,
     };
   }
