@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDefaultEngine } from '@/lib/engine';
 import { getResultCache } from '@/lib/cache/results';
 import { checkRateLimit, rateLimitResponse } from '@/lib/middleware/api';
+import { loadPropertiesForInterpretation } from '@/lib/data/property-loader';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,8 +38,8 @@ export async function GET(
     // Get engine instance
     const engine = await getDefaultEngine();
 
-    // Get required properties
-    const properties = await engine.getRequiredProperties(interpretationName);
+    // Load only properties required by this interpretation.
+    const properties = loadPropertiesForInterpretation(interpretationName);
     
     // Get rule tree
     const tree = await engine.getRuleTree(interpretationName);

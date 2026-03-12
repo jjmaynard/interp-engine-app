@@ -11,6 +11,7 @@ import type {
   InterpretationResult,
   Evaluation,
   Property,
+  PropertyValue,
 } from '@/types/interpretation';
 import { evaluateProperty } from './evaluations';
 import { applyOperator } from './operators';
@@ -18,9 +19,9 @@ import { applyHedge } from './hedges';
 
 /**
  * Property data input for evaluation
- * Keys are property names, values are the property values
+ * Keys are property names, values can be simple values or PropertyValue objects with status
  */
-export type PropertyData = Record<string, number | string | null | undefined>;
+export type PropertyData = Record<string, number | string | null | undefined | PropertyValue>;
 
 /**
  * Evaluation context for tracking state during recursive evaluation
@@ -39,6 +40,16 @@ interface NodeEvaluationResult {
   rating: number;
   propertyValues?: Record<string, number | string | null>;
   evaluationResults?: Record<string, number>;
+}
+
+function toPrimitivePropertyValue(
+  value: number | string | null | undefined | PropertyValue
+): number | string | null {
+  if (value && typeof value === 'object' && 'value' in value) {
+    return value.value;
+  }
+
+  return value ?? null;
 }
 
 /**
@@ -120,7 +131,7 @@ export function evaluateNode(
 
     return {
       rating,
-      propertyValues: { [propertyName]: propertyValue ?? null },
+      propertyValues: { [propertyName]: toPrimitivePropertyValue(propertyValue) },
       evaluationResults,
     };
   }
@@ -411,7 +422,7 @@ export function evaluateInterpretation(
   const allPropertyValues: Record<string, number | string | null> = {};
   for (const [key, value] of Object.entries(mergedValues)) {
     if (value !== undefined) {
-      allPropertyValues[key] = value;
+      allPropertyValues[key] = toPrimitivePropertyValue(value);
     }
   }
 

@@ -23,7 +23,7 @@ import {
 } from '@/lib/db/schema';
 
 // Import data from JSON files
-import interpretationTreesData from '@/data/primary_interpretation_trees.json';
+import interpretationTreesData from '@/data/interpretation_trees.json';
 import evaluationsData from '@/data/evaluations.json';
 import propertiesData from '@/data/properties.json';
 

@@ -28,15 +28,9 @@ export interface PropertyCalculationRequest {
 
 /**
  * Individual property value result
+ * Python service returns simple values, not objects
  */
-export interface PropertyValue {
-  value: number | string | null;
-  low?: number | null;
-  high?: number | null;
-  unit?: string | null;
-  method?: string;
-  source?: string;
-}
+export type PropertyValue = number | null;
 
 /**
  * Property calculation response

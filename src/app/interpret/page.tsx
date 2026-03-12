@@ -8,8 +8,16 @@ import { PropertyFormSkeleton } from '@/components/layout/LoadingSkeleton';
 import { PropertyInputForm } from '@/components/forms/PropertyInputForm';
 import { InterpretationResultDisplay } from '@/components/results/InterpretationResult';
 import { RuleTreeVisualization } from '@/components/visualization/RuleTreeVisualization';
+import type { PropertyValue } from '@/types/interpretation';
 
 type TabType = 'properties' | 'tree';
+
+const toPrimitiveValue = (value: number | string | null | PropertyValue): number | string | null => {
+  if (value && typeof value === 'object' && 'value' in value) {
+    return value.value;
+  }
+  return value;
+};
 
 export default function InterpretPage() {
   const [selectedInterp, setSelectedInterp] = useState<string>('');
@@ -66,13 +74,18 @@ export default function InterpretPage() {
   }, [selectedInterp]);
 
   // Handle evaluation
-  const handleEvaluate = async (propertyValues: Record<string, number | string | null>) => {
+  const handleEvaluate = async (propertyValues: Record<string, number | string | null | PropertyValue>) => {
     if (!selectedInterp) return;
+
+    const normalizedPropertyValues: Record<string, number | string | null> = {};
+    Object.entries(propertyValues).forEach(([key, value]) => {
+      normalizedPropertyValues[key] = toPrimitiveValue(value);
+    });
     
     console.log('[Client] Starting evaluation for:', selectedInterp);
-    console.log('[Client] Property values being sent:', propertyValues);
-    console.log('[Client] Number of properties:', Object.keys(propertyValues).length);
-    console.log('[Client] First 3 property names:', Object.keys(propertyValues).slice(0, 3));
+    console.log('[Client] Property values being sent:', normalizedPropertyValues);
+    console.log('[Client] Number of properties:', Object.keys(normalizedPropertyValues).length);
+    console.log('[Client] First 3 property names:', Object.keys(normalizedPropertyValues).slice(0, 3));
     
     setLoading(true);
     setError(null);
@@ -83,7 +96,7 @@ export default function InterpretPage() {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ properties: propertyValues }),
+          body: JSON.stringify({ properties: normalizedPropertyValues }),
         }
       );
       
@@ -111,6 +124,15 @@ export default function InterpretPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleValuesChange = (values: Record<string, number | string | null | PropertyValue>) => {
+    const normalizedValues: Record<string, number | string | null> = {};
+    Object.entries(values).forEach(([key, value]) => {
+      normalizedValues[key] = toPrimitiveValue(value);
+    });
+
+    setPropertyValues(normalizedValues);
   };
 
   return (
@@ -236,7 +258,7 @@ export default function InterpretPage() {
                         onSubmit={handleEvaluate}
                         loading={loading}
                         values={propertyValues}
-                        onValuesChange={setPropertyValues}
+                        onValuesChange={handleValuesChange}
                       />
                     ) : (
                       <div className="p-8 text-center" style={{ color: 'var(--color-slate-500)' }}>

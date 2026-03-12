@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:webpack": "next dev --webpack",
+    "dev:turbo": "next dev --turbopack",
+    "clean:next": "rm -rf .next",
     "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
     "start": "next start",
     "lint": "next lint",

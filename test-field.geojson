@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Test Field - Central Iowa"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-93.6200, 42.0300],
+            [-93.6150, 42.0300],
+            [-93.6150, 42.0270],
+            [-93.6200, 42.0270],
+            [-93.6200, 42.0300]
+          ]
+        ]
+      }
+    }
+  ]
+}

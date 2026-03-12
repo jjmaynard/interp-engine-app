@@ -26,7 +26,7 @@ async function fixInterpretations() {
   
   // Load the source data
   const sourceData: InterpretationTree[] = JSON.parse(
-    readFileSync('./src/data/primary_interpretation_trees.json', 'utf-8')
+    readFileSync('./src/data/interpretation_trees.json', 'utf-8')
   );
   
   console.log(`📦 Loaded ${sourceData.length} interpretations from source file\n`);
