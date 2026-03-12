@@ -280,7 +280,11 @@ export class PropertyServiceClient {
  * Configured from environment variables
  */
 export const propertyService = new PropertyServiceClient({
-  baseUrl: process.env.PYTHON_SERVICE_URL || 'http://localhost:8000',
+  baseUrl:
+    process.env.PYTHON_SERVICE_URL ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://soil-interp-service-production.up.railway.app:8000'
+      : 'http://localhost:8000'),
   timeout: parseInt(process.env.PYTHON_SERVICE_TIMEOUT || '30000'),
   apiKey: process.env.PYTHON_SERVICE_API_KEY,
   retries: 2,
