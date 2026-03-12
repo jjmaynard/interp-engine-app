@@ -131,9 +131,10 @@ class CSBAPIClient {
   private readonly CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
   constructor(baseURL?: string) {
-    // Use same-origin Next.js proxy routes by default to avoid browser CORS issues.
-    // Can be overridden with an explicit baseURL when needed.
-    const apiURL = baseURL || process.env.NEXT_PUBLIC_CSB_API_BASE_URL || ''
+    // In the browser, always use same-origin Next.js proxy routes to avoid CORS.
+    // Server-side callers may still provide/consume an absolute base URL.
+    const apiURL =
+      baseURL ?? (typeof window === 'undefined' ? process.env.NEXT_PUBLIC_CSB_API_BASE_URL || '' : '')
     
     this.client = axios.create({
       baseURL: apiURL,
