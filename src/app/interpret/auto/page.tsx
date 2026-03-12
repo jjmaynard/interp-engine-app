@@ -146,7 +146,11 @@ export default function AutoInterpretPage() {
 
       if (!autoResponse.ok) {
         const errorData = await autoResponse.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to fetch SSURGO data')
+        const detailedMessage = [errorData.error, errorData.message, errorData.hint]
+          .filter((part): part is string => typeof part === 'string' && part.trim().length > 0)
+          .join(' | ')
+
+        throw new Error(detailedMessage || `Failed to fetch SSURGO data (HTTP ${autoResponse.status})`)
       }
 
       const autoData = await autoResponse.json()

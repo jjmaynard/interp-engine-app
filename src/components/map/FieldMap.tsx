@@ -509,17 +509,33 @@ const FieldMap = forwardRef<FieldMapRef, FieldMapProps>(({
     const L = (window as any).L
     const map = mapRef.current
     let updateTimeout: NodeJS.Timeout
+    let isEffectActive = true
+    let lastInteractiveRequestId = 0
+
+    const isMapReadyForLayerOps = () => {
+      if (!mapRef.current || mapRef.current !== map) return false
+      if (!map._loaded) return false
+      if (!map.getContainer || !map.getContainer()) return false
+      if (!map.getPane || !map.getPane('overlayPane')) return false
+      return true
+    }
 
     const loadCSBTileLayer = async () => {
       try {
+        if (!isEffectActive || !isMapReadyForLayerOps()) return
+
         const tileResponse = await geeApi.getCSBTileURL({
           opacity: 0.7,
           min_complexity: 1,
           max_complexity: 4
         })
 
+        if (!isEffectActive || !isMapReadyForLayerOps()) return
+
         if (csbLayerRef.current) {
-          map.removeLayer(csbLayerRef.current)
+          if (map.hasLayer(csbLayerRef.current)) {
+            map.removeLayer(csbLayerRef.current)
+          }
         }
 
         const csbTileLayer = L.tileLayer(tileResponse.tile_url, {
@@ -528,6 +544,8 @@ const FieldMap = forwardRef<FieldMapRef, FieldMapProps>(({
           minZoom: 10,
           maxZoom: 20
         })
+
+        if (!isEffectActive || !isMapReadyForLayerOps()) return
 
         csbTileLayer.addTo(map)
         csbLayerRef.current = csbTileLayer
@@ -544,11 +562,16 @@ const FieldMap = forwardRef<FieldMapRef, FieldMapProps>(({
 
     const updateInteractiveLayer = async () => {
       try {
+        if (!isEffectActive || !isMapReadyForLayerOps()) return
+
+        const requestId = ++lastInteractiveRequestId
         const zoom = map.getZoom()
         
         if (zoom < 13) {
           if (csbGeoJsonLayerRef.current) {
-            map.removeLayer(csbGeoJsonLayerRef.current)
+            if (map.hasLayer(csbGeoJsonLayerRef.current)) {
+              map.removeLayer(csbGeoJsonLayerRef.current)
+            }
             csbGeoJsonLayerRef.current = null
           }
           return
@@ -571,8 +594,13 @@ const FieldMap = forwardRef<FieldMapRef, FieldMapProps>(({
           limit: limit
         })
 
+        if (!isEffectActive || !isMapReadyForLayerOps()) return
+        if (requestId !== lastInteractiveRequestId) return
+
         if (csbGeoJsonLayerRef.current) {
-          map.removeLayer(csbGeoJsonLayerRef.current)
+          if (map.hasLayer(csbGeoJsonLayerRef.current)) {
+            map.removeLayer(csbGeoJsonLayerRef.current)
+          }
         }
 
         const geoJsonLayer = L.geoJSON(response, {
@@ -623,11 +651,18 @@ const FieldMap = forwardRef<FieldMapRef, FieldMapProps>(({
               })
             }
           }
-        }).addTo(map)
+        })
+
+        if (!isEffectActive || !isMapReadyForLayerOps()) return
+        if (requestId !== lastInteractiveRequestId) return
+
+        geoJsonLayer.addTo(map)
 
         csbGeoJsonLayerRef.current = geoJsonLayer
       } catch (error) {
-        console.error('[CSB] Error loading interactive layer:', error)
+        if (isEffectActive) {
+          console.error('[CSB] Error loading interactive layer:', error)
+        }
       }
     }
 
@@ -635,6 +670,7 @@ const FieldMap = forwardRef<FieldMapRef, FieldMapProps>(({
       loadCSBTileLayer()
 
       const handleMapChange = () => {
+        if (!isEffectActive || !isMapReadyForLayerOps()) return
         clearTimeout(updateTimeout)
         updateTimeout = setTimeout(updateInteractiveLayer, 500)
       }
@@ -728,6 +764,7 @@ const FieldMap = forwardRef<FieldMapRef, FieldMapProps>(({
       }
 
       return () => {
+        isEffectActive = false
         clearTimeout(updateTimeout)
         map.off('moveend', handleMapChange)
         map.off('zoomend', handleMapChange)
@@ -735,13 +772,17 @@ const FieldMap = forwardRef<FieldMapRef, FieldMapProps>(({
           map.off('click', mapClickHandlerRef.current)
         }
         if (csbGeoJsonLayerRef.current) {
-          map.removeLayer(csbGeoJsonLayerRef.current)
+          if (map.hasLayer(csbGeoJsonLayerRef.current)) {
+            map.removeLayer(csbGeoJsonLayerRef.current)
+          }
           csbGeoJsonLayerRef.current = null
         }
       }
     } else {
       if (csbGeoJsonLayerRef.current) {
-        map.removeLayer(csbGeoJsonLayerRef.current)
+        if (map.hasLayer(csbGeoJsonLayerRef.current)) {
+          map.removeLayer(csbGeoJsonLayerRef.current)
+        }
         csbGeoJsonLayerRef.current = null
       }
     }
