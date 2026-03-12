@@ -27,12 +27,15 @@ export async function GET() {
     console.error('Failed to fetch available properties:', error);
     
     if (error instanceof PropertyServiceError) {
+      const responseStatus =
+        error.statusCode === 503 ? 503 : error.isServerError() ? 502 : error.statusCode;
+
       return NextResponse.json(
         {
           success: false,
           error: error.message,
         },
-        { status: error.isServerError() ? 502 : error.statusCode }
+        { status: responseStatus }
       );
     }
     

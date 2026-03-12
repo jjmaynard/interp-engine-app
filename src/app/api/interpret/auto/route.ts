@@ -279,14 +279,24 @@ export async function POST(request: NextRequest) {
     
     // Handle property service errors
     if (error instanceof PropertyServiceError) {
+      const isMissingServiceConfig =
+        error.context?.configuration === 'missing-python-service-url';
+      const responseStatus =
+        error.statusCode === 503 ? 503 : error.isServerError() ? 502 : 500;
+
       return NextResponse.json(
         {
           success: false,
-          error: 'Property service error',
+          error: isMissingServiceConfig
+            ? 'Python property service is not configured. Set PYTHON_SERVICE_URL in Vercel and redeploy.'
+            : 'Property service error',
           message: error.message,
           statusCode: error.statusCode,
+          hint: isMissingServiceConfig
+            ? 'Add PYTHON_SERVICE_URL to Production env vars (Project Settings -> Environment Variables), then redeploy.'
+            : undefined,
         },
-        { status: error.isServerError() ? 502 : 500 }
+        { status: responseStatus }
       );
     }
     

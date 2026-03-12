@@ -94,6 +94,20 @@ export class PropertyServiceClient {
   }
 
   /**
+   * Detect local-only base URLs that are invalid for serverless production runtimes.
+   */
+  private isLocalhostBaseUrl(): boolean {
+    if (!this.baseUrl) return true;
+
+    try {
+      const parsed = new URL(this.baseUrl);
+      return ['localhost', '127.0.0.1', '0.0.0.0'].includes(parsed.hostname);
+    } catch {
+      return this.baseUrl.includes('localhost') || this.baseUrl.includes('127.0.0.1');
+    }
+  }
+
+  /**
    * Calculate soil properties for a MUKEY
    */
   async calculateProperties(
@@ -151,6 +165,19 @@ export class PropertyServiceClient {
     options: RequestInit = {},
     attempt = 0
   ): Promise<T> {
+    if (process.env.NODE_ENV === 'production' && this.isLocalhostBaseUrl()) {
+      throw new PropertyServiceError(
+        'Python property service is not configured for production. Set PYTHON_SERVICE_URL to your deployed service URL.',
+        503,
+        {
+          endpoint,
+          baseUrl: this.baseUrl,
+          configuration: 'missing-python-service-url',
+          envVar: 'PYTHON_SERVICE_URL',
+        }
+      );
+    }
+
     const url = `${this.baseUrl}${endpoint}`;
     
     const headers: Record<string, string> = {

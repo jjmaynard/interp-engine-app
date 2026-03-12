@@ -59,13 +59,16 @@ export async function POST(request: NextRequest) {
     
     // Handle property service errors
     if (error instanceof PropertyServiceError) {
+      const responseStatus =
+        error.statusCode === 503 ? 503 : error.isServerError() ? 502 : error.statusCode;
+
       return NextResponse.json(
         {
           success: false,
           error: error.message,
           statusCode: error.statusCode,
         },
-        { status: error.isServerError() ? 502 : error.statusCode }
+        { status: responseStatus }
       );
     }
     
