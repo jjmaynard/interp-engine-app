@@ -131,10 +131,9 @@ class CSBAPIClient {
   private readonly CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
   constructor(baseURL?: string) {
-    // Use external GEE API directly
-    const apiURL = baseURL || 
-      process.env.NEXT_PUBLIC_GEE_API_URL || 
-      'https://gee-api-production.up.railway.app'
+    // Use same-origin Next.js proxy routes by default to avoid browser CORS issues.
+    // Can be overridden with an explicit baseURL when needed.
+    const apiURL = baseURL || process.env.NEXT_PUBLIC_CSB_API_BASE_URL || ''
     
     this.client = axios.create({
       baseURL: apiURL,
